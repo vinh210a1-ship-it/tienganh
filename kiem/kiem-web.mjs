@@ -7,6 +7,7 @@
 //   3. Mở từng bài: không lỗi console, không lỗi JS.
 //   4. Màn hình 390 px: không bài nào tràn ngang.
 //   5. Chế độ tối: chữ ở menu bài đang chọn, nút tab và nút chính đạt tương phản >= 4,5:1.
+//   7. Bộ từ theo buổi dạy (gói B): hai bộ 20 từ khớp hai file kiem/bo-tu-vung/*.md; hai kịch bản (học viên mới, học viên có tiến độ sẵn).
 //   6. Các cụm chữ đã sửa không quay lại ("10–15 từ mới"; "Sau khóa này" không xếp việc đã dạy là việc tiếp theo).
 //
 // Khi cố ý thêm/bớt thẻ, mẫu câu hay câu quiz: sửa BAN_DAU bên dưới (cùng PR) để mốc luôn là số thật.
@@ -81,7 +82,7 @@ try {
   const lienKetDom = [];
   for (const id of idBai) {
     await trang.evaluate(h => { location.hash = h; }, '#' + id);
-    const ds = await trang.evaluate(() => [...document.querySelectorAll('a[href^="#"]')].map(a => a.getAttribute('href').slice(1)));
+    const ds = await trang.evaluate(() => [...document.querySelectorAll('a[href^="#"]')].map(a => a.getAttribute('href').slice(1).split('?')[0]));
     lienKetDom.push(...ds);
   }
   const tatCa = [...new Set([...tinh, ...lienKetDom])].filter(x => x);
@@ -135,6 +136,120 @@ try {
   };
   await doTuongPhan('tối tự động', 'auto-toi');
   await doTuongPhan('tối ép data-theme', 'ep-toi');
+
+  /* ---------- 7. Bộ từ theo buổi dạy ---------- */
+  // 7a. Dữ liệu: đọc hai file nguồn của buổi dạy, so với BO_TU và VOCAB trong trang (không đếm tay).
+  const docBo = f => [...fs.readFileSync(path.join(here, 'bo-tu-vung', f), 'utf8').matchAll(/^\| \d+ \| \*\*([^*|]+)\*\* \|/gm)].map(x => x[1].trim());
+  const tuNguon = { '1': docBo('bo-1.md'), '2': docBo('bo-2.md') };
+  const trongTrang = await trang.evaluate(() => ({ vocab: window.__BO.vocab, bo: window.__BO.bo.map(b => ({ id: b.id, tu: b.tu })) }));
+  const tachTu = k => k.split(/[\/()]/).map(x => x.trim()).filter(Boolean);
+  for (const id of ['1', '2']) {
+    kiem(tuNguon[id].length === 20 && new Set(tuNguon[id]).size === 20, `file nguồn Bộ ${id} có đúng 20 từ khác nhau`, `đọc được ${tuNguon[id].length} từ`);
+    const bo = trongTrang.bo.find(b => b.id === id);
+    kiem(!!bo, `trang có Bộ ${id}`, 'thiếu BO_TU id ' + id);
+    if (!bo) continue;
+    const loiBo = [];
+    // mỗi từ nguồn phải nằm đúng một thẻ VOCAB, và thẻ đó phải ở bộ này
+    const theCanCo = new Set();
+    for (const w of tuNguon[id]) {
+      const the = trongTrang.vocab.filter(k => tachTu(k).includes(w));
+      if (the.length !== 1) { loiBo.push(`"${w}" khớp ${the.length} thẻ trong VOCAB`); continue; }
+      theCanCo.add(the[0]);
+      if (!bo.tu.includes(the[0])) loiBo.push(`thẻ "${the[0]}" (từ "${w}") không có trong Bộ ${id}`);
+    }
+    for (const k of bo.tu) {
+      if (!trongTrang.vocab.includes(k)) loiBo.push(`BO_TU có khóa "${k}" không phải thẻ nào trong VOCAB`);
+      else if (!theCanCo.has(k)) loiBo.push(`thẻ "${k}" nằm trong Bộ ${id} nhưng không có từ nào của file nguồn`);
+    }
+    kiem(loiBo.length === 0, `Bộ ${id}: mọi từ của file nguồn có mặt trong VOCAB và đúng bộ, không thừa thẻ`, loiBo.join(' | '));
+  }
+  const giao = (trongTrang.bo[0] ? trongTrang.bo[0].tu : []).filter(k => (trongTrang.bo[1] ? trongTrang.bo[1].tu : []).includes(k));
+  kiem(giao.length === 0, 'hai bộ không trùng thẻ nào', 'trùng: ' + giao.join(', '));
+
+  // 7b. Kịch bản: học viên MỚI (kho trống). Mặc định "Tất cả"; mở bằng link #tu-vung?bo=N thì chỉ ra thẻ của bộ N.
+  const moi = await trinhDuyet.newContext({ viewport: { width: 390, height: 800 } });
+  const pm = await moi.newPage();
+  const loiMoi = [];
+  pm.on('pageerror', e => loiMoi.push(e.message));
+  pm.on('console', m => { if (m.type() === 'error') loiMoi.push(m.text()); });
+  const docThongKe = () => pm.evaluate(() => document.querySelector('#fc-core .fc-stats').textContent);
+  await pm.goto(URL_TRANG + '#tu-vung');
+  await pm.waitForSelector('#fc-core-b');
+  kiem((await pm.inputValue('#fc-core-b')) === 'all' && /\/186/.test(await docThongKe()), 'học viên mới: mặc định là "Tất cả" (186 thẻ)', await docThongKe());
+  kiem(await pm.evaluate(() => document.querySelector('#fc-core .fc-cp').hidden), 'ở "Tất cả" không hiện nút sao chép link', 'nút hiện');
+  const baiHien = () => pm.evaluate(() => (document.querySelector('section.lesson.active') || {}).id);
+  for (const id of ['1', '2']) {
+    await pm.goto(URL_TRANG + '#tu-vung?bo=' + id);
+    await pm.reload();
+    await pm.waitForSelector('#fc-core-b');
+    kiem((await baiHien()) === 'tu-vung', `link #tu-vung?bo=${id} mở đúng Bài 4 (không rơi về trang chủ)`, 'bài đang mở: ' + (await baiHien()));
+    kiem((await pm.inputValue('#fc-core-b')) === id && /Thẻ mới: 20 · Đã thuộc: 0\/20/.test(await docThongKe()), `link bộ ${id}: ô chọn đúng bộ, 20 thẻ mới`, await docThongKe());
+    // học hết bộ: bấm "Thuộc rồi" 20 lần, mọi thẻ hiện ra phải thuộc bộ này và không lặp
+    const bo = trongTrang.bo.find(b => b.id === id);
+    const thay = [];
+    for (let i = 0; i < 20; i++) {
+      const w = await pm.evaluate(() => document.querySelector('#fc-core .fc-word').textContent);
+      thay.push(w);
+      try { await pm.click('#fc-core .btn.yes', { timeout: 3000 }); } catch { break; } // bộ có ít hơn 20 thẻ: dừng, phép kiểm bên dưới báo lỗi
+    }
+    const ngoai = thay.filter(w => !bo.tu.includes(w));
+    kiem(ngoai.length === 0 && new Set(thay).size === 20, `bộ ${id}: 20 thẻ hiện ra đều thuộc bộ và không lặp`, 'ngoài bộ/lặp: ' + ngoai.join(', ') + ' · ' + thay.join(', '));
+    const sau = await pm.evaluate(() => document.querySelector('#fc-core .fc-word').textContent);
+    kiem(/Hết thẻ đến hạn/.test(sau), `bộ ${id}: học xong 20 thẻ thì dừng, không đẩy sang 186 thẻ`, 'hiện: ' + sau);
+  }
+  // đổi bộ bằng link khi đang ở trang: ô chọn đổi theo, và quay về "Tất cả" khi bỏ ?bo=
+  await pm.evaluate(() => { location.hash = '#tu-vung?bo=1'; });
+  await pm.waitForTimeout(80);
+  kiem((await pm.inputValue('#fc-core-b')) === '1' && (await baiHien()) === 'tu-vung', 'đổi link sang ?bo=1 khi đang mở trang thì ô chọn đổi theo', 'ô = ' + (await pm.inputValue('#fc-core-b')));
+  await pm.evaluate(() => { location.hash = '#tu-vung?bo=khong-co'; });
+  await pm.waitForTimeout(80);
+  kiem((await pm.inputValue('#fc-core-b')) === 'all', 'bộ không có trong link thì quay về "Tất cả"', 'ô = ' + (await pm.inputValue('#fc-core-b')));
+  kiem(loiMoi.length === 0, 'kịch bản học viên mới: không lỗi console', loiMoi.slice(0, 3).join(' || '));
+  await moi.close();
+
+  // 7c. Kịch bản: học viên CÓ TIẾN ĐỘ SẴN (kho đã có hộp/ngày hẹn). Mở bộ rồi học: kho cũ không mất, không đổi hộp của thẻ khác.
+  const sanBoxes = { want: 4, need: 2, understand: 3, the: 5, 'a / an': 1, because: 0, 'easy / difficult': 2 };
+  const sanDue = { want: 9999, need: 0, understand: 9999, the: 9999, 'a / an': 0, because: 0, 'easy / difficult': 9999 };
+  const cu = await trinhDuyet.newContext({ viewport: { width: 1280, height: 900 } });
+  await cu.addInitScript(([b, d]) => {
+    try {
+      if (localStorage.getItem('kiem:gieo')) return;
+      const hom = Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 864e5);
+      const due = {}; for (const k of Object.keys(d)) due[k] = d[k] === 9999 ? hom + 20 : hom - 1;
+      localStorage.setItem('en8020.boxes', JSON.stringify(b));
+      localStorage.setItem('en8020.due', JSON.stringify(due));
+      localStorage.setItem('kiem:gieo', '1');
+    } catch (e) {}
+  }, [sanBoxes, sanDue]);
+  const pc = await cu.newPage();
+  const loiCu = [];
+  pc.on('pageerror', e => loiCu.push(e.message));
+  pc.on('console', m => { if (m.type() === 'error') loiCu.push(m.text()); });
+  await pc.goto(URL_TRANG + '#tu-vung?bo=1');
+  await pc.waitForSelector('#fc-core-b');
+  const tk = () => pc.evaluate(() => document.querySelector('#fc-core .fc-stats').textContent);
+  // Bộ 1 có want (hộp 4, thuộc) và need (hộp 2, đến hạn): 1 đã thuộc, 1 đến hạn, 18 mới
+  kiem(/Đến hạn hôm nay: 1 · Thẻ mới: 18 · Đã thuộc: 1\/20/.test(await tk()), 'có tiến độ sẵn: Bộ 1 đọc đúng hộp cũ (want thuộc, need đến hạn, 18 mới)', await tk());
+  // thẻ đến hạn hiện trước thẻ mới
+  kiem((await pc.evaluate(() => document.querySelector('#fc-core .fc-word').textContent)) === 'need', 'có tiến độ sẵn: thẻ đến hạn của bộ hiện trước thẻ mới', 'hiện: ' + (await pc.evaluate(() => document.querySelector('#fc-core .fc-word').textContent)));
+  await pc.selectOption('#fc-core-b', '2');
+  kiem(/Đến hạn hôm nay: 0 · Thẻ mới: 18 · Đã thuộc: 1\/20/.test(await tk()), 'có tiến độ sẵn: Bộ 2 đọc đúng hộp cũ (understand thuộc, "easy / difficult" chưa đến hạn, 18 mới)', await tk());
+  await pc.selectOption('#fc-core-b', 'all');
+  kiem(/\/186/.test(await tk()), 'chọn lại "Tất cả" thì đủ 186 thẻ', await tk());
+  // học một thẻ ở Bộ 1 rồi kiểm kho: các khóa cũ còn nguyên, chỉ thẻ vừa học đổi
+  await pc.selectOption('#fc-core-b', '1');
+  await pc.click('#fc-core .btn.yes');
+  const kho = await pc.evaluate(() => JSON.parse(localStorage.getItem('en8020.boxes')));
+  const doi = Object.keys(sanBoxes).filter(k => kho[k] !== sanBoxes[k]);
+  kiem(Object.keys(sanBoxes).every(k => k in kho) && doi.length === 1 && doi[0] === 'need' && kho.need === 3, 'có tiến độ sẵn: học một thẻ chỉ đổi hộp thẻ đó, các thẻ cũ giữ nguyên hộp', 'khác: ' + doi.join(',') + ' · need=' + kho.need);
+  // nạp lại trang không mất tiến độ
+  await pc.reload();
+  await pc.waitForSelector('#fc-core-b');
+  await pc.selectOption('#fc-core-b', 'all');
+  const kho2 = await pc.evaluate(() => JSON.parse(localStorage.getItem('en8020.boxes')));
+  kiem(Object.keys(sanBoxes).every(k => k in kho2), 'nạp lại trang: không mất thẻ nào đã có tiến độ', 'mất: ' + Object.keys(sanBoxes).filter(k => !(k in kho2)).join(','));
+  kiem(loiCu.length === 0, 'kịch bản có tiến độ sẵn: không lỗi console', loiCu.slice(0, 3).join(' || '));
+  await cu.close();
 } finally {
   await trinhDuyet.close();
 }

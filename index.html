@@ -736,6 +736,7 @@ nav.toc li.grp{font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transf
 
   <h2>Bộ thẻ từ</h2>
   <p>Cách dùng: nhìn từ tiếng Anh, tự nhớ nghĩa, bấm vào thẻ (hoặc phím cách) để lật. Chọn <b>Thuộc rồi</b> thì thẻ lên một hộp và được hẹn lại sau 1, 3, 7, 14, rồi 30 ngày; chọn <b>Chưa thuộc</b> thì thẻ về hộp đầu và quay lại ngay hôm nay. Thẻ đến hạn hiện trước, thẻ mới hiện sau. Hết thẻ đến hạn thì dừng, bạn có thể bấm “Ôn thêm” nếu muốn. Đây là hệ thống Leitner có lịch ngày. Thẻ từ hộp 3 trở lên (đã nhớ được ba lần liền, hẹn từ 7 ngày) được tính là đã thuộc.</p>
+  <p><b>Ôn theo buổi dạy.</b> Ô <b>Bộ của buổi dạy</b> cho ôn riêng 20 từ của một buổi (hiện có Bộ 1 và Bộ 2, cùng dạy ngày 22/11). Mặc định vẫn là <b>Tất cả</b>. Chọn một bộ rồi bấm <b>Sao chép link bộ này</b> để gửi thẳng cho học viên; mở link đó là vào đúng bộ. Tiến độ từng thẻ là một, dù bạn xem theo bộ hay xem tất cả.</p>
   <div class="fc" id="fc-core"></div>
   <div class="quiz" data-q="tu-vung"></div>
 </section>
@@ -2410,7 +2411,7 @@ function refreshDone(){
 }
 
 function route(){
-  var id = (location.hash || "").replace("#","");
+  var id = (location.hash || "").replace("#","").split("?")[0];
   if(!document.getElementById(id) || !document.getElementById(id).classList.contains("lesson")) id = "home";
   var secs = document.querySelectorAll(".lesson");
   for(var i=0;i<secs.length;i++) secs[i].classList.toggle("active", secs[i].id === id);
@@ -2489,23 +2490,35 @@ function initQuizzes(){
   makeFinal();
 }
 
+/* ---------- Bộ từ theo buổi dạy ----------
+   Mỗi bộ liệt kê KHÓA THẺ (chữ đầu tiên của thẻ trong VOCAB). Thẻ ghép ("child (children)", "easy / difficult",
+   "cheap / expensive") vẫn là một thẻ nên đi cùng bộ chứa từ của nó. Thẻ không thuộc bộ nào vẫn nằm ở "Tất cả".
+   Nguồn: 20-TU-VUNG-HOM-NAY và 20-TU-VUNG-BO-2 (bản sao ở kiem/bo-tu-vung/); phép kiểm so hai bên. */
+var BO_TU = [
+  {id:"1", ten:"Bộ 1 · buổi 22/11 (20 từ)", tu:["want","need","like","use","buy","eat","drink","read","write","help","name","friend","family","job","phone","child (children)","water","tired","busy","happy"]},
+  {id:"2", ten:"Bộ 2 · buổi 22/11 (20 từ)", tu:["understand","remember","forget","change","finish","check","send","leave","bring","problem","information","meeting","report","customer","price","important","different","easy / difficult","cheap / expensive","ready"]}
+];
+
 /* ---------- Thẻ từ (dùng chung cho nhiều bộ) ---------- */
 var due = load("due", {});
 var DAYS = [1,3,7,14,30];
 function today(){ var d = new Date(); return Math.floor((d.getTime() - d.getTimezoneOffset()*60000) / 864e5); }
 function dayLabel(n){ var d = new Date(n*864e5); return d.getUTCDate() + "/" + (d.getUTCMonth()+1); }
-function makeFC(host, data, groups, prefix){
+function makeFC(host, data, groups, prefix, sets){
   if(!host) return;
   var uid = host.id;
   host.innerHTML =
-    '<div class="fc-top"><label for="'+uid+'-g">Nhóm: <select id="'+uid+'-g">' +
+    '<div class="fc-top">' + (sets ? '<label for="'+uid+'-b">Bộ của buổi dạy: <select id="'+uid+'-b"><option value="all">Tất cả</option>' + sets.map(function(b){ return '<option value="'+b.id+'">'+esc(b.ten)+'</option>'; }).join("") + '</select></label>' : '') +
+    '<label for="'+uid+'-g">Nhóm: <select id="'+uid+'-g">' +
     groups.map(function(g){ return '<option value="'+g[0]+'">'+esc(g[1])+'</option>'; }).join("") +
     '</select></label><span class="fc-stats" aria-live="polite"></span></div>' +
     '<div class="fc-card" tabindex="0" role="button" aria-label="Lật thẻ"><div class="fc-word"></div><div class="fc-hint">Bấm vào thẻ (hoặc phím cách khi đang chọn thẻ) để xem nghĩa</div><div class="fc-back"><div class="fc-vi"></div><div class="fc-ex"></div></div></div>' +
     '<div class="fc-btns"><button class="btn no" type="button">Chưa thuộc</button><button class="btn yes" type="button">Thuộc rồi</button><button class="btn ghost fc-more" type="button" hidden>Ôn thêm</button></div>' +
-    '<div class="row"><button class="btn ghost fc-lb" type="button">Xem danh sách nhóm này</button><button class="btn ghost fc-rs" type="button">Xóa tiến độ nhóm này</button></div>' +
+    '<div class="row"><button class="btn ghost fc-lb" type="button">Xem danh sách nhóm này</button><button class="btn ghost fc-rs" type="button">Xóa tiến độ nhóm này</button>' + (sets ? '<button class="btn ghost fc-cp" type="button" hidden>Sao chép link bộ này</button>' : '') + '</div>' +
     '<div class="tbl fc-list" hidden></div>';
-  var sel = host.querySelector("select"), card = host.querySelector(".fc-card");
+  var sel = host.querySelector("#"+uid+"-g"), selB = host.querySelector("#"+uid+"-b"), card = host.querySelector(".fc-card");
+  var setOf = {};
+  (sets || []).forEach(function(b){ var m = {}; b.tu.forEach(function(w){ m[w] = true; }); setOf[b.id] = m; });
   var wEl = host.querySelector(".fc-word"), viEl = host.querySelector(".fc-vi"), exEl = host.querySelector(".fc-ex");
   var st = host.querySelector(".fc-stats"), list = host.querySelector(".fc-list"), lb = host.querySelector(".fc-lb");
   var more = host.querySelector(".fc-more"), yesB = host.querySelector(".yes"), noB = host.querySelector(".no");
@@ -2515,7 +2528,10 @@ function makeFC(host, data, groups, prefix){
   function bx(w){ return boxes[key(w)] || 0; }
   function dueDay(w){ var d = due[key(w)]; return (typeof d === "number") ? d : today(); }
   function isDue(w){ return seen(w) && dueDay(w) <= today(); }
-  function deck(){ var g = sel.value; return data.filter(function(v){ return g === "all" || v[3] === g; }); }
+  function deck(){
+    var g = sel.value, b = selB ? selB.value : "all", m = setOf[b];
+    return data.filter(function(v){ return (g === "all" || v[3] === g) && (b === "all" || (m && m[v[0]])); });
+  }
   function stats(){
     var d = deck();
     var known = d.filter(function(v){ return bx(v[0]) >= 3; }).length;
@@ -2585,6 +2601,25 @@ function makeFC(host, data, groups, prefix){
     var c = d[0]; show(c); extra = true;
   });
   sel.addEventListener("change", function(){ last = null; next(); if(!list.hidden) renderList(); });
+  if(selB){
+    /* Địa chỉ #tu-vung?bo=1 mở thẳng bộ 1: thầy gửi link này cho học viên. Không có bo= thì "Tất cả". */
+    var boTuHash = function(){ var m = /[?&]bo=([A-Za-z0-9_-]+)/.exec(location.hash || ""); return (m && setOf[m[1]]) ? m[1] : "all"; };
+    var ganBo = function(id){ if(selB.value === id) return; selB.value = id; capNut(); last = null; next(); if(!list.hidden) renderList(); };
+    var cp = host.querySelector(".fc-cp");
+    var capNut = function(){ cp.hidden = (selB.value === "all"); };
+    var linkBo = function(){ return location.href.split("#")[0] + "#tu-vung?bo=" + selB.value; };
+    selB.value = boTuHash(); capNut();
+    selB.addEventListener("change", function(){
+      try{ history.replaceState(null, "", "#tu-vung" + (selB.value === "all" ? "" : "?bo=" + selB.value)); }catch(e){}
+      capNut(); last = null; next(); if(!list.hidden) renderList();
+    });
+    cp.addEventListener("click", function(){
+      var u = linkBo();
+      try{ navigator.clipboard.writeText(u).then(function(){ toast("Đã sao chép link của bộ này."); }, function(){ toast("Link của bộ này: " + u); }); }
+      catch(e){ toast("Link của bộ này: " + u); }
+    });
+    window.addEventListener("hashchange", function(){ if(/^#tu-vung(\?|$)/.test(location.hash || "")) ganBo(boTuHash()); });
+  }
   host.querySelector(".fc-rs").addEventListener("click", function(){
     deck().forEach(function(v){ delete boxes[key(v[0])]; delete due[key(v[0])]; }); save("boxes", boxes); save("due", due); last = null; next(); if(!list.hidden) renderList(); toast("Đã xóa tiến độ của nhóm thẻ này.");
   });
@@ -2595,7 +2630,7 @@ function makeFC(host, data, groups, prefix){
   });
   next();
 }
-makeFC(document.getElementById("fc-core"), VOCAB, [["all","Tất cả"],["f","Từ chức năng"],["v","Động từ"],["n","Danh từ"],["a","Tính từ"],["t","Thời gian và tần suất"],["q","Số lượng"]], "");
+makeFC(document.getElementById("fc-core"), VOCAB, [["all","Tất cả"],["f","Từ chức năng"],["v","Động từ"],["n","Danh từ"],["a","Tính từ"],["t","Thời gian và tần suất"],["q","Số lượng"]], "", BO_TU);
 makeFC(document.getElementById("fc-awl"), AWL, [["all","Tất cả AWL ("+AWL.length+" họ từ)"],["s1","Sublist 1 (đủ 60 họ từ)"],["s2","Sublist 2 (chọn lọc)"],["s3","Sublist 3 (chọn lọc)"]], "awl:");
 makeFC(document.getElementById("fc-field"), FIELD, [["all","Tất cả các ngành"]].concat(FIELDS), "field:");
 
@@ -3296,6 +3331,7 @@ refreshDone();
 initQuizzes();
 wireSay(document);
 route();
+window.__BO = {bo: BO_TU, vocab: VOCAB.map(function(v){ return v[0]; })};
 window.__COUNTS = {vocab: VOCAB.length, phrases: totalP, quiz: Object.keys(QUIZ).reduce(function(s,k){return s+QUIZ[k].length;},0)};
 })();
 </script>
