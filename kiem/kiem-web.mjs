@@ -12,7 +12,8 @@
 //   9. Gói D: Bài 3B (giờ, thứ–ngày–tháng, tiền, số điện thoại): mọi số trên trang có chữ đọc kèm, chữ đọc khớp số theo bộ đổi số độc lập (kiem/doc-so.mjs, tự kiểm bằng kiem/gold-doc-so.mjs); nút loa đọc đúng chữ đã ghi; mỗi mục có nhãn "Tự soạn"; đáp án đóng; vị trí trong mục lục; câu quiz; lộ trình nối vào cuối tuần.
 //  10. Gói E: 12 tình huống Thực hành: sáu khóa lưu cũ còn nguyên, khóa mới không trùng; mỗi tình huống mới có nhãn Tự soạn, mục Học trước, 8–10 lượt, câu then chốt, danh sách kiểm; số/giờ/giá có chữ đọc ghi sẵn; chỉ dùng cấu trúc đã khai (bộ dò cấu trúc, tự thử đỏ); nối đúng tuần ở Lộ trình; trang, mục lục, trang chủ ghi "12"; Bài 3B trỏ Bài 2B.
 //  11. Gói F: bài kiểm tra trình độ ngắn A1–A2: đúng 15 câu mỗi lần (300 lần rút), không câu nào vượt A2, mọi câu A1/A2 của ngân hàng đều có thể xuất hiện; bảng kết quả (Dưới A1/A1/A2/nên làm bản đầy đủ) khớp bảng gõ tay cho mọi cặp điểm; 7 kịch bản làm bài thật; bản đầy đủ vẫn 53 câu, vẫn mở bằng phần vốn từ; kết quả bản ngắn không ghi đè kết quả bản đầy đủ; khung giới thiệu không ghi thời gian chưa đo; 390 px không tràn; tương phản chế độ tối.
-//  12. Gói H: Lộ trình 12 tuần: 186 thẻ chia đúng vào tuần 1–10 (bảng gõ tay), mỗi thẻ đúng một tuần; liên kết trong trang; tình huống 7–12 chỉ dùng cấu trúc đã dạy tới tuần được xếp; chế độ "theo lộ trình" của thẻ từ (bật, đổi tuần, tắt, nhớ sau tải lại, tiến độ ôn không đổi); tệp sao lưu có khóa mới, tệp cũ vẫn nạp được, giá trị lưu hỏng không làm vỡ trang; 390 px và tương phản ba chế độ.
+//  13. Gói H: Lộ trình 12 tuần: 186 thẻ chia đúng vào tuần 1–10 (bảng gõ tay), mỗi thẻ đúng một tuần; liên kết trong trang; tình huống 7–12 chỉ dùng cấu trúc đã dạy tới tuần được xếp; chế độ "theo lộ trình" của thẻ từ (bật, đổi tuần, tắt, nhớ sau tải lại, tiến độ ôn không đổi); tệp sao lưu có khóa mới, tệp cũ vẫn nạp được, giá trị lưu hỏng không làm vỡ trang; 390 px và tương phản ba chế độ.
+//  12. Gói G: trang Phân tích câu chạy thật với bộ phân tích đã sửa (4 câu lỗi cũ hiện đúng nhãn, 390 px không tràn, không lỗi console). Độ chính xác do kiem/kiem-phan-tich.mjs đo.
 //   6. Các cụm chữ đã sửa không quay lại ("10–15 từ mới"; "Sau khóa này" không xếp việc đã dạy là việc tiếp theo).
 //
 // Khi cố ý thêm/bớt thẻ, mẫu câu hay câu quiz: sửa BAN_DAU bên dưới (cùng PR) để mốc luôn là số thật.
@@ -711,7 +712,7 @@ try {
     }
   }
 
-  // 12. Gói H: Lộ trình 12 tuần. Dữ liệu (thẻ theo tuần, liên kết, tình huống đúng tuần), chế độ "theo lộ trình" của thẻ từ, tương thích tệp sao lưu cũ.
+  // 13. Gói H: Lộ trình 12 tuần. Dữ liệu (thẻ theo tuần, liên kết, tình huống đúng tuần), chế độ "theo lộ trình" của thẻ từ, tương thích tệp sao lưu cũ.
   {
     // Bảng GÕ TAY từ giáo trình 12 tuần (mục 5, 7), không tính lại từ mã: số thẻ mỗi tuần, nhóm thẻ, bài bắt buộc phải có liên kết.
     const THE_TUAN = [15, 14, 20, 20, 21, 20, 20, 24, 20, 12];
@@ -886,6 +887,22 @@ try {
       for (const r of kq.tp) kiem(r.tp >= NGUONG_TUONG_PHAN, `gói H · ${cach === 'sang' ? 'chế độ sáng' : cach === 'auto-toi' ? 'tối tự động' : 'tối ép data-theme'}: ${r.ten} tương phản ${r.tp.toFixed(2)}:1`, `thấp hơn ${NGUONG_TUONG_PHAN}:1`);
       await c4.close();
     }
+  }
+  // 12. Gói G: trang Phân tích câu chạy với bộ phân tích đã sửa (độ chính xác do kiem-phan-tich.mjs đo; ở đây chỉ kiểm trang chạy thật)
+  {
+    const cG = await trinhDuyet.newContext({ viewport: { width: 390, height: 800 } });
+    const pG = await cG.newPage(); const loiG = [];
+    pG.on('pageerror', e => loiG.push(e.message)); pG.on('console', m => { if (m.type() === 'error') loiG.push(m.text()); });
+    await pG.goto(URL_TRANG + '#phan-tich'); await pG.waitForSelector('#pcText');
+    const mau = ['The teacher, tired and hungry, left the room.', 'They appointed her manager.', 'She painted the wall white.', 'He left her sister a note.'];
+    await pG.fill('#pcText', mau.join(' ')); await pG.click('#pcGo');
+    await pG.waitForSelector('#pcRes .pc-ph', { timeout: 5000 }).catch(() => {});
+    const kq = await pG.evaluate(() => { const t = r => [...document.querySelectorAll('#pcRes .pc-ph[data-r="' + r + '"]')].map(e => e.textContent.replace(/\s+/g, ' ').replace(/^[A-Za-z]\s(?=[A-Z a-z])/, '').trim()); return { M: t('M'), C: t('C'), O: t('O'), thua: document.documentElement.scrollWidth - window.innerWidth }; });
+    const co = (r, x) => kq[r].some(c => c.includes(x) && c.length <= x.length + 2); /* khớp cả cụm, cho phép chữ nhãn đứng trước; một nhãn gộp nhiều cụm thì không khớp */
+    kiem(co('M', 'tired and hungry') && co('C', 'manager') && co('C', 'white') && co('O', 'note') && co('O', 'her sister') && co('O', 'her'), 'gói G · trang Phân tích câu hiện đúng 4 câu lỗi cũ (M tired and hungry, O her + C manager, C white, O her sister + O a note)', JSON.stringify(kq));
+    kiem(kq.thua <= 0, 'gói G · 390 px: trang Phân tích câu có kết quả vẫn không tràn ngang', kq.thua + ' px');
+    kiem(loiG.length === 0, 'gói G · trang Phân tích câu không lỗi console', loiG.slice(0, 3).join(' || '));
+    await cG.close();
   }
 } finally {
   await trinhDuyet.close();
