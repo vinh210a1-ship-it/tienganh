@@ -1,5 +1,24 @@
 # Nhật ký web Tiếng Anh 80/20 (mục mới nhất ở trên)
 
+## 2026-11-22 tối · sửa PR #6 theo Kiểm định (cùng nhánh claude/goi-c-ngu-phap)
+- Mục 9 bảng so sánh: thêm hàng "2 âm tiết tận cùng -y" (easier, happier, the easiest, the happiest) và đổi hàng dài thành "trừ tận cùng -y", khớp Bài 5B.
+- Mục 6 số nhiều: bỏ "-o" khỏi quy tắc -es chung, thêm "một số từ tận cùng -o → -es (tomatoes, potatoes; nhưng photos, pianos)".
+- Nit: Bài 2B "Với danh từ, tiếng Anh không có dấu hiệu nào khác..." (đại từ thì có: he / him); mục 11 đổi "công thức vạn năng" thành "công thức thường dùng" và thêm hai ngoại lệ (to be: Where is the bank?; từ hỏi là chủ ngữ: Who called you?).
+- Vì bộ kiểm buộc khớp file gốc: sửa cả `kiem/nguon-ngu-phap/*.md` và hai file gốc ở /mnt/project-files/tieng-anh/ (BANG-TONG-HOP-NGU-PHAP, BAI-3-CAU-CO-BAN-TO-BE). `kiem-web.mjs` xanh.
+
+## 2026-11-22 tối · gói C: bảng tổng hợp ngữ pháp + Bài 2B + sửa nút ghost chế độ tối (nhánh claude/goi-c-ngu-phap)
+- Đối chiếu trước khi thêm: Bài 2 đã có bảng đại từ, am/is/are, khẳng định/phủ định/hỏi, khung tự giới thiệu; Bài 7 đã có a/an/the, đếm được, in/on/at, there is/are, từ nối; Bài 3, 5, 5B, 6 đã có hiện tại đơn, quá khứ/tương lai, so sánh, modal. Vì vậy: không chép lại phần đó, chỉ thêm phần chưa có và trỏ liên kết sang bài đã có.
+- **Trang tra cứu "Bảng tổng hợp ngữ pháp"** (`#bang-ngu-phap`, nhóm Công cụ): từ BANG-TONG-HOP-NGU-PHAP (mục 0–11 và mục "chưa có"); bỏ mục 12 vì là gợi ý dạy 60 phút cho thầy. Mỗi mục có liên kết "học kỹ" sang bài. Bảng nằm trong khung cuộn ngang nên không làm tràn trang ở 390 px.
+- **Bài 2B "S + V + O, số nhiều, to be đầy đủ"** (`#cau-co-ban`, Khu 1, đếm vào tiến độ, nằm giữa Bài 2 và Bài 3): từ BAI-3-CAU-CO-BAN-TO-BE. Có khung S + V + O (O với C), số nhiều và công thức 4 bước, 15 cách dùng to be, bảng lỗi hay gặp, bài tập A–H, 5 bài đọc. Bài tập và bài đọc sinh thẳng từ file gốc bằng script (không gõ tay). Đáp án và gợi ý đáp án ẩn trong khối "Xem đáp án", bấm mới hiện. 12 câu quiz mới (quiz 87 → 99), đã đưa vào nhóm nền tảng của bài kiểm tra cuối khóa. Không đưa mục 8, 9 của file gốc (khung dạy 60 phút, lưu ý cho thầy).
+- Đổi tên "Bài 3" của file gốc thành "Bài 2B" trên web để khỏi nhầm với Bài 3 Hiện tại đơn của web. Trang chủ đổi "12 bài nền tảng" thành 13.
+- Nhãn: mọi mục h2 của hai trang có huy hiệu "Tự soạn" (nhãn [G]), kèm ghi chú đầu trang: người soạn tự viết, chưa người bản xứ hoặc giáo viên tiếng Anh duyệt, không có số liệu.
+- **Sửa nút ghost chế độ tối** (lỗi Kiểm định ghi ở PR #5): quy tắc `.btn{color:#0f131b}` của chế độ tối đặc hiệu hơn `.btn.ghost` nên chữ gần đen trên nền tối (1,10:1). Thêm hai dòng CSS trả màu nhấn: nay 7,70:1 ở cả hai chế độ tối (tự động và ép data-theme). Ảnh chụp 390 px chế độ tối: "Xem danh sách nhóm này", "Xóa tiến độ nhóm này" đọc được.
+- **Bộ kiểm** `kiem/kiem-web.mjs` thêm: (a) đo tương phản nút ghost ở ba trang (Bài 4, Phân tích câu, bài tập nhanh), thử đỏ 1,10:1 trên bản cũ rồi xanh sau sửa; (b) mục 8 cho gói C: mọi `.say`, mục bài tập, bài đọc, đáp án trên hai trang phải có trong `kiem/nguon-ngu-phap/*.md` (bản sao hai file gốc), mỗi h2 có nhãn "Tự soạn", đáp án nằm trong `<details>` đóng và không hiện, bảng cuộn trong khung, số "bài nền tảng" ở trang chủ khớp mục lục, thứ tự mục lục. Thử đỏ bằng cách cố ý sửa một câu và mở sẵn một đáp án: ra đúng 2 phép đỏ. Mốc `BAN_DAU.quiz` = 99.
+- Kết quả: `node kiem/kiem-web.mjs` xanh toàn bộ; `node kiem/kiem-phan-tich.mjs` không đổi (tập 4 vẫn 27/30).
+- Chưa kiểm được: trang live github.io, nghe loa bằng tai (giọng máy đọc "___" và số), Safari iPhone. Nội dung ngữ pháp là tự soạn, chưa người bản xứ duyệt.
+- Chưa làm: thêm Bài 2B vào "Lộ trình 8 tuần" (để gói H), mục 12 của bảng (khung dạy 60 phút) không lên web. Chưa chép index.html sang E:\web tiếng anh (chờ PR gộp).
+- PR chờ luồng Kiểm định duyệt; không tự gộp. Muốn bỏ: `git revert` commit gộp.
+
 ## 2026-11-22 tối · gói B: thẻ từ ôn theo bộ của buổi dạy (nhánh claude/project-thread-ovb6lb)
 - Làm gì: Bài 4 có ô "Bộ của buổi dạy" (Tất cả / Bộ 1 / Bộ 2, mỗi bộ 20 từ dạy ngày 22/11), nằm cạnh ô "Nhóm"; hai ô lọc cùng lúc. Mặc định vẫn "Tất cả". Mở link `#tu-vung?bo=1` hoặc `?bo=2` là vào đúng bộ; đổi ô thì địa chỉ đổi theo; có nút "Sao chép link bộ này" cho thầy. Bộ không có trong link thì về "Tất cả". Bộ lọc thuần túy: lịch ôn (hộp 1/3/7/14/30 ngày), khóa lưu `en8020.boxes`, `en8020.due` không đổi, không thẻ nào đổi hộp.
 - Khi học xong 20 thẻ của bộ thì dừng ("Hết thẻ đến hạn"), không đẩy sang 186 thẻ.

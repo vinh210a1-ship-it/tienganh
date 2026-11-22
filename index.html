@@ -142,6 +142,9 @@ td.num{font-variant-numeric:tabular-nums}
 :root[data-theme="dark"] .btn{color:#0f131b}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn{color:#0f131b}}
 .btn.ghost{background:transparent;color:var(--accent)}
+/* Chế độ tối: quy tắc ".btn{color:#0f131b}" ở trên (độ đặc hiệu cao hơn) làm chữ nút ghost gần đen trên nền tối; trả lại màu nhấn. */
+:root[data-theme="dark"] .btn.ghost{color:var(--accent)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.ghost{color:var(--accent)}}
 .btn.done{background:var(--ok);border-color:var(--ok)}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:20px}
 .pager{display:flex;justify-content:space-between;gap:10px;margin-top:34px;padding-top:18px;border-top:1px solid var(--line);flex-wrap:wrap}
@@ -225,6 +228,10 @@ nav.toc li.grp{font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transf
 .backup{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:10px;font-size:.92rem;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw;z-index:20}
 .toast.show{opacity:1}
+/* Bài 2B: khối bài tập và bài đọc */
+.bt,.doc{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px 18px 14px;margin:14px 0}
+.bt h3,.doc h3{margin-top:.9rem}
+.bt details p,.doc details li{max-width:none}
 .src-list{font-size:.92rem}
 .src-list li{margin-bottom:6px}
 
@@ -338,7 +345,7 @@ nav.toc li.grp{font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transf
       <h3>Học để dùng</h3>
       <p><b>20% kiến thức, 80% ứng dụng.</b> Mỗi bài chỉ giữ phần kiến thức gặp nhiều nhất; phần lớn thời gian là nghe, nhại theo, nói theo tình huống, ghi âm.</p>
       <ul>
-        <li>12 bài nền tảng: phát âm, ngữ pháp lõi, từ vựng, mẫu câu, tiếng Anh nơi làm việc.</li>
+        <li>13 bài nền tảng: phát âm, ngữ pháp lõi, từ vựng, mẫu câu, tiếng Anh nơi làm việc.</li>
         <li>6 tình huống nói thật (gọi món, hỏi đường, họp, gọi điện, email xin mẫu).</li>
         <li>Lộ trình 8 tuần, 30–45 phút mỗi ngày.</li>
       </ul>
@@ -402,6 +409,7 @@ nav.toc li.grp{font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transf
   <h2>Cách dùng trang này</h2>
   <ul>
     <li><b>Nút loa:</b> đọc câu tiếng Anh bằng giọng đọc có sẵn của trình duyệt. Bật “Đọc chậm” ở góc trên khi mới tập. Chrome, Edge và Safari có giọng tốt nhất.</li>
+    <li><b>Bảng tổng hợp ngữ pháp:</b> một trang tra cứu cho cả bản đồ ngữ pháp A1–A2, mỗi mục có liên kết sang bài học kỹ. Mở nhanh trên điện thoại bằng link <code>#bang-ngu-phap</code>.</li>
     <li><b>Phân tích câu:</b> dán hoặc tải một đoạn tiếng Anh, bật chế độ phân tích để xem từng câu được gạch chân theo thành phần (chủ ngữ, động từ, tân ngữ...). Kết quả chỉ là gợi ý.</li>
     <li><b>Bài tập nhanh</b> ở cuối mỗi bài: chọn đáp án là biết ngay đúng sai kèm giải thích.</li>
     <li><b>Tiến độ</b> (bài đã học, thẻ từ đã thuộc, việc trong tuần) được lưu trên trình duyệt này của bạn, không đồng bộ sang máy khác.</li>
@@ -633,7 +641,255 @@ nav.toc li.grp{font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transf
     <li><span class="en say">My English isn't very good yet, but I'm learning every day.</span><span class="vi">Tiếng Anh của tôi chưa tốt lắm, nhưng tôi học mỗi ngày.</span></li>
     <li><span class="en say">Nice to meet you.</span><span class="vi">Rất vui được gặp bạn.</span></li>
   </ul>
+  <p class="note"><b>Học tiếp:</b> <a href="#cau-co-ban">Bài 2B</a> thêm khung S + V + O, cách đổi số ít sang số nhiều và mọi chỗ dùng to be. Cần tra nhanh cả bản đồ ngữ pháp: <a href="#bang-ngu-phap">Bảng tổng hợp ngữ pháp</a>.</p>
   <div class="quiz" data-q="to-be"></div>
+</section>
+
+<!-- ===================== BÀI 2B: S + V + O, SỐ NHIỀU, TO BE ĐẦY ĐỦ ===================== -->
+<section class="lesson" id="cau-co-ban" data-title="S + V + O, số nhiều, to be đầy đủ">
+  <div class="kicker">Bài 2B</div>
+  <h1>Mở rộng Bài 2: S + V + O, số ít/số nhiều, to be đầy đủ</h1>
+  <p class="lead">Bài này nối tiếp <a href="#to-be">Bài 2</a>: thêm khung câu có tân ngữ, cách đổi cả câu từ số ít sang số nhiều, mọi chỗ dùng to be, bài tập A–H và năm bài đọc ngắn.</p>
+  <p class="note"><span class="tag hyp">Tự soạn</span>Mọi ví dụ, bài tập và bài đọc ở trang này do người soạn khóa tự viết từ hiểu biết ngữ pháp ở mức A1, <b>chưa có người bản xứ hoặc giáo viên tiếng Anh duyệt</b>, không trích từ giáo trình nào và không có số liệu. Bài 2 đã dạy bảng đại từ, am/is/are và khung tự giới thiệu nên bài này không chép lại; chỉ thêm phần chưa có.</p>
+
+  <div class="key">
+    <h3>Điều cần nhớ</h3>
+    <ul>
+      <li><b>Câu cơ bản = S + V (+ O).</b> Chủ ngữ làm gì (với cái gì): <span class="say">I drink coffee.</span> Tiếng Việt cũng xếp chủ ngữ trước động từ, nên đây là điểm <b>thuận lợi</b> của người Việt.</li>
+      <li>Khi sau động từ không phải “hành động lên cái gì” mà là “tả chủ ngữ” thì dùng to be: S + <b>be</b> + bổ ngữ. <span class="say">I am a teacher.</span> <span class="say">She is tired.</span> <span class="say">They are at home.</span></li>
+      <li><b>to be chia theo chủ ngữ:</b> I <b>am</b> · he/she/it/số ít <b>is</b> · you/we/they/số nhiều <b>are</b>.</li>
+      <li><b>Số ít/số nhiều kéo theo 3 thứ cùng đổi:</b> danh từ (thêm -s), to be (is → are), a/an (bỏ đi): <span class="say">She is a teacher.</span> → <span class="say">They are teachers.</span></li>
+      <li><b>Ba lỗi người Việt hay mắc:</b> thiếu to be (<i>She very tired</i>), thừa to be (<i>I am agree</i>), quên -s/số nhiều (<i>two book</i>).</li>
+    </ul>
+  </div>
+
+  <h2>Câu cơ bản S + V + O <span class="tag hyp">Tự soạn</span></h2>
+  <h3>Ba thành phần</h3>
+  <div class="tbl"><table>
+    <tr><th>Thành phần</th><th>Là gì</th><th>Ví dụ</th></tr>
+    <tr><td><b>S</b> (Subject, chủ ngữ)</td><td>người/vật thực hiện hành động</td><td><span class="say">I</span>, <span class="say">My sister</span>, <span class="say">The company</span></td></tr>
+    <tr><td><b>V</b> (Verb, động từ)</td><td>hành động hoặc trạng thái</td><td><span class="say">drink</span>, <span class="say">work</span>, <span class="say">is</span></td></tr>
+    <tr><td><b>O</b> (Object, tân ngữ)</td><td>người/vật <b>chịu</b> hành động</td><td><span class="say">coffee</span>, <span class="say">English</span>, <span class="say">him</span></td></tr>
+  </table></div>
+  <p>Ví dụ: <span class="say"><b>My sister</b> drinks tea every morning.</span> (S = My sister, V = drinks, O = tea)</p>
+
+  <h3>Thứ tự là cố định, vì thứ tự quyết định nghĩa</h3>
+  <div class="tbl"><table>
+    <tr><th>Câu</th><th>Nghĩa</th></tr>
+    <tr><td><span class="say">The dog bites the man.</span></td><td>Con chó cắn người.</td></tr>
+    <tr><td><span class="say">The man bites the dog.</span></td><td>Người cắn chó.</td></tr>
+  </table></div>
+  <p>Đổi chỗ S và O là đổi nghĩa. Với danh từ, tiếng Anh không có dấu hiệu nào khác để báo ai làm gì (đại từ thì có: he / him).</p>
+
+  <h3>Bốn kiểu câu cơ bản</h3>
+  <div class="tbl"><table>
+    <tr><th>Kiểu</th><th>Công thức</th><th>Ví dụ</th><th>Ghi chú</th></tr>
+    <tr><td>1</td><td>S + V</td><td><span class="say">I sleep.</span> <span class="say">She works.</span></td><td>Không cần tân ngữ</td></tr>
+    <tr><td>2</td><td>S + V + O</td><td><span class="say">I drink coffee.</span> <span class="say">He reads emails.</span></td><td>Phổ biến nhất</td></tr>
+    <tr><td>3</td><td>S + <b>be</b> + bổ ngữ (C)</td><td><span class="say">I am a nurse.</span> <span class="say">It is cheap.</span></td><td>Bổ ngữ là danh từ, tính từ hoặc nơi chốn</td></tr>
+    <tr><td>4</td><td>S + V + O + nơi chốn + thời gian</td><td><span class="say">We bought milk at the market yesterday.</span></td><td>Nơi chốn trước thời gian</td></tr>
+  </table></div>
+  <p class="note"><b>Phân biệt O và C</b> (hay nhầm): sau động từ thường là O (cái chịu hành động): <span class="say">I read a book.</span> Sau <b>be</b> là C (cái mô tả hoặc đồng nhất với chủ ngữ): <span class="say">I am a teacher.</span> Mẹo: nếu hai thứ là <b>cùng một người/vật</b> (I = a teacher) thì đó là C; nếu là hai thứ khác nhau (I ≠ a book) thì đó là O. Bảng đại từ tân ngữ (me, him, her…) ở <a href="#to-be">Bài 2</a>.</p>
+  <p><b>Câu mệnh lệnh không có chủ ngữ:</b> <span class="say">Close the door, please.</span> <span class="say">Be careful!</span> Đây là ngoại lệ thường gặp nhất cho luật “phải có chủ ngữ” (chủ ngữ “you” được hiểu ngầm).</p>
+
+  <h2>Số ít và số nhiều <span class="tag hyp">Tự soạn</span></h2>
+  <h3>Danh từ số nhiều</h3>
+  <div class="tbl"><table>
+    <tr><th>Quy tắc</th><th>Ví dụ</th></tr>
+    <tr><td>Thông thường thêm <b>-s</b></td><td><span class="say">book → books</span>, <span class="say">cat → cats</span>, <span class="say">key → keys</span></td></tr>
+    <tr><td>Tận cùng <b>-s, -ss, -sh, -ch, -x, -z</b> thêm <b>-es</b></td><td><span class="say">bus → buses</span>, <span class="say">box → boxes</span>, <span class="say">watch → watches</span>, <span class="say">dish → dishes</span></td></tr>
+    <tr><td>Tận cùng <b>phụ âm + y</b>: đổi y → <b>-ies</b></td><td><span class="say">baby → babies</span>, <span class="say">city → cities</span></td></tr>
+    <tr><td>Tận cùng <b>nguyên âm + y</b>: thêm -s</td><td><span class="say">boy → boys</span>, <span class="say">day → days</span></td></tr>
+    <tr><td>Một số từ tận cùng <b>-o</b> thêm <b>-es</b></td><td><span class="say">tomato → tomatoes</span>, <span class="say">potato → potatoes</span> (nhưng <span class="say">photo → photos</span>, <span class="say">piano → pianos</span>)</td></tr>
+    <tr><td>Một số từ tận cùng <b>-f/-fe</b>: đổi thành <b>-ves</b></td><td><span class="say">knife → knives</span>, <span class="say">leaf → leaves</span>, <span class="say">life → lives</span> (nhưng <span class="say">roof → roofs</span>)</td></tr>
+    <tr><td><b>Bất quy tắc</b> (phải thuộc)</td><td><span class="say">man → men</span>, <span class="say">woman → women</span>, <span class="say">child → children</span>, <span class="say">person → people</span>, <span class="say">foot → feet</span>, <span class="say">tooth → teeth</span></td></tr>
+    <tr><td><b>Không đổi</b></td><td><span class="say">fish → fish</span>, <span class="say">sheep → sheep</span></td></tr>
+  </table></div>
+  <p><b>Cách đọc đuôi -s:</b> /s/ sau âm vô thanh (<span class="say">cats</span>), /z/ sau âm hữu thanh và nguyên âm (<span class="say">dogs</span>, <span class="say">keys</span>), /ɪz/ sau âm gió (<span class="say">boxes</span>, <span class="say">buses</span>). Chú ý đọc ra, vì tiếng Việt không có đuôi này nên người Việt hay nuốt. Đếm được và không đếm được (<i>water, rice, information</i>) học ở <a href="#ghep-cau">Bài 7</a>.</p>
+
+  <h3>Đại từ và từ chỉ định số ít/số nhiều</h3>
+  <div class="tbl"><table>
+    <tr><th>Số ít</th><th>Số nhiều</th></tr>
+    <tr><td>I</td><td>we</td></tr>
+    <tr><td>he / she / it</td><td>they</td></tr>
+    <tr><td>you</td><td>you (cùng một chữ, nhưng <b>luôn chia như số nhiều</b>: <span class="say">you are</span>)</td></tr>
+    <tr><td>this (cái này)</td><td>these (những cái này)</td></tr>
+    <tr><td>that (cái kia)</td><td>those (những cái kia)</td></tr>
+    <tr><td><span class="say">a book</span></td><td><span class="say">books</span> · <span class="say">some books</span> · <span class="say">two books</span></td></tr>
+  </table></div>
+
+  <h3>Công thức đổi cả câu từ số ít sang số nhiều</h3>
+  <p>Làm <b>bốn bước</b>:</p>
+  <ol>
+    <li>đổi chủ ngữ sang số nhiều (he → they, this → these…)</li>
+    <li>đổi <b>to be</b> (is → are, was → were)</li>
+    <li><b>bỏ a/an</b></li>
+    <li>danh từ thêm <b>-s</b> (theo bảng trên)</li>
+  </ol>
+  <div class="tbl"><table>
+    <tr><th>Số ít</th><th>Số nhiều</th></tr>
+    <tr><td><span class="say">This is a book.</span></td><td><span class="say">These are books.</span></td></tr>
+    <tr><td><span class="say">She is a teacher.</span></td><td><span class="say">They are teachers.</span></td></tr>
+    <tr><td><span class="say">It is my key.</span></td><td><span class="say">They are my keys.</span></td></tr>
+    <tr><td><span class="say">That is a big box.</span></td><td><span class="say">Those are big boxes.</span></td></tr>
+    <tr><td><span class="say">He is a student.</span></td><td><span class="say">They are students.</span></td></tr>
+    <tr><td><span class="say">The child is at home.</span></td><td><span class="say">The children are at home.</span></td></tr>
+  </table></div>
+  <p>Từ sở hữu <b>không đổi</b> theo số: my, your, his, her, our, their đứng trước cả danh từ số ít lẫn số nhiều (<span class="say">my book</span>, <span class="say">my books</span>).</p>
+
+  <h3>Số ít/số nhiều với động từ</h3>
+  <ul>
+    <li><b>to be:</b> is ↔ are (xem phần to be bên dưới).</li>
+    <li><b>Động từ thường ở hiện tại đơn:</b> chỉ <b>he/she/it/danh từ số ít</b> thêm -s: <span class="say">He works.</span> nhưng <span class="say">They work.</span> (Chi tiết ở <a href="#hien-tai-don">Bài 3: Hiện tại đơn</a>.)</li>
+    <li>Hai danh từ số ít nối bằng <b>and</b> thành <b>số nhiều</b>: <span class="say">Tom and Lan are friends.</span></li>
+    <li>Vài từ số ít dù trông như số nhiều: <span class="say">news is</span>, <span class="say">everyone is</span>, <span class="say">my family is</span>. Vài từ luôn số nhiều: <span class="say">people are</span>, <span class="say">my glasses are</span> (kính mắt).</li>
+  </ul>
+
+  <h2>Động từ to be: mọi trường hợp <span class="tag hyp">Tự soạn</span></h2>
+  <h3>Chia ở hiện tại</h3>
+  <div class="tbl"><table>
+    <tr><th>Ngôi</th><th>Khẳng định</th><th>Rút gọn</th><th>Phủ định</th><th>Rút gọn phủ định</th><th>Câu hỏi</th></tr>
+    <tr><td>I</td><td><span class="say">I am</span></td><td><span class="say">I'm</span></td><td><span class="say">I am not</span></td><td><span class="say">I'm not</span></td><td><span class="say">Am I…?</span></td></tr>
+    <tr><td>you</td><td><span class="say">you are</span></td><td><span class="say">you're</span></td><td><span class="say">you are not</span></td><td><span class="say">you aren't</span> / <span class="say">you're not</span></td><td><span class="say">Are you…?</span></td></tr>
+    <tr><td>he</td><td><span class="say">he is</span></td><td><span class="say">he's</span></td><td><span class="say">he is not</span></td><td><span class="say">he isn't</span> / <span class="say">he's not</span></td><td><span class="say">Is he…?</span></td></tr>
+    <tr><td>she</td><td><span class="say">she is</span></td><td><span class="say">she's</span></td><td><span class="say">she is not</span></td><td><span class="say">she isn't</span> / <span class="say">she's not</span></td><td><span class="say">Is she…?</span></td></tr>
+    <tr><td>it</td><td><span class="say">it is</span></td><td><span class="say">it's</span></td><td><span class="say">it is not</span></td><td><span class="say">it isn't</span> / <span class="say">it's not</span></td><td><span class="say">Is it…?</span></td></tr>
+    <tr><td>we</td><td><span class="say">we are</span></td><td><span class="say">we're</span></td><td><span class="say">we are not</span></td><td><span class="say">we aren't</span> / <span class="say">we're not</span></td><td><span class="say">Are we…?</span></td></tr>
+    <tr><td>they</td><td><span class="say">they are</span></td><td><span class="say">they're</span></td><td><span class="say">they are not</span></td><td><span class="say">they aren't</span> / <span class="say">they're not</span></td><td><span class="say">Are they…?</span></td></tr>
+  </table></div>
+  <ul>
+    <li>Không có “amn't” (<i>I amn't</i>). Với I chỉ nói <span class="say">I'm not</span>.</li>
+    <li>Văn nói gần như luôn dùng dạng rút gọn.</li>
+  </ul>
+  <p><b>Trả lời ngắn:</b> <span class="say">Yes, I am.</span> <span class="say">No, I'm not.</span> <span class="say">Yes, he is.</span> <span class="say">No, he isn't.</span> <span class="say">Yes, they are.</span> <span class="say">No, they aren't.</span> Câu trả lời khẳng định ngắn <b>không rút gọn</b> (không nói <i>Yes, I'm.</i>).</p>
+
+  <h3>Chia ở quá khứ</h3>
+  <div class="tbl"><table>
+    <tr><th>Ngôi</th><th>Khẳng định</th><th>Phủ định</th><th>Câu hỏi</th></tr>
+    <tr><td>I, he, she, it</td><td><b>was</b></td><td><span class="say">wasn't</span></td><td><span class="say">Was he…?</span></td></tr>
+    <tr><td>you, we, they</td><td><b>were</b></td><td><span class="say">weren't</span></td><td><span class="say">Were you…?</span></td></tr>
+  </table></div>
+  <p><span class="say">I was tired yesterday.</span> <span class="say">They were at a café.</span> <span class="say">Was it cold?</span> — <span class="say">Yes, it was.</span> Quá khứ đơn nói đầy đủ ở <a href="#qua-khu-tuong-lai">Bài 5</a>.</p>
+
+  <h3>Các cách dùng to be (đủ trường hợp)</h3>
+  <div class="tbl"><table>
+    <tr><th>#</th><th>Dùng để</th><th>Ví dụ</th><th>Lưu ý với người Việt</th></tr>
+    <tr><td>1</td><td>Nói <b>tên, danh tính</b></td><td><span class="say">I am Lan.</span> <span class="say">This is my friend.</span></td><td></td></tr>
+    <tr><td>2</td><td>Nói <b>nghề</b></td><td><span class="say">She is a nurse.</span></td><td>Phải có <b>a/an</b> trước nghề số ít</td></tr>
+    <tr><td>3</td><td>Nói <b>tính chất, tình trạng</b> (tính từ)</td><td><span class="say">He is tall.</span> <span class="say">It is cheap.</span></td><td>Tiếng Việt bỏ “là” (“Tôi bận”) nhưng tiếng Anh <b>phải có be</b>: <span class="say">I am busy.</span></td></tr>
+    <tr><td>4</td><td>Nói <b>nơi chốn</b></td><td><span class="say">The keys are on the table.</span> <span class="say">We are at home.</span></td><td></td></tr>
+    <tr><td>5</td><td>Nói <b>xuất xứ, quốc tịch</b></td><td><span class="say">I am from Hue.</span> <span class="say">She is Vietnamese.</span></td><td></td></tr>
+    <tr><td>6</td><td>Nói <b>tuổi</b></td><td><span class="say">I am 28.</span> <span class="say">He is 30 years old.</span></td><td>Không nói <i>I have 28 years.</i></td></tr>
+    <tr><td>7</td><td>Nói <b>cảm giác</b></td><td><span class="say">I am hungry.</span> <span class="say">She is cold.</span> <span class="say">We are late.</span></td><td>Tiếng Việt dùng “đói, lạnh” như tính từ, tiếng Anh vẫn dùng be</td></tr>
+    <tr><td>8</td><td>Nói <b>giờ, ngày, thời tiết, khoảng cách</b> (chủ ngữ <b>it</b>)</td><td><span class="say">It is 8 o'clock.</span> <span class="say">It is Monday.</span> <span class="say">It is hot.</span></td><td>Chủ ngữ giả <b>it</b>, không bỏ</td></tr>
+    <tr><td>9</td><td>Nói <b>giá, kích cỡ</b></td><td><span class="say">It is 20 dollars.</span> <span class="say">The room is 4 meters long.</span></td><td></td></tr>
+    <tr><td>10</td><td><b>Chỉ vật</b> với this/that/these/those</td><td><span class="say">This is my phone.</span> <span class="say">Those are my keys.</span></td><td></td></tr>
+    <tr><td>11</td><td>Hỏi thông tin (Wh-question)</td><td><span class="say">What is your name?</span> <span class="say">Where are you from?</span> <span class="say">How old are you?</span></td><td></td></tr>
+    <tr><td>12</td><td><b>There is / There are</b> (có)</td><td><span class="say">There is a bank near here.</span> <span class="say">There are two chairs.</span></td><td>Học kỹ ở <a href="#ghep-cau">Bài 7</a></td></tr>
+    <tr><td>13</td><td><b>be + V-ing</b> (đang làm)</td><td><span class="say">I am working.</span></td><td>Thì hiện tại tiếp diễn, học ở <a href="#qua-khu-tuong-lai">Bài 5</a></td></tr>
+    <tr><td>14</td><td><b>be</b> nguyên mẫu, mệnh lệnh</td><td><span class="say">Be careful!</span> <span class="say">Be quiet, please.</span></td><td></td></tr>
+    <tr><td>15</td><td><b>be</b> sau modal, sau will, going to</td><td><span class="say">She will be late.</span> <span class="say">It can be hard.</span></td><td>A2 trở đi</td></tr>
+  </table></div>
+  <p class="note">Hàng 13–15 chỉ <b>giới thiệu</b> để biết “be còn dùng ở nhiều chỗ”; chưa cần luyện kỹ ở bài này.</p>
+
+  <h3>Các câu hỏi thông dụng với to be</h3>
+  <div class="tbl"><table>
+    <tr><th>Câu hỏi</th><th>Trả lời mẫu</th></tr>
+    <tr><td><span class="say">What is your name?</span></td><td><span class="say">My name is Lan.</span> / <span class="say">I'm Lan.</span></td></tr>
+    <tr><td><span class="say">Where are you from?</span></td><td><span class="say">I'm from Hue.</span></td></tr>
+    <tr><td><span class="say">How old are you?</span></td><td><span class="say">I'm 28.</span></td></tr>
+    <tr><td><span class="say">How are you?</span></td><td><span class="say">I'm fine, thanks.</span></td></tr>
+    <tr><td><span class="say">What do you do?</span> (không dùng be)</td><td><span class="say">I'm a nurse.</span></td></tr>
+    <tr><td><span class="say">Who is he?</span></td><td><span class="say">He's my brother.</span></td></tr>
+    <tr><td><span class="say">Where is the bank?</span></td><td><span class="say">It's next to the station.</span></td></tr>
+    <tr><td><span class="say">What time is it?</span></td><td><span class="say">It's half past six.</span> (6:30)</td></tr>
+    <tr><td><span class="say">How much is it?</span></td><td><span class="say">It's ten dollars.</span></td></tr>
+    <tr><td><span class="say">Are you tired?</span></td><td><span class="say">Yes, I am.</span> / <span class="say">No, I'm not.</span></td></tr>
+  </table></div>
+
+  <h2>Những lỗi hay gặp <span class="tag hyp">Tự soạn</span></h2>
+  <p>Sửa trước khi lỗi thành thói quen.</p>
+  <div class="tbl"><table>
+    <tr><th>Sai</th><th>Đúng</th><th>Vì sao</th></tr>
+    <tr><td>She very beautiful.</td><td><span class="say">She <b>is</b> very beautiful.</span></td><td>Thiếu to be (tiếng Việt bỏ “là”)</td></tr>
+    <tr><td>I am agree.</td><td><span class="say">I agree.</span></td><td><i>agree</i> đã là động từ, không thêm be</td></tr>
+    <tr><td>He <b>are</b> my brother.</td><td><span class="say">He <b>is</b> my brother.</span></td><td>Chọn be theo chủ ngữ</td></tr>
+    <tr><td>They <b>is</b> students.</td><td><span class="say">They <b>are</b> students.</span></td><td>Chủ ngữ số nhiều → are</td></tr>
+    <tr><td>She teacher.</td><td><span class="say">She is <b>a</b> teacher.</span></td><td>Thiếu be và thiếu a</td></tr>
+    <tr><td>They are <b>a</b> teachers.</td><td><span class="say">They are teachers.</span></td><td>Số nhiều không có a</td></tr>
+    <tr><td>I am 30 years.</td><td><span class="say">I am 30</span> (years old).</td><td>Tuổi dùng be, không dùng have</td></tr>
+    <tr><td>I like <b>she</b>.</td><td><span class="say">I like <b>her</b>.</span></td><td>Sau động từ dùng đại từ tân ngữ</td></tr>
+    <tr><td>Two <b>book</b></td><td><span class="say">Two <b>books</b></span></td><td>Sau số từ phải dùng số nhiều</td></tr>
+    <tr><td>He <b>work</b> in a lab.</td><td><span class="say">He <b>works</b> in a lab.</span></td><td>he/she/it + động từ thường thêm -s</td></tr>
+  </table></div>
+
+  <h2>Bài tập A–H <span class="tag hyp">Tự soạn</span></h2>
+  <p>Làm trên giấy trước, rồi bấm “Xem đáp án” của từng bài. Đáp án ẩn cho đến khi bạn bấm.</p>
+<div class="bt"><h3>A. Điền am / is / are</h3>
+<ol><li>I ___ a student.</li><li>She ___ my sister.</li><li>They ___ at home.</li><li>The water ___ cold.</li><li>My parents ___ teachers.</li><li>Tom and Lan ___ friends.</li><li>It ___ 8 o'clock.</li><li>You ___ late.</li><li>This ___ my phone.</li><li>These ___ my keys.</li></ol>
+<details><summary>Xem đáp án A</summary><p>1 am · 2 is · 3 are · 4 is · 5 are · 6 are · 7 is · 8 are · 9 is · 10 are</p></details>
+</div>
+<div class="bt"><h3>B. Viết số nhiều</h3>
+<p>book · box · baby · day · child · tomato · knife · person</p>
+<details><summary>Xem đáp án B</summary><p>books · boxes · babies · days · children · tomatoes · knives · people</p></details>
+</div>
+<div class="bt"><h3>C. Đổi sang số nhiều (cả câu)</h3>
+<ol><li>This is a book.</li><li>She is a teacher.</li><li>It is my key.</li><li>He is a student.</li></ol>
+<details><summary>Xem đáp án C</summary><p>1 These are books. · 2 They are teachers. · 3 They are my keys. · 4 They are students.</p></details>
+</div>
+<div class="bt"><h3>D. Sửa lỗi</h3>
+<ol><li>She very tired.</li><li>I am agree.</li><li>He are my brother.</li><li>They is students.</li><li>We am at work.</li><li>She teacher.</li><li>They are a teachers.</li><li>I like she.</li></ol>
+<details><summary>Xem đáp án D</summary><p>1 She <b>is</b> very tired. · 2 I agree. · 3 He <b>is</b> my brother. · 4 They <b>are</b> students. · 5 We <b>are</b> at work. · 6 She is <b>a</b> teacher. · 7 They are teachers. · 8 I like <b>her</b>.</p></details>
+</div>
+<div class="bt"><h3>E. Chỉ ra S, V, O hoặc C</h3>
+<ol><li>My sister drinks coffee every morning.</li><li>We are teachers.</li><li>He reads emails at work.</li><li>The soup is hot.</li></ol>
+<details><summary>Xem đáp án E</summary><p>1 S = My sister · V = drinks · O = coffee · (thời gian = every morning).</p><p>2 S = We · V = are · C = teachers (<b>không phải O</b>, vì là be).</p><p>3 S = He · V = reads · O = emails · (nơi chốn = at work).</p><p>4 S = The soup · V = is · C = hot.</p></details>
+</div>
+<div class="bt"><h3>F. Đổi sang phủ định và câu hỏi</h3>
+<ol><li>She is a doctor.</li><li>They are at school.</li><li>He is tired.</li></ol>
+<details><summary>Xem đáp án F</summary><p>1 She isn't a doctor. / Is she a doctor? · 2 They aren't at school. / Are they at school? · 3 He isn't tired. / Is he tired?</p></details>
+</div>
+<div class="bt"><h3>G. Dịch Việt → Anh</h3>
+<ol><li>Tôi là giáo viên.</li><li>Cô ấy rất mệt.</li><li>Họ ở nhà.</li><li>Đây là những chiếc chìa khóa của tôi.</li><li>Anh ấy uống cà phê.</li><li>Tôi thích họ.</li></ol>
+<details><summary>Xem đáp án G</summary><p>1 I am a teacher. (I'm a teacher.) · 2 She is very tired. · 3 They are at home. · 4 These are my keys. · 5 He drinks coffee. · 6 I like them.</p></details>
+</div>
+<div class="bt"><h3>H. Nói (3 phút)</h3>
+<p>học viên tự giới thiệu theo khung: <i>Hi, I'm ___. I'm from ___. I'm ___ years old. I'm a ___. My family is small/big. I have ___.</i> Thầy hỏi lại 3 câu bằng <i>Are you…? Is your…? Where is…?</i></p>
+<p class="note">Bài nói: không có đáp án cố định. Ghi âm lại, nghe lại và tự tìm 3 lỗi.</p>
+</div>
+  <h2>Năm bài đọc dễ (A1) <span class="tag hyp">Tự soạn</span></h2>
+  <p>Cách dùng mỗi bài (10 phút): (1) nghe, bấm nút loa, chỉ nghe; (2) đọc thầm, gạch từ chưa biết; (3) đọc to, nghe lại âm cuối; (4) trả lời câu hỏi; (5) tìm S, V, O hoặc C trong 3 câu; (6) viết lại bài về bản thân. Bài đọc là văn bản tự soạn cho khóa này, không trích từ nguồn nào.</p>
+<div class="doc"><h3>Bài đọc 1 · Hi, I'm Lan (to be, tự giới thiệu)</h3>
+<div class="email"><span class="say">Hi! My name is Lan. I am 28 years old. I am from Hue, but I live in Ho Chi Minh City now. I am a nurse. My job is interesting, but I am often busy. My office is near my house. It is small and clean. I am happy at work.</span></div>
+<div class="tbl"><table><tr><th>Từ</th><th>Nghĩa</th></tr><tr><td><span class="say">nurse</span></td><td>y tá</td></tr><tr><td><span class="say">interesting</span></td><td>thú vị</td></tr><tr><td><span class="say">often</span></td><td>thường</td></tr><tr><td><span class="say">busy</span></td><td>bận</td></tr><tr><td><span class="say">near</span></td><td>gần</td></tr><tr><td><span class="say">clean</span></td><td>sạch</td></tr></table></div>
+<p><b>Câu hỏi</b></p><ol><li>Where is Lan from?</li><li>How old is she?</li><li>Is her office big? (Yes / No)</li><li>Is she happy at work?</li><li>What is her job?</li></ol>
+<details><summary>Xem gợi ý đáp án</summary><ol><li>She is from Hue.</li><li>She is 28.</li><li>No, it is small.</li><li>Yes, she is.</li><li>She is a nurse.</li></ol></details>
+<p><b>Nhiệm vụ:</b> tìm 5 chỗ dùng <b>am/is</b> và nói vì sao dùng <i>am</i> hoặc <i>is</i>.</p></div>
+<div class="doc"><h3>Bài đọc 2 · My family (số ít, số nhiều, he/she/they)</h3>
+<div class="email"><span class="say">This is my family. We are four. My father is a driver. He is 55. He drives a bus. My mother is a cook. She is 52. She cooks dinner for us. My brother is a student. His name is Minh. He is 20. He studies English. They are very kind. My parents are at home today, but my brother is at school. I love my family.</span></div>
+<div class="tbl"><table><tr><th>Từ</th><th>Nghĩa</th></tr><tr><td><span class="say">driver</span></td><td>tài xế</td></tr><tr><td><span class="say">cook</span></td><td>đầu bếp, người nấu ăn</td></tr><tr><td><span class="say">kind</span></td><td>tốt bụng</td></tr><tr><td><span class="say">parents</span></td><td>bố mẹ</td></tr><tr><td><span class="say">study</span></td><td>học</td></tr><tr><td><span class="say">love</span></td><td>yêu thương</td></tr></table></div>
+<p><b>Câu hỏi</b></p><ol><li>How many people are in the family?</li><li>What is the father's job?</li><li>How old is Minh?</li><li>Where are the parents today?</li><li>Is Minh a driver?</li></ol>
+<details><summary>Xem gợi ý đáp án</summary><ol><li>Four.</li><li>He is a driver.</li><li>He is 20.</li><li>They are at home.</li><li>No, he is a student.</li></ol></details>
+<p><b>Nhiệm vụ:</b> (1) gạch chân các danh từ số nhiều (<i>parents</i>); (2) tìm câu có <b>S + V + O</b> (<i>He drives a bus. She cooks dinner for us. He studies English.</i>); (3) vì sao là <i>drives</i>, <i>cooks</i>, <i>studies</i> mà không phải <i>drive</i>? (chủ ngữ he/she số ít, hiện tại đơn thêm -s).</p></div>
+<div class="doc"><h3>Bài đọc 3 · In my bag (danh từ đếm được, a/an, this/these)</h3>
+<div class="email"><span class="say">I have a bag. It is old, but I love it. In my bag, I have two books, a pen, an apple and three keys. I also have a small bottle of water. This is my phone. These are my keys. I carry my bag every day.</span></div>
+<div class="tbl"><table><tr><th>Từ</th><th>Nghĩa</th></tr><tr><td><span class="say">bag</span></td><td>cái túi</td></tr><tr><td><span class="say">bottle</span></td><td>cái chai</td></tr><tr><td><span class="say">carry</span></td><td>mang, xách</td></tr><tr><td><span class="say">key</span></td><td>chìa khóa</td></tr><tr><td><span class="say">also</span></td><td>cũng</td></tr></table></div>
+<p><b>Câu hỏi</b></p><ol><li>How many books are in the bag?</li><li>Is there an apple?</li><li>What is in the bottle?</li><li>Is the bag new?</li></ol>
+<details><summary>Xem gợi ý đáp án</summary><ol><li>Two.</li><li>Yes, there is.</li><li>Water.</li><li>No, it is old.</li></ol></details>
+<p><b>Nhiệm vụ:</b> (1) lập bảng <b>số ít / số nhiều</b> từ bài (<i>book → books, key → keys, apple → apples</i>); (2) vì sao <i>water</i> không có a hoặc -s? (không đếm được, nên dùng <i>a bottle of water</i>); (3) đổi <i>This is my phone</i> thành <i>These are my phones</i>.</p></div>
+<div class="doc"><h3>Bài đọc 4 · A day at work (S + V + O)</h3>
+<div class="email"><span class="say">I work in an office. I start at eight. I read emails and answer calls. My boss is Mr. Brown. He is friendly. He drinks tea, and I drink coffee. At noon, we eat lunch in the canteen. The food is cheap, and it is good. I finish work at five. Then I go home.</span></div>
+<div class="tbl"><table><tr><th>Từ</th><th>Nghĩa</th></tr><tr><td><span class="say">office</span></td><td>văn phòng</td></tr><tr><td><span class="say">answer</span></td><td>trả lời, nghe (điện thoại)</td></tr><tr><td><span class="say">boss</span></td><td>sếp</td></tr><tr><td><span class="say">friendly</span></td><td>thân thiện</td></tr><tr><td><span class="say">canteen</span></td><td>căng-tin</td></tr><tr><td><span class="say">cheap</span></td><td>rẻ</td></tr><tr><td><span class="say">finish</span></td><td>kết thúc</td></tr></table></div>
+<p><b>Câu hỏi</b></p><ol><li>Where does the writer work?</li><li>What does the boss drink?</li><li>Where do they eat lunch?</li><li>Is the food expensive?</li></ol>
+<details><summary>Xem gợi ý đáp án</summary><ol><li>In an office.</li><li>Tea.</li><li>In the canteen.</li><li>No, it is cheap.</li></ol></details>
+<p><b>Nhiệm vụ:</b> (1) tìm 5 câu <b>S + V + O</b> (<i>I read emails. I answer calls. He drinks tea. I drink coffee. We eat lunch.</i>); (2) tìm 3 câu dùng <b>be</b> (<i>My boss is Mr. Brown. He is friendly. The food is cheap.</i>); (3) viết 5 câu S + V + O về ngày làm việc của bạn.</p></div>
+<div class="doc"><h3>Bài đọc 5 · Yesterday (was / were)</h3>
+<div class="email"><span class="say">Yesterday I was very tired. I was at work until seven. My friends were at a café. They were happy. The café was noisy. Today I am fine. I am at home now. My sister is here, too.</span></div>
+<div class="tbl"><table><tr><th>Từ</th><th>Nghĩa</th></tr><tr><td><span class="say">yesterday</span></td><td>hôm qua</td></tr><tr><td><span class="say">until</span></td><td>cho đến khi</td></tr><tr><td><span class="say">noisy</span></td><td>ồn</td></tr><tr><td><span class="say">too</span></td><td>cũng</td></tr></table></div>
+<p><b>Câu hỏi</b></p><ol><li>Was the writer tired yesterday?</li><li>Where were the friends?</li><li>Was the café quiet?</li><li>How is the writer today?</li></ol>
+<details><summary>Xem gợi ý đáp án</summary><ol><li>Yes, he or she was.</li><li>They were at a café.</li><li>No, it was noisy.</li><li>He or she is fine.</li></ol></details>
+<p><b>Nhiệm vụ:</b> đổi các câu về hôm nay (<i>Today I am tired. My friends are at a café.</i>).</p></div>
+  <div class="quiz" data-q="cau-co-ban"></div>
 </section>
 
 <!-- ===================== BÀI 3: HIỆN TẠI ĐƠN ===================== -->
@@ -1509,6 +1765,185 @@ R&amp;D Department</div>
   </ul>
 </section>
 
+<!-- ===================== TRA CỨU: BẢNG TỔNG HỢP NGỮ PHÁP ===================== -->
+<section class="lesson" id="bang-ngu-phap" data-title="Bảng tổng hợp ngữ pháp">
+  <div class="kicker">Tra cứu · A1–A2</div>
+  <h1>Bảng tổng hợp ngữ pháp</h1>
+  <p class="lead">Bản đồ toàn cảnh: tiếng Anh gồm những mảnh nào và ghép lại thế nào. Dùng để tra nhanh trên điện thoại; muốn học kỹ từng phần thì bấm sang bài tương ứng.</p>
+  <p class="note"><span class="tag hyp">Tự soạn</span>Bảng này do người soạn khóa tự viết từ hiểu biết ngữ pháp chuẩn, <b>chưa có người bản xứ hoặc giáo viên tiếng Anh duyệt</b> và không có số liệu. Không cần học hết trong một buổi: bắt đầu từ mục 0, 2 và 3, các mục còn lại học dần theo lộ trình.</p>
+
+  <div class="key">
+    <h3>Kết luận trước</h3>
+    <ul>
+      <li><b>Câu tiếng Anh bắt buộc có chủ ngữ và động từ.</b> Không nói “Tired” hay “I tired”; phải <span class="say">I am tired</span></li>
+      <li><b>Thứ tự cố định:</b> chủ ngữ → động từ → tân ngữ/bổ ngữ → nơi chốn → thời gian.</li>
+      <li><b>Trợ động từ</b> (do/does/did/will/can…) đã mang thì và ngôi, nên động từ chính sau nó <b>luôn ở dạng nguyên mẫu</b>: <span class="say">Does he work?</span></li>
+    </ul>
+  </div>
+
+  <h2>0. Một câu hoàn chỉnh trông thế nào <span class="tag hyp">Tự soạn</span></h2>
+  <p><b>Chủ ngữ + Động từ + (Tân ngữ / Bổ ngữ) + Nơi chốn + Thời gian</b></p>
+  <div class="tbl"><table>
+    <tr><th>Chủ ngữ (ai)</th><th>Động từ (làm gì)</th><th>Tân ngữ / bổ ngữ (cái gì)</th><th>Nơi chốn</th><th>Thời gian</th></tr>
+    <tr><td>I</td><td>work</td><td></td><td>in a lab</td><td>every day.</td></tr>
+    <tr><td>She</td><td>is</td><td>a teacher</td><td>at school</td><td>now.</td></tr>
+    <tr><td>We</td><td>bought</td><td>some milk</td><td>at the market</td><td>yesterday.</td></tr>
+  </table></div>
+  <p>Ba luật nền:</p>
+  <ol>
+    <li><b>Câu tiếng Anh bắt buộc có chủ ngữ và động từ.</b> Không nói “Tired” hay “I tired”; phải “I am tired”.</li>
+    <li><b>Thứ tự cố định</b>, không đảo như tiếng Việt: tính từ đứng <b>trước</b> danh từ (<span class="say">a big house</span> = một ngôi nhà to), nơi chốn đứng <b>trước</b> thời gian.</li>
+    <li><b>Động từ biến đổi theo thì và ngôi</b> (<span class="say">work → works → worked → working</span>); danh từ biến đổi theo số (<span class="say">one cat → two cats</span>).</li>
+  </ol>
+  <p class="note">Học kỹ: <a href="#to-be">Bài 2</a> và <a href="#cau-co-ban">Bài 2B</a>.</p>
+
+  <h2>1. Tám loại từ <span class="tag hyp">Tự soạn</span></h2>
+  <div class="tbl"><table>
+    <tr><th>Từ loại</th><th>Làm gì</th><th>Ví dụ</th></tr>
+    <tr><td>Danh từ (noun)</td><td>Tên người, vật, nơi</td><td><span class="say">teacher</span>, <span class="say">coffee</span>, <span class="say">Hanoi</span></td></tr>
+    <tr><td>Đại từ (pronoun)</td><td>Thay danh từ</td><td>I, you, he, she, it, we, they</td></tr>
+    <tr><td>Động từ (verb)</td><td>Hành động, trạng thái</td><td><span class="say">work</span>, <span class="say">eat</span>, <span class="say">be</span>, <span class="say">have</span></td></tr>
+    <tr><td>Tính từ (adjective)</td><td>Mô tả danh từ</td><td><span class="say">big</span>, <span class="say">cheap</span>, <span class="say">tired</span></td></tr>
+    <tr><td>Trạng từ (adverb)</td><td>Mô tả động từ, tính từ: cách thức, tần suất, mức độ</td><td><span class="say">quickly</span>, <span class="say">always</span>, <span class="say">very</span></td></tr>
+    <tr><td>Giới từ (preposition)</td><td>Nối danh từ với phần còn lại: nơi chốn, thời gian</td><td>in, on, at, to, from</td></tr>
+    <tr><td>Liên từ (conjunction)</td><td>Nối từ, cụm, câu</td><td>and, but, because, so</td></tr>
+    <tr><td>Mạo từ (article)</td><td>Đứng trước danh từ</td><td>a, an, the</td></tr>
+  </table></div>
+
+  <h2>2. Đại từ và sở hữu <span class="tag hyp">Tự soạn</span></h2>
+  <p>Bảng đầy đủ (chủ ngữ, tân ngữ, tính từ sở hữu, to be) học một lần ở <a href="#to-be">Bài 2</a>. Thêm hai điều cần nhớ:</p>
+  <ul>
+    <li>Sở hữu bằng danh từ: <b>'s</b> (<span class="say">Lan's phone</span>, <span class="say">my boss's office</span>). “of” dùng cho vật: <span class="say">the end of the day</span>.</li>
+    <li>Chỉ định: this/that (số ít, gần/xa), these/those (số nhiều, gần/xa).</li>
+  </ul>
+
+  <h2>3. Ba loại động từ trong câu <span class="tag hyp">Tự soạn</span></h2>
+  <div class="tbl"><table>
+    <tr><th>Loại</th><th>Dùng khi</th><th>Khẳng định</th><th>Phủ định</th><th>Câu hỏi</th></tr>
+    <tr><td><b>to be</b> (am/is/are, was/were)</td><td>tính từ, nghề, nơi chốn đứng sau</td><td><span class="say">She is tired.</span></td><td><span class="say">She isn't tired.</span></td><td><span class="say">Is she tired?</span></td></tr>
+    <tr><td><b>Động từ thường</b> (work, eat…)</td><td>hành động</td><td><span class="say">She works.</span></td><td><span class="say">She doesn't work.</span></td><td><span class="say">Does she work?</span></td></tr>
+    <tr><td><b>Động từ khuyết thiếu</b> (can, should…)</td><td>khả năng, xin phép, khuyên</td><td><span class="say">She can swim.</span></td><td><span class="say">She can't swim.</span></td><td><span class="say">Can she swim?</span></td></tr>
+  </table></div>
+  <p>Lỗi số một của người Việt: <b>thiếu to be</b> (<i>She very beautiful</i>) và <b>thừa to be</b> (<i>I am agree</i>).</p>
+
+  <h2>4. Các thì cần cho A1–A2 <span class="tag hyp">Tự soạn</span></h2>
+  <div class="tbl"><table>
+    <tr><th>Thì</th><th>Công thức</th><th>Dùng khi</th><th>Ví dụ</th><th>Học kỹ</th></tr>
+    <tr><td><b>Hiện tại đơn</b></td><td>S + V(s/es) · don't/doesn't + V · Do/Does + S + V?</td><td>thói quen, sự thật, lịch cố định</td><td><span class="say">I drink tea every morning.</span> <span class="say">He works in a factory.</span></td><td><a href="#hien-tai-don">Bài 3</a></td></tr>
+    <tr><td><b>Hiện tại tiếp diễn</b></td><td>S + am/is/are + V-ing</td><td>đang xảy ra; kế hoạch gần</td><td><span class="say">She is talking on the phone.</span> <span class="say">We are meeting tomorrow.</span></td><td><a href="#qua-khu-tuong-lai">Bài 5</a></td></tr>
+    <tr><td><b>Quá khứ đơn</b></td><td>S + V-ed (hoặc bất quy tắc) · didn't + V · Did + S + V?</td><td>việc đã xong, có thời điểm</td><td><span class="say">I worked late yesterday.</span> <span class="say">We went home at six.</span></td><td><a href="#qua-khu-tuong-lai">Bài 5</a></td></tr>
+    <tr><td><b>Tương lai: be going to</b></td><td>S + am/is/are going to + V</td><td>kế hoạch đã định; dự đoán có dấu hiệu</td><td><span class="say">I'm going to visit my parents.</span></td><td><a href="#qua-khu-tuong-lai">Bài 5</a></td></tr>
+    <tr><td><b>Tương lai: will</b></td><td>S + will + V</td><td>quyết định tức thì, hứa, dự đoán</td><td><span class="say">I'll help you.</span> <span class="say">It will rain tonight.</span></td><td><a href="#qua-khu-tuong-lai">Bài 5</a></td></tr>
+    <tr><td><b>Hiện tại hoàn thành</b></td><td>S + have/has + V3 (quá khứ phân từ)</td><td>kinh nghiệm; vừa xong; for/since</td><td><span class="say">I have finished the report.</span> <span class="say">Have you ever been to Japan?</span></td><td><a href="#so-sanh">Bài 5B</a></td></tr>
+    <tr><td><b>Quá khứ tiếp diễn</b></td><td>S + was/were + V-ing</td><td>việc đang diễn ra tại một lúc trong quá khứ</td><td><span class="say">I was cooking when he called.</span></td><td><a href="#so-sanh">Bài 5B</a></td></tr>
+  </table></div>
+  <p>Ghi nhớ chính tả:</p>
+  <ul>
+    <li>Đuôi <b>-s/-es</b> cho he/she/it: <span class="say">watch → watches</span>, <span class="say">go → goes</span>, <span class="say">study → studies</span>, <span class="say">have → has</span>.</li>
+    <li>Đuôi <b>-ed</b>: <span class="say">work → worked</span>; <span class="say">study → studied</span>; <span class="say">stop → stopped</span> (gấp đôi phụ âm cuối với từ ngắn). Cách đọc: /t/, /d/, /ɪd/ (xem <a href="#phat-am">Bài 1</a>).</li>
+    <li>Động từ bất quy tắc phải thuộc: <span class="say">go–went–gone</span>, <span class="say">have–had–had</span>, <span class="say">make–made–made</span>, <span class="say">see–saw–seen</span>, <span class="say">take–took–taken</span>, <span class="say">do–did–done</span>, <span class="say">be–was/were–been</span>.</li>
+    <li><b>for</b> + khoảng thời gian (<span class="say">for two years</span>); <b>since</b> + mốc bắt đầu (<span class="say">since 2020</span>).</li>
+  </ul>
+  <p>Các thì <b>để sau</b> (chưa dạy ở A1–A2): hiện tại hoàn thành tiếp diễn, quá khứ hoàn thành, tương lai tiếp diễn…</p>
+
+  <h2>5. Động từ khuyết thiếu (modal) <span class="tag hyp">Tự soạn</span></h2>
+  <p>Công thức: <b>modal + động từ nguyên mẫu</b>, không thêm to, không thêm -s (<span class="say">She can speak</span>). Học kỹ ở <a href="#modal">Bài 6</a>.</p>
+  <div class="tbl"><table>
+    <tr><th>Modal</th><th>Dùng cho</th><th>Ví dụ</th></tr>
+    <tr><td>can / can't</td><td>khả năng; xin phép thân mật</td><td><span class="say">I can swim.</span> <span class="say">Can I sit here?</span></td></tr>
+    <tr><td>could</td><td>nhờ vả lịch sự</td><td><span class="say">Could you help me, please?</span></td></tr>
+    <tr><td>would like ('d like)</td><td>muốn (lịch sự)</td><td><span class="say">I'd like a coffee.</span></td></tr>
+    <tr><td>should / shouldn't</td><td>lời khuyên</td><td><span class="say">You should rest.</span></td></tr>
+    <tr><td>have to / has to</td><td>bắt buộc theo hoàn cảnh</td><td><span class="say">I have to go now.</span></td></tr>
+    <tr><td>must / mustn't</td><td>bắt buộc / cấm</td><td><span class="say">You mustn't smoke here.</span></td></tr>
+    <tr><td>may / might</td><td>có thể xảy ra</td><td><span class="say">It might rain.</span></td></tr>
+  </table></div>
+  <p class="note">Bẫy: <b>don't have to</b> = không cần (được phép không làm); <b>mustn't</b> = cấm.</p>
+
+  <h2>6. Danh từ <span class="tag hyp">Tự soạn</span></h2>
+  <div class="tbl"><table>
+    <tr><th>Chủ đề</th><th>Quy tắc</th><th>Ví dụ</th></tr>
+    <tr><td>Số nhiều</td><td>thêm -s; -s/-sh/-ch/-x → -es; phụ âm + y → -ies; một số từ tận cùng -o → -es (<span class="say">tomatoes</span>, <span class="say">potatoes</span>; nhưng <span class="say">photos</span>, <span class="say">pianos</span>)</td><td><span class="say">cats</span>, <span class="say">boxes</span>, <span class="say">babies</span></td></tr>
+    <tr><td>Bất quy tắc</td><td>man–men, woman–women, child–children, person–people</td><td></td></tr>
+    <tr><td>Đếm được / không đếm được</td><td>đếm được có a/an, số nhiều; không đếm được không có a/an, không -s</td><td><span class="say">a book</span>, <span class="say">two books</span> / <span class="say">water</span>, <span class="say">rice</span>, <span class="say">information</span>, <span class="say">advice</span></td></tr>
+    <tr><td>Lượng từ</td><td>đếm được: many, a few; không đếm được: much, a little; cả hai: some, any, a lot of</td><td><span class="say">some water</span>, <span class="say">many people</span></td></tr>
+  </table></div>
+  <p><b>Some</b> dùng trong câu khẳng định, <b>any</b> trong câu phủ định và câu hỏi: <span class="say">I don't have any questions.</span> <span class="say">Do you have any questions?</span> Học kỹ: <a href="#cau-co-ban">Bài 2B</a> (số nhiều) và <a href="#ghep-cau">Bài 7</a> (đếm được).</p>
+
+  <h2>7. Mạo từ: a / an / the / không mạo từ <span class="tag hyp">Tự soạn</span></h2>
+  <div class="tbl"><table>
+    <tr><th>Mạo từ</th><th>Dùng khi</th><th>Ví dụ</th></tr>
+    <tr><td><b>a</b></td><td>danh từ đếm được <b>số ít</b>, nhắc lần đầu, chung chung; trước <b>âm phụ âm</b></td><td><span class="say">a book</span>, <span class="say">a university</span></td></tr>
+    <tr><td><b>an</b></td><td>giống “a” nhưng trước <b>âm nguyên âm</b> (xét <b>âm</b>, không xét chữ)</td><td><span class="say">an apple</span>, <span class="say">an hour</span></td></tr>
+    <tr><td><b>the</b></td><td>cái đã xác định (hai bên đều biết), duy nhất, đã nhắc rồi</td><td><span class="say">Close the door.</span> <span class="say">The sun is hot.</span> <span class="say">I have a dog. The dog is big.</span></td></tr>
+    <tr><td><b>Không mạo từ</b> (Ø)</td><td>danh từ số nhiều nói chung; không đếm được nói chung; tên riêng; bữa ăn, môn học, ngôn ngữ</td><td><span class="say">I like music.</span> <span class="say">She speaks English.</span> <span class="say">We have lunch at noon.</span></td></tr>
+  </table></div>
+  <p class="note">Mẹo chọn nhanh: <i>Có đếm được không? Số ít hay số nhiều? Người nghe đã biết cái nào chưa?</i> Học kỹ ở <a href="#ghep-cau">Bài 7</a>.</p>
+
+  <h2>8. Giới từ <span class="tag hyp">Tự soạn</span></h2>
+  <h3>Thời gian và nơi chốn (in / on / at)</h3>
+  <div class="tbl"><table>
+    <tr><th></th><th><b>at</b> (điểm)</th><th><b>on</b> (bề mặt, ngày)</th><th><b>in</b> (khoảng, không gian bao quanh)</th></tr>
+    <tr><td>Thời gian</td><td><span class="say">at 7 o'clock</span>, <span class="say">at night</span>, <span class="say">at noon</span></td><td><span class="say">on Monday</span>, <span class="say">on May 5th</span>, <span class="say">on my birthday</span></td><td><span class="say">in May</span>, <span class="say">in 2026</span>, <span class="say">in summer</span>, <span class="say">in the morning</span></td></tr>
+    <tr><td>Nơi chốn</td><td><span class="say">at home</span>, <span class="say">at work</span>, <span class="say">at the station</span>, <span class="say">at the door</span></td><td><span class="say">on the table</span>, <span class="say">on the wall</span>, <span class="say">on the second floor</span></td><td><span class="say">in a room</span>, <span class="say">in Hanoi</span>, <span class="say">in Vietnam</span>, <span class="say">in the box</span></td></tr>
+  </table></div>
+  <h3>Chuyển động và các giới từ thường dùng</h3>
+  <div class="tbl"><table>
+    <tr><th>Giới từ</th><th>Nghĩa</th><th>Ví dụ</th></tr>
+    <tr><td>to / from</td><td>đến / từ</td><td><span class="say">go to work</span>, <span class="say">from Hue</span></td></tr>
+    <tr><td>into / out of</td><td>vào / ra</td><td><span class="say">go into the room</span></td></tr>
+    <tr><td>by</td><td>bằng (phương tiện)</td><td><span class="say">by bus</span>, <span class="say">by email</span></td></tr>
+    <tr><td>with / without</td><td>với / không có</td><td><span class="say">coffee without sugar</span></td></tr>
+    <tr><td>for</td><td>cho; trong (khoảng)</td><td><span class="say">This is for you.</span> <span class="say">for ten minutes</span></td></tr>
+    <tr><td>about</td><td>về; khoảng</td><td><span class="say">about 20 minutes</span></td></tr>
+    <tr><td>next to, near, between, in front of, behind</td><td>vị trí</td><td><span class="say">next to the bank</span></td></tr>
+  </table></div>
+  <p>Học giới từ <b>theo cụm</b>, không theo nghĩa từng chữ: <span class="say">depend on</span>, <span class="say">interested in</span>, <span class="say">good at</span>, <span class="say">arrive in/at</span>, <span class="say">listen to</span>. Học kỹ in/on/at ở <a href="#ghep-cau">Bài 7</a>.</p>
+
+  <h2>9. Tính từ, trạng từ, so sánh <span class="tag hyp">Tự soạn</span></h2>
+  <ul>
+    <li><b>Tính từ</b> đứng trước danh từ hoặc sau to be; không thêm -s: <span class="say">a big house</span>, <span class="say">two big houses</span>; <span class="say">The house is big.</span></li>
+    <li><b>Trạng từ tần suất</b> đứng <b>trước động từ thường, sau to be</b>: always, usually, often, sometimes, never. <span class="say">I usually walk to work.</span> <span class="say">She is never late.</span></li>
+    <li><b>Trạng từ cách thức:</b> tính từ + -ly (<span class="say">quickly</span>, <span class="say">carefully</span>). Ngoại lệ: <span class="say">good → well</span>, <span class="say">fast → fast</span>.</li>
+  </ul>
+  <div class="tbl"><table>
+    <tr><th>Loại từ</th><th>So sánh hơn</th><th>So sánh nhất</th></tr>
+    <tr><td>Ngắn (1 âm tiết)</td><td>tính từ + -er (<span class="say">cheaper</span>) than</td><td>the + -est (<span class="say">the cheapest</span>)</td></tr>
+    <tr><td>2 âm tiết tận cùng -y</td><td>đổi y → i rồi thêm -er (<span class="say">easier</span>, <span class="say">happier</span>) than</td><td>the + -iest (<span class="say">the easiest</span>, <span class="say">the happiest</span>)</td></tr>
+    <tr><td>Dài (2 âm tiết trở lên, trừ tận cùng -y)</td><td>more + tính từ (<span class="say">more expensive</span>) than</td><td>the most + tính từ (<span class="say">the most expensive</span>)</td></tr>
+    <tr><td>Bất quy tắc</td><td><span class="say">good → better</span></td><td><span class="say">the best</span> (<span class="say">bad → worse → the worst</span>)</td></tr>
+  </table></div>
+  <p>Học kỹ so sánh ở <a href="#so-sanh">Bài 5B</a>.</p>
+
+  <h2>10. Liên từ và câu ghép <span class="tag hyp">Tự soạn</span></h2>
+  <div class="tbl"><table>
+    <tr><th>Từ nối</th><th>Chức năng</th><th>Ví dụ</th></tr>
+    <tr><td>and</td><td>thêm</td><td><span class="say">I work and I study.</span></td></tr>
+    <tr><td>but</td><td>tương phản</td><td><span class="say">It's small but good.</span></td></tr>
+    <tr><td>or</td><td>lựa chọn</td><td><span class="say">Tea or coffee?</span></td></tr>
+    <tr><td>because</td><td>nguyên nhân</td><td><span class="say">I'm late because of the rain.</span> / <span class="say">because it rained</span></td></tr>
+    <tr><td>so</td><td>kết quả</td><td><span class="say">It was cheap, so I bought it.</span></td></tr>
+    <tr><td>when</td><td>khi</td><td><span class="say">Call me when you arrive.</span></td></tr>
+    <tr><td>if</td><td>nếu</td><td><span class="say">If you are free, call me.</span></td></tr>
+  </table></div>
+  <p>Có thể dạy sớm: <b>if</b> dùng hiện tại đơn cho cả hai vế khi nói sự thật hoặc việc có thể xảy ra (<span class="say">If it rains, we stay home</span>). Các kiểu điều kiện khác để sau. Học kỹ ở <a href="#ghep-cau">Bài 7</a>.</p>
+
+  <h2>11. Năm loại câu và câu hỏi <span class="tag hyp">Tự soạn</span></h2>
+  <div class="tbl"><table>
+    <tr><th>Loại câu</th><th>Cấu trúc</th><th>Ví dụ</th></tr>
+    <tr><td>Khẳng định</td><td>S + V</td><td><span class="say">She likes tea.</span></td></tr>
+    <tr><td>Phủ định</td><td>S + trợ động từ + not + V</td><td><span class="say">She doesn't like coffee.</span></td></tr>
+    <tr><td>Hỏi Yes/No</td><td>Trợ động từ + S + V?</td><td><span class="say">Does she like tea?</span> <span class="say">Yes, she does.</span></td></tr>
+    <tr><td>Hỏi Wh</td><td><b>Từ hỏi + trợ động từ + S + V?</b></td><td><span class="say">Where do you live?</span> <span class="say">What did you eat?</span> <span class="say">When will they arrive?</span></td></tr>
+    <tr><td>Mệnh lệnh / lời nhờ</td><td>V nguyên mẫu (+ please)</td><td><span class="say">Close the door, please.</span></td></tr>
+  </table></div>
+  <p><b>Từ hỏi:</b> what (cái gì), where (ở đâu), when (khi nào), who (ai), why (tại sao), how (thế nào), how much / how many (bao nhiêu), which (cái nào).</p>
+  <p>Công thức thường dùng: <b>từ hỏi → trợ động từ (do/does/did/will/can) → chủ ngữ → động từ nguyên mẫu</b>. Bỏ từ hỏi là thành câu Yes/No. Hai ngoại lệ hay gặp: với to be thì đưa be lên trước chủ ngữ (<span class="say">Where is the bank?</span>), và khi từ hỏi chính là chủ ngữ thì không cần trợ động từ (<span class="say">Who called you?</span>). Học kỹ ở <a href="#hien-tai-don">Bài 3</a>.</p>
+
+  <h2>12. Chưa có trong bảng <span class="tag hyp">Tự soạn</span></h2>
+  <p>Câu bị động, điều kiện loại 2 và 3, mệnh đề quan hệ (who, which, that), câu gián tiếp, cụm động từ (phrasal verbs). Cố ý bỏ ra để người mới không bị quá tải.</p>
+</section>
+
 <section class="lesson" id="phan-tich" data-title="Phân tích câu">
   <div class="kicker">Công cụ</div>
   <h1>Phân tích câu</h1>
@@ -1610,6 +2045,7 @@ var LESSONS = [
   {id:"phuong-phap", n:"Bài 0", t:"Cách học 80/20", d:"4 thói quen quyết định tốc độ tiến bộ, lịch 30 phút/ngày.", grp:"Khu 1 · Học để dùng", z:1},
   {id:"phat-am", n:"Bài 1", t:"Phát âm sống còn", d:"Âm cuối, -s, -ed, trọng âm, th và nối âm.", z:1},
   {id:"to-be", n:"Bài 2", t:"Câu cơ bản và to be", d:"Đại từ, am/is/are, khung tự giới thiệu.", z:1},
+  {id:"cau-co-ban", n:"Bài 2B", t:"S + V + O, số nhiều, to be đầy đủ", d:"Khung S + V + O, đổi số ít sang số nhiều, 15 cách dùng to be, bài tập A–H, 5 bài đọc.", z:1},
   {id:"hien-tai-don", n:"Bài 3", t:"Hiện tại đơn và câu hỏi", d:"Thói quen, công việc; công thức câu hỏi vạn năng.", z:1},
   {id:"tu-vung", n:"Bài 4", t:"Từ vựng lõi", d:"186 từ tần suất cao, 5 động từ đa năng, thẻ ôn có lịch ngày.", z:1},
   {id:"qua-khu-tuong-lai", n:"Bài 5", t:"Quá khứ, tương lai, đang làm", d:"Kể chuyện hôm qua, kế hoạch, việc đang diễn ra.", z:1},
@@ -1623,11 +2059,12 @@ var LESSONS = [
   {id:"hoc-thuat", n:"Bài 10", t:"Từ vựng học thuật (AWL)", d:"Sublist 1–3, họ từ, danh từ hóa, hedging, từ nối.", grp:"Khu 2 · Nâng cao và IELTS", z:2},
   {id:"chuyen-nganh", n:"Bài 11", t:"Từ vựng chuyên ngành", d:"Gốc từ khoa học, thuật ngữ 7 ngành, cách tự xây bộ từ.", z:2},
   {id:"ielts", n:"Bài 12", t:"Chiến lược IELTS", d:"Cấu trúc đề, tiêu chí chấm, TRUE/FALSE/NOT GIVEN, Writing, Speaking.", z:2},
-  {id:"phan-tich", n:"Công cụ", t:"Phân tích câu", d:"Dán hoặc tải tài liệu, bật chế độ phân tích để gạch chân S, V, O, C, A theo màu.", grp:"Công cụ", tool:1}
+  {id:"bang-ngu-phap", n:"Tra cứu", t:"Bảng tổng hợp ngữ pháp", d:"Bản đồ A1–A2: câu, từ loại, thì, modal, danh từ, mạo từ, giới từ, so sánh, câu hỏi; mỗi mục trỏ sang bài học kỹ.", grp:"Công cụ", tool:1},
+  {id:"phan-tich", n:"Công cụ", t:"Phân tích câu", d:"Dán hoặc tải tài liệu, bật chế độ phân tích để gạch chân S, V, O, C, A theo màu.", tool:1}
 ];
 var COUNTED = LESSONS.filter(function(l){return l.z && !l.nocount;}).map(function(l){return l.id;});
 var ZONE = {1:"Khu 1", 2:"Khu 2"};
-var FOUNDATION = ["phuong-phap","phat-am","to-be","hien-tai-don","tu-vung","qua-khu-tuong-lai","so-sanh","modal","ghep-cau","mau-cau","cong-viec"];
+var FOUNDATION = ["phuong-phap","phat-am","to-be","cau-co-ban","hien-tai-don","tu-vung","qua-khu-tuong-lai","so-sanh","modal","ghep-cau","mau-cau","cong-viec"];
 
 var VOCAB = [
 /* từ chức năng */
@@ -1946,6 +2383,19 @@ var QUIZ = {
 {q:"Câu hỏi nào đúng?",o:["Are you a student?","Do you are a student?","You student?"],a:0,w:"Câu hỏi với to be: đưa am/is/are lên đầu, không dùng thêm do."},
 {q:"Sửa câu “I am agree.”:",o:["I agree.","I am agreeing with.","I agreed am."],a:0,w:"agree đã là động từ nên không cần am."},
 {q:"This is ___ book. (sách của họ)",o:["they","them","their"],a:2,w:"Đứng trước danh từ để chỉ sở hữu dùng their."}],
+"cau-co-ban":[
+{q:"Câu nào có nghĩa “Người cắn chó”?",o:["The man bites the dog.","The dog bites the man.","Bites the man the dog."],a:0,w:"Thứ tự S + V + O quyết định nghĩa: đổi chỗ S và O là đổi nghĩa."},
+{q:"We are teachers. Trong câu này “teachers” là:",o:["O (tân ngữ)","C (bổ ngữ)","V (động từ)"],a:1,w:"Sau be là bổ ngữ (C): we và teachers là cùng một đối tượng. O chỉ đứng sau động từ thường."},
+{q:"My sister drinks coffee every morning. Tân ngữ (O) là:",o:["My sister","drinks","coffee","every morning"],a:2,w:"coffee là cái chịu hành động drinks. every morning chỉ thời gian."},
+{q:"The water ___ cold.",o:["am","is","are"],a:1,w:"water là danh từ không đếm được, đi với is."},
+{q:"Tom and Lan ___ friends.",o:["is","am","are"],a:2,w:"Hai danh từ số ít nối bằng and thành số nhiều, nên dùng are."},
+{q:"Số nhiều của “baby” là:",o:["babys","babies","babyes"],a:1,w:"Phụ âm + y: đổi y thành -ies."},
+{q:"Số nhiều của “knife” là:",o:["knifes","knives","knifs"],a:1,w:"Một số từ tận cùng -fe đổi thành -ves: knife → knives."},
+{q:"Đổi cả câu sang số nhiều: “She is a teacher.”",o:["They are teachers.","They is teachers.","They are a teachers."],a:0,w:"Bốn bước: đổi chủ ngữ (they), đổi be (are), bỏ a, thêm -s cho danh từ."},
+{q:"“Tôi 28 tuổi” là:",o:["I have 28 years.","I am 28.","I 28."],a:1,w:"Tuổi dùng to be, không dùng have."},
+{q:"I like ___. (cô ấy)",o:["she","her","hers"],a:1,w:"Sau động từ dùng đại từ tân ngữ: her."},
+{q:"Phủ định của “He is tired.” là:",o:["He isn't tired.","He doesn't tired.","He not is tired."],a:0,w:"Phủ định của to be: thêm not sau is (rút gọn isn't), không mượn do."},
+{q:"Câu trả lời ngắn đúng cho “Are you tired?” (đang mệt):",o:["Yes, I am.","Yes, I'm.","Yes, I do."],a:0,w:"Trả lời khẳng định ngắn với be không rút gọn: Yes, I am."}],
 "hien-tai-don":[
 {q:"He ___ coffee every morning.",o:["drink","drinks","drinking"],a:1,w:"Hiện tại đơn với he/she/it thì động từ thêm -s."},
 {q:"She ___ like spicy food.",o:["don't","doesn't","isn't"],a:1,w:"Phủ định với she dùng doesn't + động từ nguyên mẫu."},
