@@ -1,5 +1,5 @@
 # Tập G (gói G): 47 câu MỚI, lời giải viết tay TRƯỚC khi chạy bộ phân tích; chạy lần đầu để lấy số trung thực rồi mới sửa luật.
-# Quy ước như gold-heldout.txt. Cụm tính từ/danh từ giữa hai dấu phẩy gạch [M ...]. Các câu lỗi đã biết của Kiểm định (appointed her manager, painted the wall white, left her sister a note, The teacher, tired and hungry...) nằm ở gold-hoi-quy.txt, không ở đây.
+# Quy ước như gold-heldout.txt (mệnh đề quan hệ không có dấu phẩy = <m ...>; cụm giới từ in/on/at/for sau danh từ = [A ...]). Hai dòng (The man who lives next door; She is the tallest girl) lúc đầu tôi viết sai quy ước, sửa sau lần chạy đầu và ghi ở NHAT-KY. Cụm tính từ/danh từ giữa hai dấu phẩy gạch [M ...]. Các câu lỗi đã biết của Kiểm định (appointed her manager, painted the wall white, left her sister a note, The teacher, tired and hungry...) nằm ở gold-hoi-quy.txt, không ở đây.
 # O + C (appoint, vote, crown, elect, declare, paint, drive, keep, turn, find, leave, consider, wipe)
 The board appointed him chairman. ||| [S The board] [V appointed] [O him] [C chairman]
 The students voted her class president. ||| [S The students] [V voted] [O her] [C class president]
@@ -44,10 +44,10 @@ My sister, who lives in Paris, works for a bank. ||| [S My sister] <M [X who] [V
 # Câu thường (đo độ chính xác chung)
 Every morning my grandfather walks his dog in the park. ||| [A Every morning] [S my grandfather] [V walks] [O his dog] [A in the park]
 When the milk boils, the foam rises quickly. ||| <A [X When] [S the milk] [V boils]> [S the foam] [V rises] [A quickly]
-The man who lives next door is a pilot. ||| [S The man] <M [X who] [V lives] [A next door]> [V is] [C a pilot]
+The man who lives next door is a pilot. ||| [S The man] <m [X who] [V lives] [A next door]> [V is] [C a pilot]
 I don't know where she put the keys. ||| [S I] [V don't know] <O [X where] [S she] [V put] [O the keys]>
 My parents want to visit Japan next year. ||| [S My parents] [V want] <T [T to visit] [O Japan] [A next year]>
 We watched a film in the evening. ||| [S We] [V watched] [O a film] [A in the evening]
-She is the tallest girl in the class. ||| [S She] [V is] [C the tallest girl in the class]
+She is the tallest girl in the class. ||| [S She] [V is] [C the tallest girl] [A in the class]
 Why did you leave the party early? ||| [X Why] [V did] [S you] [V leave] [O the party] [A early]
 She said that the train was late. ||| [S She] [V said] <O [X that] [S the train] [V was] [C late]>

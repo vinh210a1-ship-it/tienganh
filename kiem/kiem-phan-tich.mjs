@@ -67,5 +67,14 @@ const b = chamTap('gold-heldout.txt', 'Tập giữ lại (viết lời giải tr
 const c = chamTap('gold-moi.txt', 'Tập mới (40 câu, chạy lần đầu để lấy số trung thực)');
 const d = chamTap('gold-tap4.txt', 'Tập 4 (30 câu chưa từng thấy, chạy một lần rồi mới sửa)');
 const e = chamTap('gold-hoi-quy.txt', 'Hồi quy (lỗi Kiểm định tìm ra, đã sửa; chỉ để chống lỗi quay lại)');
+const g = chamTap('gold-g.txt', 'Tập G (47 câu mới của gói G, lời giải viết trước khi chạy; số lần đầu ghi ở NHAT-KY)');
+const g2 = chamTap('gold-g2.txt', 'Tập G2 (29 câu mới viết sau khi sửa tập G; chạy một lần, không chỉnh theo)');
 const NGUONG = 0.75;
 if (c.F < NGUONG) { console.log(`\nF1 tập mới ${(100 * c.F).toFixed(1)}% thấp hơn ngưỡng ${NGUONG * 100}%`); process.exit(1); }
+// Chống hồi quy (gói G): ba tập đã sửa xong phải còn đúng hoàn toàn; tập 4 (tập giữ, không chỉnh theo) không được tụt dưới mức hiện tại.
+const loi = [];
+if (e.exact < 1) loi.push('tập hồi quy không còn đúng hoàn toàn');
+if (g.exact < 1) loi.push('tập G không còn đúng hoàn toàn');
+if (g2.exact < 1) loi.push('tập G2 không còn đúng hoàn toàn');
+if (d.F < 0.95) loi.push(`tập 4 F1 ${(100 * d.F).toFixed(1)}% tụt dưới 95%`);
+if (loi.length) { console.log('\nTỤT ĐIỂM: ' + loi.join('; ')); process.exit(1); }
