@@ -1,0 +1,27 @@
+# Hồi quy: các lỗi do bộ phận Kiểm định tìm ra ở PR #2 và lỗi tìm thêm khi sửa. Lời giải viết tay; câu đã được sửa luật cho khớp, nên bộ này CHỈ để chống lỗi quay lại, không dùng làm độ chính xác.
+He called me a liar. ||| [S He] [V called] [O me] [C a liar]
+They elected Maria president. ||| [S They] [V elected] [O Maria] [C president]
+They named the baby Anna. ||| [S They] [V named] [O the baby] [C Anna]
+I consider him my friend. ||| [S I] [V consider] [O him] [C my friend]
+He found it easy. ||| [S He] [V found] [O it] [C easy]
+She gave up smoking last year. ||| [S She] [V gave up] [O smoking] [A last year]
+My brother travels a lot. ||| [S My brother] [V travels] [A a lot]
+She asked him where he lived. ||| [S She] [V asked] [O him] <O [X where] [S he] [V lived]>
+He told me that he was tired. ||| [S He] [V told] [O me] <O [X that] [S he] [V was] [C tired]>
+She told me that the shop was closed. ||| [S She] [V told] [O me] <O [X that] [S the shop] [V was closed]>
+He asked what time it was. ||| [S He] [V asked] <O [X what time] [S it] [V was]>
+What did you buy? ||| [O What] [V did] [S you] [V buy]
+What are you doing? ||| [O What] [V are] [S you] [V doing]
+What time is it? ||| [X What time] [V is] [S it]
+She is reading a book. ||| [S She] [V is reading] [O a book]
+I am doing my homework. ||| [S I] [V am doing] [O my homework]
+Having a car is useful. ||| <S [V Having] [O a car]> [V is] [C useful]
+She made me a cake. ||| [S She] [V made] [O me] [O a cake]
+He left me a message. ||| [S He] [V left] [O me] [O a message]
+I found her a good job. ||| [S I] [V found] [O her] [O a good job]
+Can you find me a taxi? ||| [V Can] [S you] [V find] [O me] [O a taxi]
+I will keep you a seat. ||| [S I] [V will keep] [O you] [O a seat]
+He left the company a year ago. ||| [S He] [V left] [O the company] [A a year ago]
+He left a year ago. ||| [S He] [V left] [A a year ago]
+I saw him a week ago. ||| [S I] [V saw] [O him] [A a week ago]
+He found it easy. ||| [S He] [V found] [O it] [C easy]

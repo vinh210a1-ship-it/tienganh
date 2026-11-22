@@ -66,5 +66,6 @@ const a = chamTap('gold-ielts.txt', 'Tập chỉnh (10 câu IELTS, đã dùng đ
 const b = chamTap('gold-heldout.txt', 'Tập giữ lại (viết lời giải trước khi chạy)');
 const c = chamTap('gold-moi.txt', 'Tập mới (40 câu, chạy lần đầu để lấy số trung thực)');
 const d = chamTap('gold-tap4.txt', 'Tập 4 (30 câu chưa từng thấy, chạy một lần rồi mới sửa)');
+const e = chamTap('gold-hoi-quy.txt', 'Hồi quy (lỗi Kiểm định tìm ra, đã sửa; chỉ để chống lỗi quay lại)');
 const NGUONG = 0.75;
 if (c.F < NGUONG) { console.log(`\nF1 tập mới ${(100 * c.F).toFixed(1)}% thấp hơn ngưỡng ${NGUONG * 100}%`); process.exit(1); }
