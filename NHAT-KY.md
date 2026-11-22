@@ -1,5 +1,16 @@
 # Nhật ký web Tiếng Anh 80/20 (mục mới nhất ở trên)
 
+## 2026-11-22 chiều · gói A: sửa chỗ web nói sai + bộ kiểm chung (nhánh claude/project-thread-t6ipwc)
+- Bài 4: bỏ câu "Mỗi ngày thêm 10–15 từ mới… Sau 8 tuần thuộc hết bộ này" (mâu thuẫn bộ 186 thẻ). Thay bằng: bộ có 186 thẻ; nhịp gợi ý khoảng 15–20 từ mới mỗi tuần (2–3 từ mỗi ngày) cộng ôn thẻ đến hạn; học hết bộ khoảng 9–12 tuần (186/20 ≈ 9,3; 186/15 ≈ 12,4). Nhịp này gắn nhãn Ước lượng (nhãn [G]), không phải kết quả nghiên cứu.
+- Trang Lộ trình: câu "Mục tiêu tuần 8: thuộc hết bộ thẻ" cũng mâu thuẫn nên sửa thành "đã mở hết các nhóm thẻ ghi trong lộ trình và không dồn thẻ quá hạn; thuộc cả 186 thẻ cần khoảng 9–12 tuần".
+- "Sau khóa này học gì tiếp": bỏ hiện tại hoàn thành và so sánh (đã dạy ở Bài 5B, có liên kết). Việc còn lại: hoàn thành bộ thẻ, cụm động từ, mở rộng vốn từ 2.000–3.000 họ từ, đọc sách phân cấp + nghe có phụ đề, dùng lại kiến thức qua Thực hành và Phân tích câu.
+- Bài 3 (bảng động từ bất quy tắc): câu "hiện tại hoàn thành, sẽ học ở giai đoạn sau" cũng lỗi thời, nay trỏ tới Bài 5B.
+- Thêm `kiem/kiem-web.mjs` (cần Playwright): đếm thẻ/mẫu câu/câu quiz so với mốc 186/80/87 và so với chữ trên trang; mọi liên kết # (HTML tĩnh, chuỗi JS, DOM sau khi vẽ) trỏ tới bài có thật; mở 19 bài không lỗi console; 390 px không tràn ngang; tương phản chế độ tối (tự động và ép data-theme) ≥ 4,5:1 ở menu bài đang chọn (8,49), số bài (6,92), nút tab (8,49), nút chính (9,10); chặn câu "10–15 từ mới" quay lại.
+- Đã thử bắt lỗi thật: chạy trên `index.html` của main cũ ra 4 phép đỏ (đúng hai lỗi của gói A); cố ý làm hỏng một liên kết ra đỏ; cố ý đổi màu chữ chế độ tối ra 2,19:1 đỏ. Bản đã sửa: xanh toàn bộ.
+- Chưa kiểm được (cloud): trang live github.io, nghe bằng tai, Safari iPhone. Bộ kiểm không đo được nội dung đúng/sai về ngữ pháp, chỉ bắt trang vỡ.
+- Lệnh cho các gói sau: `node kiem/kiem-web.mjs` (cố ý đổi số thẻ/mẫu câu/câu quiz thì sửa `BAN_DAU` ở đầu file cùng PR). `node kiem/kiem-phan-tich.mjs` vẫn dùng cho Phân tích câu.
+- Chưa chép sang E:\web tiếng anh (chờ gộp PR, làm một lần sau gói A, sao lưu bản cũ vào goc\).
+
 ## 2026-11-22 tối · sửa lỗi Kiểm định tìm ở PR #2 (nhánh claude/phan-tich-sua-oc)
 - Kiểm định đã gộp PR #2 và ghi 5 lỗi nhỏ; sửa 1–4 và một phần 5:
   1. O + C: "He called me a liar", "They elected Maria president", "They named the baby Anna", "I consider him my friend" nay ra O rồi C (động từ call/name/elect/appoint/declare/crown/vote/label/consider; ban đầu có thêm choose/find/keep/leave nhưng Kiểm định chỉ ra làm hỏng "He left me a message", "He left the company a year ago"... nên đã bỏ, các động từ này giữ O + tính từ; có tách "Maria president" thành O + C khi một chữ viết hoa).

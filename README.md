@@ -5,7 +5,7 @@ Web học tiếng Anh bằng tiếng Việt, hai khu: **Học để dùng** (20%
 Trang chính là `index.html`, cộng thêm bộ phân tích câu `phan-tich/phan-tich.js` (một file JavaScript, không cần cài gì). Bấm đúp `index.html` để mở bằng Chrome, Edge hoặc Safari; giữ nguyên thư mục `phan-tich/` bên cạnh nó.
 
 ## Cấu trúc
-- **Khu 1 · Học để dùng:** Bài 0–9, Bài 5B (so sánh, hiện tại hoàn thành, for/since), 6 tình huống Thực hành, Lộ trình 8 tuần.
+- **Khu 1 · Học để dùng:** Bài 0–9, Bài 5B (so sánh, hiện tại hoàn thành, for/since), 6 tình huống Thực hành, Lộ trình 8 tuần (186 thẻ từ ở Bài 4 cần khoảng 9–12 tuần để học hết).
 - **Khu 2 · Nâng cao và IELTS:** Bài 10 (AWL), Bài 11 (chuyên ngành), Bài 12 (IELTS).
 - **Kiểm tra trình độ** dùng chung (A1 → C1 và vốn từ).
 - **Công cụ · Phân tích câu:** dán hoặc tải tệp (.txt, .md, .docx), bật chế độ phân tích để gạch chân S, V, O, C, A, to-V theo màu. Chạy hoàn toàn trong trình duyệt, kết quả chỉ là gợi ý.
@@ -23,5 +23,8 @@ Lưu trong trình duyệt (localStorage, khóa bắt đầu bằng `en8020.`). S
 - `phan-tich/phan-tich.js`: từ điển nhỏ, luật gán thành phần, xuất HTML. Thêm từ mới: sửa các danh sách đầu file (`VERBS`, `NOUNS`, `ADJS`, `IRREG`).
 - `kiem/`: các bộ câu có lời giải viết tay (`gold-*.txt`) và `kiem-phan-tich.mjs`. Chạy `node kiem/kiem-phan-tich.mjs --chi-tiet` (cần Node.js) để đo lại sau mỗi lần sửa luật. Bộ `gold-tap4.txt` chỉ chạy lần đầu để lấy số thật, đừng chỉnh luật theo nó.
 - Giao diện nằm trong `index.html` (mục `id="phan-tich"`, CSS `.pc-*`, mã JS "Phân tích câu").
+
+## Kiểm cả trang trước khi gộp PR
+`node kiem/kiem-web.mjs` (cần Node.js và Playwright: `npm install --no-save playwright && npx playwright install chromium`). Kiểm số thẻ/mẫu câu/câu quiz, liên kết `#`, lỗi console, tràn ngang ở 390 px, tương phản chữ chế độ tối. Thêm hoặc bớt thẻ, mẫu câu, câu quiz thì sửa `BAN_DAU` ở đầu file cùng PR.
 
 Nhật ký thay đổi: `NHAT-KY.md`.
