@@ -44,6 +44,7 @@
   many('can could will would shall should may might must ought', 'M');
   add('cannot', 'M', null, { neg: 1 });
   add('be', 'BE', 'b'); many('am is are was were', 'BE', 'fin'); add('been', 'BE', 'n'); add('being', 'BE', 'g');
+  add('doing', 'V', 'g'); add('having', 'V', 'g');
   add('have', 'HV', 'b'); many('have has had', 'HV', 'fin'); add('had', 'HV', 'n'); add('having', 'HV', 'g');
   add('do', 'DO', 'b'); many('do does did', 'DO', 'fin'); add('done', 'DO', 'n'); add('doing', 'DO', 'g');
   add('not', 'NEG'); add("n't", 'NEG');
@@ -60,7 +61,7 @@
   var NEG_INV = ['not only', 'not until', 'never', 'hardly', 'rarely', 'seldom', 'scarcely', 'no sooner', 'only when', 'only after', 'little'];
 
   /* động từ thường (dạng gốc) */
-  var VERBS = ('apologize exchange kick kiss paint pretend protect repair cling creep kneel shrink wind weave broadcast burst grind lower lessen enhance ensure facilitate minimise modify monitor predict regulate restrict simulate sustain transform utilize whisk emulsify homogenize pasteurize sterilize ferment extract isolate precipitate coagulate crystallize affect contribute cause rain snow fail exceed refer decrease tolerate resist absorb release dissolve interact adsorb adhere bind form accept achieve act add admit adopt advise afford agree aim allow announce answer appear apply argue arrange arrive ask assume attach attempt avoid bake bath believe belong borrow boil bother call carry cause celebrate change charge chat check choose claim clean clear click climb close collect combine commit compare complain complete conceal conduct confirm connect consider consist consolidate contact contain continue contribute control convert cook copy correct cost count cover crack create cross cry cut damage dance deal decide decline decrease deliver demand demonstrate depend describe design destroy detect determine develop die differ discover discuss dislike display distribute divide double doubt download draw dream dress drop dry earn eat employ enable encourage end enjoy enter establish estimate examine exist expand expect experience explain explore express extend face fail fade fall feel fill finish fit fix focus follow force forget form freeze gain gather generate grow guess handle happen hate head hear heat help hesitate hide hit hold hope hurry identify ignore illustrate imagine imply improve include increase indicate influence inform insist install intend introduce invest invite involve join jump keep kill knock know label land last laugh launch lead learn leave lend let lie lift like limit link list listen live load lock look lose love maintain manage mark match matter mean measure meet mention mind miss mix move name need notice obtain observe occur offer open operate order organize ought own pack park pass pay perform permit pick place plan plant play point practice prefer prepare present press prevent print produce promise promote prove provide publish pull push put quit raise reach read realize receive recall recognize recommend record reduce refer reflect refuse regard relate relax release rely remain remember remind remove repeat replace replicate reply report represent require reserve respond rest result retain retrieve return reveal review revisit rise roll rub run sail save say search see seem select sell send separate serve set settle shake share shift shop shout show shut sign sing sit skip sleep slide smell smile solve sound speak spend spread stand start state stay steal stick stop store study submit succeed suffer suggest supply support suppose surprise survive switch take talk taste teach tell tend term test thank think throw touch train transfer translate travel treat trust try turn understand update use vary visit wait wake walk want warm warn wash waste watch wear weigh welcome win wish wonder work worry write yield reconstruct reread distribute stabilize memorize memorise emulsify solidify strengthen apply approach assess analyse analyze define derive evaluate estimate interpret investigate occur participate require specify summarise summarize overcome undergo undertake withdraw prolong concentrate cram review practise reconsider recover relate separate quantify minimize minimise maximise maximize optimize optimise validate verify calibrate dissolve disperse dilute stir blend whip heat cool chill freeze thaw pour weigh sieve filter rinse boil simmer bake fry roast grill steam preserve store ship order invoice approve attend schedule reschedule cancel postpone book hire fire train supervise manage report draft sign deliver').split(/\s+/);
+  var VERBS = ('elect appoint declare crown vote label apologize exchange kick kiss paint pretend protect repair cling creep kneel shrink wind weave broadcast burst grind lower lessen enhance ensure facilitate minimise modify monitor predict regulate restrict simulate sustain transform utilize whisk emulsify homogenize pasteurize sterilize ferment extract isolate precipitate coagulate crystallize affect contribute cause rain snow fail exceed refer decrease tolerate resist absorb release dissolve interact adsorb adhere bind form accept achieve act add admit adopt advise afford agree aim allow announce answer appear apply argue arrange arrive ask assume attach attempt avoid bake bath believe belong borrow boil bother call carry cause celebrate change charge chat check choose claim clean clear click climb close collect combine commit compare complain complete conceal conduct confirm connect consider consist consolidate contact contain continue contribute control convert cook copy correct cost count cover crack create cross cry cut damage dance deal decide decline decrease deliver demand demonstrate depend describe design destroy detect determine develop die differ discover discuss dislike display distribute divide double doubt download draw dream dress drop dry earn eat employ enable encourage end enjoy enter establish estimate examine exist expand expect experience explain explore express extend face fail fade fall feel fill finish fit fix focus follow force forget form freeze gain gather generate grow guess handle happen hate head hear heat help hesitate hide hit hold hope hurry identify ignore illustrate imagine imply improve include increase indicate influence inform insist install intend introduce invest invite involve join jump keep kill knock know label land last laugh launch lead learn leave lend let lie lift like limit link list listen live load lock look lose love maintain manage mark match matter mean measure meet mention mind miss mix move name need notice obtain observe occur offer open operate order organize ought own pack park pass pay perform permit pick place plan plant play point practice prefer prepare present press prevent print produce promise promote prove provide publish pull push put quit raise reach read realize receive recall recognize recommend record reduce refer reflect refuse regard relate relax release rely remain remember remind remove repeat replace replicate reply report represent require reserve respond rest result retain retrieve return reveal review revisit rise roll rub run sail save say search see seem select sell send separate serve set settle shake share shift shop shout show shut sign sing sit skip sleep slide smell smile solve sound speak spend spread stand start state stay steal stick stop store study submit succeed suffer suggest supply support suppose surprise survive switch take talk taste teach tell tend term test thank think throw touch train transfer translate travel treat trust try turn understand update use vary visit wait wake walk want warm warn wash waste watch wear weigh welcome win wish wonder work worry write yield reconstruct reread distribute stabilize memorize memorise emulsify solidify strengthen apply approach assess analyse analyze define derive evaluate estimate interpret investigate occur participate require specify summarise summarize overcome undergo undertake withdraw prolong concentrate cram review practise reconsider recover relate separate quantify minimize minimise maximise maximize optimize optimise validate verify calibrate dissolve disperse dilute stir blend whip heat cool chill freeze thaw pour weigh sieve filter rinse boil simmer bake fry roast grill steam preserve store ship order invoice approve attend schedule reschedule cancel postpone book hire fire train supervise manage report draft sign deliver').split(/\s+/);
   var IRREG = ('become became become|bend bent bent|bet bet bet|bite bit bitten|bleed bled bled|breed bred bred|burn burnt burnt|fight fought fought|flee fled fled|ride rode ridden|ring rang rung|seek sought sought|shine shone shone|spin spun spun|split split split|sting stung stung|sweep swept swept|swing swung swung|weep wept wept|lean leant leant|leap leapt leapt|forbid forbade forbidden|go went gone|get got got|make made made|say said said|see saw seen|come came come|know knew known|think thought thought|take took taken|give gave given|find found found|tell told told|feel felt felt|leave left left|put put put|bring brought brought|buy bought bought|eat ate eaten|drink drank drunk|write wrote written|read read read|meet met met|pay paid paid|send sent sent|speak spoke spoken|begin began begun|sleep slept slept|run ran run|sit sat sat|stand stood stood|lose lost lost|win won won|teach taught taught|build built built|fall fell fallen|break broke broken|draw drew drawn|choose chose chosen|drive drove driven|fly flew flown|forget forgot forgotten|hold held held|sing sang sung|swim swam swum|wear wore worn|rise rose risen|throw threw thrown|hide hid hidden|keep kept kept|let let let|set set set|cut cut cut|hit hit hit|hurt hurt hurt|cost cost cost|spend spent spent|lead led led|learn learnt learnt|understand understood understood|mean meant meant|sell sold sold|catch caught caught|grow grew grown|show showed shown|lend lent lent|feed fed fed|lie lay lain|shut shut shut|spread spread spread|steal stole stolen|shake shook shaken|wake woke woken|bear bore borne|beat beat beaten|blow blew blown|dig dug dug|hang hung hung|light lit lit|shoot shot shot|sink sank sunk|strike struck struck|swear swore sworn|tear tore torn|undergo underwent undergone|overcome overcame overcome|withdraw withdrew withdrawn|undertake undertook undertaken|forgive forgave forgiven|upset upset upset|rebuild rebuilt rebuilt|redo redid redone|rewrite rewrote rewritten').split('|');
   /* danh từ cũng là động từ, hoặc danh từ hay gặp (để từ có hai khả năng) */
   var NV = ('approach attempt benefit challenge claim comment concern control copy escape experiment guess influence interest joke judge picture protest purchase range level surface work study test result increase decrease change need use help call look face show rise fall drink walk talk plan mix process record research report review recall decline term cost answer question pay rest love hope fear wish watch step stop turn order offer visit trip practice support market design shape cover check count dress fix heat cool form guide impact label link list load lock mark match note point press price promise push race reach rule sample score set sign sound spread start stress supply surprise target touch train trust value view vote wash water wave wonder yield present object subject permit conduct contract conflict progress finish rate store state place name way end part case time cause side home number group release return save search service shift show suggest switch update repeat damage demand dream drop effect experience focus issue lead limit move open pass plant pick pull ship shop smell smile taste test transfer travel treat trial turn use waste weight').split(/\s+/);
@@ -75,6 +76,7 @@
   var THINK = 'think know believe say hope suppose guess feel realize realise mean mind wish bet imagine assume expect find show suggest imply indicate argue claim report notice learn understand remember forget decide explain mention note observe discover prove demonstrate agree promise doubt worry see hear tell ask wonder confirm conclude reveal reflect ensure'.split(' ');
   var TO_COMP = 'want need like love hate try begin start decide plan hope expect prefer learn forget remember tend appear seem happen choose manage fail offer refuse agree promise continue wish dare afford intend ought compel force allow ask tell advise encourage enable require invite remind urge permit cause help get have used order'.split(' ');
   var ING_COMP = 'enjoy like love hate start begin stop keep finish avoid consider practice practise mind suggest imagine admit deny risk quit continue prefer go spend involve'.split(' ');
+  var OC_VERBS = 'call name elect appoint declare crown vote label consider choose find keep leave'.split(' ');
   var DITRANS = 'give tell show send offer teach ask buy bring make pay lend cook get write sell hand pass'.split(' ');
   var PARTICLES = ['up', 'down', 'out', 'off', 'away', 'back'];
   var TIMEW = 'second minute hour day week month year decade century morning afternoon evening night noon midnight today yesterday tomorrow tonight monday tuesday wednesday thursday friday saturday sunday january february march april may june july august september october november december weekend season spring summer autumn winter time moment period moments years days weeks months hours minutes seconds decades centuries nights mornings'.split(' ');
@@ -488,7 +490,7 @@
         np.mods.push.apply(np.mods, p.nodes); j = p.end; np.end = j;
       }
       /* mệnh đề quan hệ */
-      if (j < limit && has(j, 'U') && cd(j, 'U').rel && !o.noRel) {
+      if (j < limit && has(j, 'U') && cd(j, 'U').rel && !o.noRel && !(np.pron && /^(where|when|why|how|whether|if|what|that)$/.test(W(j)))) {
         var rl = relClause(j, o);
         if (rl) { rl.mod = true; rl.pr = o.role; np.mods.push(rl); np.end = j = rl.b; }
       } else if (j < limit && (hasF(j, 'V', 'n') || hasF(j, 'V', 'g')) && !np.pron && (o.allowReduced || o.subject) && !has(j, 'N') && !(hasF(j, 'V', 'g') && !o.subject && !o.allowReduced)) {
@@ -572,7 +574,7 @@
       /* how much, how many, what time... */
       if (W(wa) === 'how' && j < limit && (WH_ADJ.indexOf(W(j)) >= 0)) j++;
       else if ((W(wa) === 'what' || W(wa) === 'which' || W(wa) === 'whose') && j < limit && nominalAhead(j) && !has(j, 'PS') && !(has(j, 'N') && finiteOnly(j))) {
-        var npw = npCore(j, { noPron: true }); if (npw && !vgAt(j)) j = npw.end;
+        var npw = npCore(j, { noPron: true }); if (npw && (!vgAt(j) || (has(j, 'N') && subjectStarts(j + 1)))) j = npw.end;
       }
       mark(wa, j, 'F');
       var k = j;
@@ -685,7 +687,7 @@
       var part = -1;
       if (!o.probe && j < limit && !T[j].p && PARTICLES.indexOf(W(j)) >= 0 && mainTag === 'V') {
         var after = j + 1;
-        if (after >= limit || T[after].p || !npStart(after) || has(after, 'PO') || has(after, 'D')) { part = j; segs[segs.length - 1][1] = j + 1; endTok = j + 1; }
+        if (after >= limit || T[after].p || !npStart(after) || has(after, 'PO') || has(after, 'D') || (hasF(after, 'V', 'g') && /^(give|cut|turn|take|put|end|break)$/.test(lem))) { part = j; segs[segs.length - 1][1] = j + 1; endTok = j + 1; }
       }
       var linking = mainTag === 'BE' || (mainTag === 'V' && !passive && (LINK_ONLY.indexOf(lem) >= 0 || (LINK_SEMI.indexOf(lem) >= 0 && endTok < limit && !T[endTok].p && (has(endTok, 'J') || (has(endTok, 'R') && has(endTok + 1, 'J'))) && !has(endTok, 'N'))));
       var strongLink = mainTag === 'BE' || (mainTag === 'V' && LINK_ONLY.indexOf(lem) >= 0);
@@ -695,7 +697,7 @@
       }
       return { segs: segs, advs: advs, main: main, end: endTok, lem: lem, linking: linking, strongLink: strongLink, passive: passive, neg: neg, tag: mainTag, form: cd(main, 'V') ? (T[main].c.filter(function (c) { return c.t === 'V'; })[0].f) : 'fin' };
     }
-    function nominalAfterG(k) { return nominalAhead(k + 1); }
+    function nominalAfterG(k) { return nominalAhead(k + 1) || (k + 1 < limit && !T[k + 1].p && has(k + 1, 'D')); }
     function passiveOK(k) { return true; }
 
     function pushVG(v, kids, extra) {
@@ -782,9 +784,9 @@
         }
         /* bỏ qua mệnh đề trạng ngữ mở bằng từ phụ thuộc sau động từ */
         /* mệnh đề that / wh */
-        if (has(j, 'U') && !haveObj && !haveComp) {
+        if (has(j, 'U') && (!haveObj || (nObj === 1 && /^(ask|tell|show|teach|inform|remind|warn|promise)$/.test(V.lem))) && !haveComp) {
           var u = cd(j, 'U');
-          if (isW(j, 'that') && (THINK.indexOf(V.lem) >= 0 || V.strongLink) && thatOK(j)) {
+          if (isW(j, 'that') && (THINK.indexOf(V.lem) >= 0 || V.strongLink || (haveObj && /^(tell|inform|remind|warn|promise|show|teach)$/.test(V.lem))) && thatOK(j)) {
             var tc = thatClause(j, ctx);
             if (tc) { kids.push(CL(V.linking ? 'C' : 'O', 'mđ that', tc.a, tc.end, tc.kids)); j = tc.end; if (V.linking) haveComp = true; else haveObj = true; continue; }
           }
@@ -873,12 +875,24 @@
             var np2 = npFull(j, { role: 'O', allowReduced: false });
             if (np2) {
               if (timeNP(np2) && /^(every|each|last|next|this|that)$/.test(W(np2.a)) ) { kids.push(LEAF('A', np2.a, np2.b, { sub: 'time' })); j = np2.end; continue; }
+              /* a lot, a bit, a little: trạng ngữ mức độ/tần suất, không phải tân ngữ */
+              if (np2.b - np2.a === 2 && W(np2.a) === 'a' && /^(lot|bit)$/.test(W(np2.a + 1)) && !isW(np2.b, 'of')) { markForce(np2.a, np2.b, 'D'); kids.push(LEAF('A', np2.a, np2.b, { sub: 'degree' })); j = np2.end; continue; }
+              var ocv = OC_VERBS.indexOf(V.lem) >= 0 && !V.passive;
+              /* elected Maria president / named the baby Anna: tách tân ngữ và bổ ngữ của tân ngữ */
+              if (ocv && !np2.pron && np2.mods.length === 0 && np2.b - np2.a >= 2) {
+                var nl = np2.b - 1, firstCap = T[np2.a].cap && !has(np2.a, 'D') && np2.b - np2.a === 2, lastCap = T[nl].cap && nl > np2.a + 1 && has(np2.a, 'D');
+                if (firstCap || lastCap) {
+                  var cut = firstCap ? np2.a + 1 : nl;
+                  kids.push(LEAF('O', np2.a, cut)); kids.push(LEAF('C', cut, np2.b, { note: 'bổ ngữ của tân ngữ' }));
+                  j = np2.end; haveObj = true; haveComp = true; nObj = 1; continue;
+                }
+              }
               pushNP('O', np2, kids); j = np2.end; haveObj = true; nObj = 1;
               /* tân ngữ thứ hai */
-              if (ditrans || np2.pron && has(np2.a, 'PO') && !has(np2.a, 'PS')) {
-                if (j < limit && npStart(j) && !has(j, 'P') && !(T[j].p) && !has(j, 'PS') && !has(j, 'R') && !vgAt(j) || (j < limit && has(j, 'D') && ditrans)) {
-                  var np3 = npFull(j, { role: 'O' });
-                  if (np3) { pushNP('O', np3, kids); j = np3.end; }
+              if (ditrans || ocv || np2.pron && has(np2.a, 'PO') && !has(np2.a, 'PS')) {
+                if (j < limit && npStart(j) && !has(j, 'P') && !(T[j].p) && !has(j, 'PS') && !has(j, 'R') && !vgAt(j) && !(has(j, 'U') && (isW(j, 'that') ? thatOK(j) : cd(j, 'U').wh)) || (j < limit && has(j, 'D') && (ditrans || ocv) && !(isW(j, 'that') && thatOK(j) && !(nominalAhead(j + 1) && !has(j + 1, 'D'))))) {
+                  var np3 = npFull(j, { role: ocv ? 'C' : 'O' });
+                  if (np3) { if (ocv) { pushNP('C', np3, kids, { note: 'bổ ngữ của tân ngữ' }); haveComp = true; } else pushNP('O', np3, kids); j = np3.end; }
                 }
               }
               continue;
@@ -1356,6 +1370,18 @@
     if (pos < limit) {
       for (var z = pos; z < limit; z++) if (!T[z].p) flags.leftover++;
     }
+    /* What did you buy?: từ để hỏi what/who/whom/which đứng đầu, trợ động từ đảo, chưa có tân ngữ -> là tân ngữ đã đảo lên đầu */
+    (function () {
+      var f = out[0];
+      if (!f || f.k !== 'ph' || f.r !== 'X' || !/^(what|who|whom|which)$/.test(W(f.a))) return;
+      var hasAuxInv = false, hasObj = false, nV = 0, beInv = false, ingV = false;
+      out.forEach(function (nd) {
+        if (nd.k === 'ph' && nd.r === 'V') { nV++; if (nd.note && nd.note.indexOf('đảo') >= 0 && /^(do|does|did|will|would|can|could|should|may|might|must|shall|have|has|had)$/.test(W(nd.a))) hasAuxInv = true; if (nd.note && nd.note.indexOf('đảo') >= 0 && /^(am|is|are|was|were)$/.test(W(nd.a))) beInv = true; if (/ing$/.test(W(nd.b - 1))) ingV = true; }
+        if (nd.r === 'O' || nd.r === 'C') hasObj = true;
+        if (nd.k === 'ph' && nd.r === 'A' && nd !== f && /^(at|to|for|with|about|of|from|on|in)$/.test(W(nd.a))) hasObj = true;
+      });
+      if ((hasAuxInv || (beInv && ingV)) && !hasObj && nV >= 2) { f.r = 'O'; f.note = 'từ để hỏi làm tân ngữ (đã đảo lên đầu câu)'; }
+    })();
     /* "please" không phải trạng ngữ: đổi thành từ nối/lịch sự (X) */
     (function fix(list) { list.forEach(function (nd) { if (nd.k === 'ph' && nd.r === 'A' && nd.b - nd.a === 1 && W(nd.a) === 'please') { nd.r = 'X'; nd.sub = ''; nd.note = 'từ lịch sự'; } if (nd.kids) fix(nd.kids); }); })(out);
     return { kids: out, flags: flags, limit: limit, question: question };

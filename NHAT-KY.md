@@ -1,5 +1,15 @@
 # Nhật ký web Tiếng Anh 80/20 (mục mới nhất ở trên)
 
+## 2026-11-22 tối · sửa lỗi Kiểm định tìm ở PR #2 (nhánh claude/phan-tich-sua-oc)
+- Kiểm định đã gộp PR #2 và ghi 5 lỗi nhỏ; sửa 1–4 và một phần 5:
+  1. O + C: "He called me a liar", "They elected Maria president", "They named the baby Anna", "I consider him my friend" nay ra O rồi C (động từ call/name/elect/appoint/declare/crown/vote/label/consider/choose/find/keep/leave; có tách "Maria president" thành O + C khi một chữ viết hoa).
+  2. Cụm động từ + tiểu từ + V-ing: "gave up smoking last year" → V "gave up" + O "smoking" + A.
+  3. "a lot", "a bit" thành A (mức độ/tần suất).
+  4. Mệnh đề wh-/that làm tân ngữ thứ hai sau ask/tell/show/teach/inform/remind/warn/promise ("asked him where he lived", "told me that..."); "What did you buy?" ra O đã đảo lên đầu câu (khi thiếu tân ngữ khác).
+  5. "Having a car is useful" nay đúng. "The teacher, tired and hungry, left the room" CHƯA sửa.
+- Lỗi cũ tìm thấy khi sửa và đã sửa: "She is reading a book" / "He is writing a letter" bị gắn C (do danh sách danh động từ-danh từ), "What are you doing?" và "I am doing my homework" mất động từ "doing". "He asked what time it was" bị đọc sai.
+- Thêm `kiem/gold-hoi-quy.txt` (18 câu hồi quy, chỉ để chống lỗi quay lại, KHÔNG dùng làm độ chính xác). Bốn tập cũ giữ nguyên điểm (10/10, 43/43, 40/40, tập 4 27/30).
+
 ## 2026-11-22 tối · chế độ Phân tích câu (nhánh claude/project-thread-jgi8mn)
 - vinh nhờ: thêm chỗ dán/tải tài liệu, bật chế độ phân tích thì gạch chân theo màu kiểu artifact AACbN2Tw4k85V4FHHv9v1n, và kiểm xem nhãn đã đúng chưa vì "O" gạch cả giới từ và động từ.
 - Kết luận ngữ pháp: artifact gộp "O/C" và gạch O qua cả giới từ, động từ thứ hai, cả mệnh đề là SAI. Bộ nhãn dùng ở đây: S, V, O (chỉ cụm danh từ), C (bổ ngữ sau be/seem/become, look + tính từ...), A (trạng ngữ, có loại nơi chốn/thời gian/cách thức/lý do), T (to + V, có O riêng), X (từ nối), M (bổ sung sau dấu phẩy). Mệnh đề vẽ thành khung có nhãn, bên trong gạch chân từng cụm lá.
