@@ -1,0 +1,53 @@
+# Tập G (gói G): 47 câu MỚI, lời giải viết tay TRƯỚC khi chạy bộ phân tích; chạy lần đầu để lấy số trung thực rồi mới sửa luật.
+# Quy ước như gold-heldout.txt. Cụm tính từ/danh từ giữa hai dấu phẩy gạch [M ...]. Các câu lỗi đã biết của Kiểm định (appointed her manager, painted the wall white, left her sister a note, The teacher, tired and hungry...) nằm ở gold-hoi-quy.txt, không ở đây.
+# O + C (appoint, vote, crown, elect, declare, paint, drive, keep, turn, find, leave, consider, wipe)
+The board appointed him chairman. ||| [S The board] [V appointed] [O him] [C chairman]
+The students voted her class president. ||| [S The students] [V voted] [O her] [C class president]
+The fans crowned him the king of the stage. ||| [S The fans] [V crowned] [O him] [C the king of the stage]
+The committee declared the contest open. ||| [S The committee] [V declared] [O the contest] [C open]
+They elected Tom captain of the team. ||| [S They] [V elected] [O Tom] [C captain of the team]
+She painted the door blue. ||| [S She] [V painted] [O the door] [C blue]
+The noise drove him crazy. ||| [S The noise] [V drove] [O him] [C crazy]
+You must keep the room clean. ||| [S You] [V must keep] [O the room] [C clean]
+The cold weather turned the leaves red. ||| [S The cold weather] [V turned] [O the leaves] [C red]
+I found the book very boring. ||| [S I] [V found] [O the book] [C very boring]
+They left the door open. ||| [S They] [V left] [O the door] [C open]
+The jury found him guilty. ||| [S The jury] [V found] [O him] [C guilty]
+People consider this book a classic. ||| [S People] [V consider] [O this book] [C a classic]
+He wiped the table clean. ||| [S He] [V wiped] [O the table] [C clean]
+He kept the soup warm. ||| [S He] [V kept] [O the soup] [C warm]
+They kept the children busy. ||| [S They] [V kept] [O the children] [C busy]
+# O + O (tân ngữ gián tiếp có her/his/my/our + danh từ)
+She left his brother a note. ||| [S She] [V left] [O his brother] [O a note]
+She gave his brother a present. ||| [S She] [V gave] [O his brother] [O a present]
+I sent my boss an email. ||| [S I] [V sent] [O my boss] [O an email]
+The waiter brought our table two glasses of water. ||| [S The waiter] [V brought] [O our table] [O two glasses of water]
+Tom bought his daughter a bicycle. ||| [S Tom] [V bought] [O his daughter] [O a bicycle]
+She showed the manager her passport. ||| [S She] [V showed] [O the manager] [O her passport]
+My uncle lent me his car. ||| [S My uncle] [V lent] [O me] [O his car]
+They offered the new student a seat. ||| [S They] [V offered] [O the new student] [O a seat]
+He told his friends the news. ||| [S He] [V told] [O his friends] [O the news]
+The teacher taught the class a song. ||| [S The teacher] [V taught] [O the class] [O a song]
+She cooked her husband dinner. ||| [S She] [V cooked] [O her husband] [O dinner]
+He wrote his mother a letter. ||| [S He] [V wrote] [O his mother] [O a letter]
+I will leave you my number. ||| [S I] [V will leave] [O you] [O my number]
+He found his son a job. ||| [S He] [V found] [O his son] [O a job]
+# Cụm tính từ / danh từ chen giữa hai dấu phẩy
+The children, cold and wet, came into the house. ||| [S The children] [M cold and wet] [V came] [A into the house]
+My neighbour, angry about the noise, called the police. ||| [S My neighbour] [M angry about the noise] [V called] [O the police]
+The driver, exhausted after a long trip, stopped the car. ||| [S The driver] [M exhausted after a long trip] [V stopped] [O the car]
+Maria, happy and relaxed, opened the window. ||| [S Maria] [M happy and relaxed] [V opened] [O the window]
+The soup, hot and spicy, was perfect. ||| [S The soup] [M hot and spicy] [V was] [C perfect]
+Our guide, a tall young man, spoke very good English. ||| [S Our guide] [M a tall young man] [V spoke] [O very good English]
+The students, nervous before the exam, checked their notes. ||| [S The students] [M nervous before the exam] [V checked] [O their notes]
+My sister, who lives in Paris, works for a bank. ||| [S My sister] <M [X who] [V lives] [A in Paris]> [V works] [A for a bank]
+# Câu thường (đo độ chính xác chung)
+Every morning my grandfather walks his dog in the park. ||| [A Every morning] [S my grandfather] [V walks] [O his dog] [A in the park]
+When the milk boils, the foam rises quickly. ||| <A [X When] [S the milk] [V boils]> [S the foam] [V rises] [A quickly]
+The man who lives next door is a pilot. ||| [S The man] <M [X who] [V lives] [A next door]> [V is] [C a pilot]
+I don't know where she put the keys. ||| [S I] [V don't know] <O [X where] [S she] [V put] [O the keys]>
+My parents want to visit Japan next year. ||| [S My parents] [V want] <T [T to visit] [O Japan] [A next year]>
+We watched a film in the evening. ||| [S We] [V watched] [O a film] [A in the evening]
+She is the tallest girl in the class. ||| [S She] [V is] [C the tallest girl in the class]
+Why did you leave the party early? ||| [X Why] [V did] [S you] [V leave] [O the party] [A early]
+She said that the train was late. ||| [S She] [V said] <O [X that] [S the train] [V was] [C late]>
