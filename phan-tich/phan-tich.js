@@ -76,8 +76,8 @@
   var THINK = 'think know believe say hope suppose guess feel realize realise mean mind wish bet imagine assume expect find show suggest imply indicate argue claim report notice learn understand remember forget decide explain mention note observe discover prove demonstrate agree promise doubt worry see hear tell ask wonder confirm conclude reveal reflect ensure'.split(' ');
   var TO_COMP = 'want need like love hate try begin start decide plan hope expect prefer learn forget remember tend appear seem happen choose manage fail offer refuse agree promise continue wish dare afford intend ought compel force allow ask tell advise encourage enable require invite remind urge permit cause help get have used order'.split(' ');
   var ING_COMP = 'enjoy like love hate start begin stop keep finish avoid consider practice practise mind suggest imagine admit deny risk quit continue prefer go spend involve'.split(' ');
-  var OC_VERBS = 'call name elect appoint declare crown vote label consider choose find keep leave'.split(' ');
-  var DITRANS = 'give tell show send offer teach ask buy bring make pay lend cook get write sell hand pass'.split(' ');
+  var OC_VERBS = 'call name elect appoint declare crown vote label consider'.split(' ');
+  var DITRANS = 'give tell show send offer teach ask buy bring make pay lend cook get write sell hand pass keep save'.split(' ');
   var PARTICLES = ['up', 'down', 'out', 'off', 'away', 'back'];
   var TIMEW = 'second minute hour day week month year decade century morning afternoon evening night noon midnight today yesterday tomorrow tonight monday tuesday wednesday thursday friday saturday sunday january february march april may june july august september october november december weekend season spring summer autumn winter time moment period moments years days weeks months hours minutes seconds decades centuries nights mornings'.split(' ');
   var FREQW = 'always usually often sometimes never rarely seldom ever again twice'.split(' ');
@@ -875,6 +875,8 @@
             var np2 = npFull(j, { role: 'O', allowReduced: false });
             if (np2) {
               if (timeNP(np2) && /^(every|each|last|next|this|that)$/.test(W(np2.a)) ) { kids.push(LEAF('A', np2.a, np2.b, { sub: 'time' })); j = np2.end; continue; }
+              /* a year ago, two days ago: trạng ngữ thời gian */
+              if (isW(np2.end, 'ago') && timeNP(np2)) { markForce(np2.a, np2.end + 1, 'D'); kids.push(LEAF('A', np2.a, np2.end + 1, { sub: 'time' })); j = np2.end + 1; continue; }
               /* a lot, a bit, a little: trạng ngữ mức độ/tần suất, không phải tân ngữ */
               if (np2.b - np2.a === 2 && W(np2.a) === 'a' && /^(lot|bit)$/.test(W(np2.a + 1)) && !isW(np2.b, 'of')) { markForce(np2.a, np2.b, 'D'); kids.push(LEAF('A', np2.a, np2.b, { sub: 'degree' })); j = np2.end; continue; }
               var ocv = OC_VERBS.indexOf(V.lem) >= 0 && !V.passive;
@@ -892,7 +894,8 @@
               if (ditrans || ocv || np2.pron && has(np2.a, 'PO') && !has(np2.a, 'PS')) {
                 if (j < limit && npStart(j) && !has(j, 'P') && !(T[j].p) && !has(j, 'PS') && !has(j, 'R') && !vgAt(j) && !(has(j, 'U') && (isW(j, 'that') ? thatOK(j) : cd(j, 'U').wh)) || (j < limit && has(j, 'D') && (ditrans || ocv) && !(isW(j, 'that') && thatOK(j) && !(nominalAhead(j + 1) && !has(j + 1, 'D'))))) {
                   var np3 = npFull(j, { role: ocv ? 'C' : 'O' });
-                  if (np3) { if (ocv) { pushNP('C', np3, kids, { note: 'bổ ngữ của tân ngữ' }); haveComp = true; } else pushNP('O', np3, kids); j = np3.end; }
+                  if (np3 && isW(np3.end, 'ago') && timeNP(np3)) { markForce(np3.a, np3.end + 1, 'D'); kids.push(LEAF('A', np3.a, np3.end + 1, { sub: 'time' })); j = np3.end + 1; }
+                  else if (np3) { if (ocv) { pushNP('C', np3, kids, { note: 'bổ ngữ của tân ngữ' }); haveComp = true; } else pushNP('O', np3, kids); j = np3.end; }
                 }
               }
               continue;
@@ -903,6 +906,7 @@
           }
           /* NP thời gian đứng một mình sau tân ngữ/bổ ngữ: A */
           var np4 = npFull(j, { role: 'A' });
+          if (np4 && isW(np4.end, 'ago') && timeNP(np4)) { markForce(np4.a, np4.end + 1, 'D'); kids.push(LEAF('A', np4.a, np4.end + 1, { sub: 'time' })); j = np4.end + 1; continue; }
           if (np4 && timeNP(np4) && /^(every|each|last|next|this|that|one|two|three|\d)/.test(W(np4.a))) { kids.push(LEAF('A', np4.a, np4.b, { sub: 'time' })); j = np4.end; continue; }
           break;
         }
