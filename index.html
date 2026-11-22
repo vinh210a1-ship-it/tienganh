@@ -2634,6 +2634,7 @@ R&amp;D Department</div>
 <div class="toast" id="toast" role="status"></div>
 
 <script src="phan-tich/phan-tich.js"></script>
+<script src="am-thanh/danh-sach.js"></script>
 <script>
 (function(){
 "use strict";
@@ -3395,7 +3396,11 @@ function pickVoice(){
        || vs.filter(function(v){ return /^en/i.test(v.lang); })[0] || null;
 }
 if(synth){ pickVoice(); try{ synth.onvoiceschanged = pickVoice; }catch(e){} }
-function speak(text, rate){
+/* Giọng người thật (gói J): am-thanh/danh-sach.js khai câu nào có tệp mp3 (do kiem/tao-danh-sach-am-thanh.mjs sinh ra). Câu có tệp thì phát tệp; không có tệp, tệp hỏng hay trình duyệt chặn phát thì quay về giọng máy như cũ. */
+var AM = (window.AM_THANH && typeof window.AM_THANH === "object") ? window.AM_THANH : {}, curAudio = null;
+function normAm(t){ return String(t == null ? "" : t).replace(/\s+/g, " ").trim(); }
+function stopAudio(){ if(curAudio){ try{ curAudio.pause(); }catch(e){} curAudio = null; } }
+function speakTts(text, rate){
   if(!synth){ toast("Trình duyệt này chưa hỗ trợ đọc tiếng Anh. Hãy thử Chrome, Edge hoặc Safari."); return; }
   try{
     synth.cancel();
@@ -3406,6 +3411,21 @@ function speak(text, rate){
     synth.speak(u);
   }catch(e){ toast("Không phát được âm thanh. Hãy thử lại hoặc đổi trình duyệt."); }
 }
+function speak(text, rate){
+  stopAudio();
+  var src = Object.prototype.hasOwnProperty.call(AM, normAm(text)) ? AM[normAm(text)] : null;
+  if(typeof src !== "string" || !/^am-thanh\/[A-Za-z0-9_.-]+\.mp3$/.test(src)){ speakTts(text, rate); return; }
+  try{
+    if(synth) synth.cancel();
+    var a = new Audio(src), fb = false;
+    curAudio = a;
+    a.playbackRate = slowEl.checked ? 0.8 : 1;
+    var quayVe = function(){ if(fb || curAudio !== a) return; fb = true; curAudio = null; speakTts(text, rate); };
+    a.addEventListener("error", quayVe);
+    var p = a.play(); if(p && p.catch) p.catch(quayVe);
+  }catch(e){ speakTts(text, rate); }
+}
+window.__AM = {norm: normAm, map: AM, speak: speak};
 var ICON = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>';
 function makeBtn(text){
   var b = document.createElement("button");
@@ -4876,11 +4896,16 @@ window.__PCUI = {render: render, state: st};
     }
     veNut(r);
   }
+  var cho = 0, choSo = 0;  /* đang chờ trình duyệt hỏi quyền micro: chống bấm hai lần và chống ghi tiếp sau khi đã rời bài */
   function batDau(r){
+    if(cho) return;
     dungNghe();
     try{ if(window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){}
     if(typeof stopAudio === "function") stopAudio();
+    var tk = cho = ++choSo;
     navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+      if(cho !== tk){ traMic(stream); return; }
+      cho = 0;
       var kieu = chonKieu(), mr;
       try{ mr = kieu ? new MediaRecorder(stream, {mimeType: kieu}) : new MediaRecorder(stream); }
       catch(e){ traMic(stream); noi("Trình duyệt này không ghi được âm thanh ở dạng cần thiết. Hãy thử Chrome, Edge hoặc Safari bản mới.", true); return; }
@@ -4893,6 +4918,8 @@ window.__PCUI = {render: render, state: st};
       c.timer = setTimeout(function(){ if(rec === c){ c.tuDung = true; dungGhi(); } }, CFG.toiDa);
       noi("Đang ghi… nói xong thì bấm nút vuông để dừng.");
     }, function(e){
+      if(cho !== tk) return;
+      cho = 0;
       var ten = e && e.name;
       if(ten === "NotAllowedError" || ten === "SecurityError") noi("Trình duyệt đang chặn micro cho trang này. Bấm biểu tượng ổ khóa cạnh địa chỉ trang, cho phép micro rồi thử lại. Không có micro thì vẫn tập nói bình thường, chỉ không nghe lại được bản của mình.", true);
       else if(ten === "NotFoundError" || ten === "OverconstrainedError") noi("Không tìm thấy micro. Hãy cắm hoặc bật micro rồi thử lại.", true);
@@ -4939,7 +4966,7 @@ window.__PCUI = {render: render, state: st};
     if(l){ if(rec) dungGhi(); dungNghe(); }
   }, true);
   /* Rời trang, đổi bài hay ẩn tab: dừng và trả micro, bỏ bản đang ghi dở. */
-  function roi(){ if(rec) dungGhi(true); dungNghe(); }
+  function roi(){ cho = 0; if(rec) dungGhi(true); dungNghe(); }
   window.addEventListener("hashchange", roi);
   window.addEventListener("pagehide", roi);
   document.addEventListener("visibilitychange", function(){ if(document.hidden) roi(); });
