@@ -180,6 +180,8 @@ td.num{font-variant-numeric:tabular-nums}
 .pt-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:.9rem;color:var(--muted);font-variant-numeric:tabular-nums}
 .pt-bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin:10px 0 18px}
 .pt-bar i{display:block;height:100%;background:var(--accent)}
+.pt-fast{background:var(--accent-soft);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:14px 18px;margin:0 0 20px;color:var(--ink)}
+.pt-fast h2{margin-top:0}
 .pt-pass{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:14px;max-width:70ch;font-size:.98rem}
 .pt-q{font-weight:600;font-size:1.08rem;margin:6px 0 12px}
 .pt-listen{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
@@ -364,7 +366,7 @@ nav.toc li.grp{font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transf
       <a class="btn" href="#hoc-thuat">Vào Khu 2</a>
     </div>
   </div>
-  <p class="note"><b>Chưa biết mình ở trình độ nào?</b> Làm <a href="#kiem-tra">bài kiểm tra trình độ</a> (A1 → C1, khoảng 25–35 phút) để biết nên vào khu nào và bắt đầu từ bài nào. <span id="ptLastHome"></span></p>
+  <p class="note"><b>Chưa biết mình ở trình độ nào?</b> Làm <a href="#kiem-tra">bài kiểm tra trình độ</a> (A1 → C1, khoảng 25–35 phút) để biết nên vào khu nào và bắt đầu từ bài nào. Mới học hoặc đã lâu không học: có <a href="#kiem-tra">bản ngắn A1–A2, 15 câu</a>. <span id="ptLastHome"></span></p>
 
   <div class="key">
     <h3>Kết luận trước: phần 20% đáng học nhất (Khu 1)</h3>
@@ -3910,16 +3912,48 @@ function buildTest(){
   });
   return items.map(function(it){ return {it: it, ord: it.t === "mc" ? shuffle(it.o.map(function(_, i){ return i; })) : null}; });
 }
-function ptNew(){ pt = {items: buildTest(), i: 0, res: [], start: Date.now(), plays: 0, asked: {}, yn: null}; }
+/* ---------- Bản ngắn A1–A2 (gói F): 15 câu lấy từ chính ngân hàng PTB, không đụng buildTest ---------- */
+/* Số câu mỗi bậc là kế hoạch tự đặt [G]: r = số đoạn đọc (mỗi đoạn 2 câu). Tổng = 7 + 8 = 15. */
+var SHORT_PLAN = {A1: {g: 3, r: 1, l: 2}, A2: {g: 4, r: 1, l: 2}};
+var SHORT_LV = ["A1", "A2"];
+var SHORT_PASS = 0.7;  /* [G] đạt một bậc khi đúng từ 70% số câu của bậc, giống bản đầy đủ */
+var SHORT_VUNG = 1;    /* [G] đạt A2 mà sai tối đa 1 câu A2 thì bản ngắn không còn phân biệt được: nên làm bản đầy đủ */
+function buildShort(){
+  var items = [];
+  SHORT_LV.forEach(function(lv){
+    var pl = SHORT_PLAN[lv];
+    items = items.concat(pickN(bankOf(lv,"g"), pl.g));
+    var reads = bankOf(lv,"r"); var ps = {}; reads.forEach(function(q){ ps[q.p] = 1; });
+    shuffle(Object.keys(ps)).slice(0, pl.r).forEach(function(p){ items = items.concat(reads.filter(function(q){ return q.p === p; })); });
+    items = items.concat(pickN(bankOf(lv,"l"), pl.l));
+  });
+  return items.map(function(it){ return {it: it, ord: it.t === "mc" ? shuffle(it.o.map(function(_, i){ return i; })) : null}; });
+}
+/* a1, a2 = {ok, total}. Trả "Dưới A1" | "A1" | "A2" | "full" (A2 vững: nên làm bản đầy đủ). A1 chưa đạt thì dừng, như ptLevel của bản đầy đủ. */
+function shortOutcome(a1, a2){
+  if(!(a1.total && a1.ok / a1.total >= SHORT_PASS)) return "Dưới A1";
+  if(!(a2.total && a2.ok / a2.total >= SHORT_PASS)) return "A1";
+  return (a2.total - a2.ok) <= SHORT_VUNG ? "full" : "A2";
+}
+function shortNeed(total){ return Math.ceil(total * SHORT_PASS - 1e-9); }
+function ptNew(short){ pt = {items: short ? buildShort() : buildTest(), i: 0, res: [], start: Date.now(), plays: 0, asked: {}, yn: null, short: !!short}; }
 function norm(s){ return String(s||"").toLowerCase().replace(/[.,!?;:"“”']/g,"").replace(/\s+/g," ").trim(); }
 function ptLastLine(){
   var last = load("ptLast", null);
   return last ? "Lần làm gần nhất (" + last.date + "): <b>" + last.level + "</b>" + (last.vocab ? ", vốn từ ước lượng khoảng " + last.vocab.toLocaleString("vi-VN") + " họ từ" : "") + "." : "";
 }
+function ptLastShortLine(){
+  var last = load("ptLastShort", null);
+  return last ? "Lần làm bản ngắn gần nhất (" + last.date + "): <b>" + last.label + "</b>." : "";
+}
+function ptLastBoth(){ var a = ptLastLine(), b = ptLastShortLine(); return a && b ? a + " " + b : a + b; }
 function ptIntro(){
   ptBox.innerHTML =
    '<div class="pt-box">' +
-   '<h2 style="margin-top:0">Cấu trúc bài</h2>' +
+   '<div class="pt-fast"><h2>Mới học, hoặc đã lâu không học tiếng Anh?</h2>' +
+   '<p>Làm <b>bản ngắn A1–A2: 15 câu</b> (ngữ pháp, đọc, nghe; không có phần vốn từ). Bản này chỉ cho biết bạn đang ở <b>A1</b>, <b>A2</b>, hay đã vững ở A2 nên làm bản đầy đủ. Bản ngắn <b>không đo</b> từ B1 trở lên.</p>' +
+   '<div class="row"><button class="btn" type="button" id="ptStartShort">Làm bản ngắn A1–A2 (15 câu)</button></div></div>' +
+   '<h2 style="margin-top:0">Bản đầy đủ: cấu trúc bài</h2>' +
    '<ul>' +
    '<li><b>Phần 1, vốn từ (2–3 phút):</b> đánh dấu những từ bạn biết nghĩa. Trong danh sách có từ giả không tồn tại trong tiếng Anh; đánh dấu từ giả sẽ làm điểm phần này bị trừ.</li>' +
    '<li><b>Phần 2 (20–30 phút):</b> khoảng 50 câu, khó dần từ A1 đến C1. Mỗi bậc gồm ngữ pháp và từ vựng, đọc hiểu, nghe; từ B1 trở lên có thêm câu tự gõ dạng từ đúng.</li>' +
@@ -3933,10 +3967,11 @@ function ptIntro(){
    '</ul>' +
    '<p><b>Quy tắc:</b> không tra từ điển. Câu nào không biết, bấm “Tôi không biết” thay vì đoán. Câu nghe được nghe tối đa 2 lần.</p>' +
    (synth ? '' : '<p class="warn">Trình duyệt này không đọc được tiếng Anh nên câu nghe sẽ hiện lời thoại để đọc. Kết quả phần nghe khi đó không phản ánh kỹ năng nghe.</p>') +
-   '<p>' + ptLastLine() + '</p>' +
+   '<p>' + ptLastBoth() + '</p>' +
    '<div class="row"><button class="btn" type="button" id="ptStart">Bắt đầu làm bài</button></div>' +
    '</div>';
   document.getElementById("ptStart").addEventListener("click", function(){ ptNew(); ptVocab(); });
+  document.getElementById("ptStartShort").addEventListener("click", function(){ ptNew(true); ptShow(); });
 }
 function ptVocab(){
   var words = [];
@@ -3972,7 +4007,7 @@ function ptShow(){
   var cur = pt.items[pt.i], q = cur.it;
   pt.plays = 0;
   var html = '<div class="pt-box">' +
-    '<div class="pt-head"><span>Phần 2 · Câu ' + (pt.i+1) + '/' + pt.items.length + ' · ' + SKN[q.sk] + '</span><span>Mức độ tăng dần</span></div>' +
+    '<div class="pt-head"><span>' + (pt.short ? 'Bản ngắn A1–A2' : 'Phần 2') + ' · Câu ' + (pt.i+1) + '/' + pt.items.length + ' · ' + SKN[q.sk] + '</span><span>Mức độ tăng dần</span></div>' +
     '<div class="pt-bar"><i style="width:' + (pt.i/pt.items.length*100) + '%"></i></div>';
   if(q.sk === "r") html += '<div class="pt-pass">' + esc(PT_PASS[q.p]).replace(/\n/g,"<br>") + '</div>';
   if(q.sk === "l"){
@@ -4026,7 +4061,7 @@ function ptAnswer(ok, given){
   pt.res[pt.i] = {it: q, ok: ok, given: given};
   pt.i++;
   var next = pt.items[pt.i];
-  if(!next){ ptResult(); return; }
+  if(!next){ ptFinish(); return; }
   if(next.it.lv !== q.lv && !pt.asked[q.lv]){
     var s = lvStats(q.lv);
     if(s.ok / s.total < 0.5){ pt.asked[q.lv] = true; ptStopAsk(q.lv, s); return; }
@@ -4039,10 +4074,11 @@ function ptStopAsk(lv, s){
     '<div class="row"><button class="btn" type="button" id="ptStop">Dừng và xem kết quả</button><button class="btn ghost" type="button" id="ptGo">Làm tiếp</button></div></div>';
   document.getElementById("ptStop").addEventListener("click", function(){
     for(var i=pt.i;i<pt.items.length;i++) pt.res[i] = {it: pt.items[i].it, ok: false, given: null, skipped: true};
-    ptResult();
+    ptFinish();
   });
   document.getElementById("ptGo").addEventListener("click", ptShow);
 }
+function ptFinish(){ if(pt.short) ptResultShort(); else ptResult(); }
 function ptLevel(){
   var level = "Dưới A1";
   for(var i=0;i<LV5.length;i++){ var s = lvStats(LV5[i]); if(s.total && s.ok / s.total >= 0.7) level = LV5[i]; else break; }
@@ -4102,12 +4138,60 @@ function ptResult(){
     (wrong.length ? '<details><summary>Xem lại ' + wrong.length + ' câu sai hoặc chưa biết</summary><ul class="wrong-list">' + wl + '</ul></details>' : '<p><b>Bạn đúng tất cả các câu.</b></p>') +
     '<div class="row"><button class="btn ghost" type="button" id="ptAgain">Làm đề mới</button></div></div>';
   document.getElementById("ptAgain").addEventListener("click", function(){ ptNew(); ptVocab(); });
-  var h = document.getElementById("ptLastHome"); if(h) h.innerHTML = ptLastLine();
+  var h = document.getElementById("ptLastHome"); if(h) h.innerHTML = ptLastBoth();
+  try{ ptBox.scrollIntoView({block:"start"}); }catch(e){}
+}
+function ptResultShort(){
+  var a1 = lvStats("A1"), a2 = lvStats("A2");
+  var out = shortOutcome(a1, a2);
+  var label = out === "full" ? "từ A2 trở lên (nên làm bản đầy đủ)" : out;
+  var mins = Math.max(1, Math.round((Date.now() - pt.start)/60000));
+  var total = pt.res.filter(function(x){ return x.ok; }).length;
+  var d = new Date();
+  save("ptLastShort", {level: out, label: label, date: d.getDate() + "/" + (d.getMonth()+1) + "/" + d.getFullYear(), ok: total, n: pt.items.length});
+  var rows = SHORT_LV.map(function(lv){
+    var s = lvStats(lv), good = s.ok / s.total >= SHORT_PASS;
+    return '<div class="lv-row"><b>' + lv + '</b><div class="track"><i style="width:' + (s.ok/s.total*100) + '%;background:' + (good ? "var(--ok)" : "var(--bad)") + '"></i></div><span>' + s.ok + '/' + s.total + ' <span class="pill ' + (good ? "ok" : "no") + '">' + (good ? "Đạt" : "Chưa đạt") + '</span></span></div>';
+  }).join("");
+  var skills = ["g","r","l"].map(function(k){
+    var r = pt.res.filter(function(x){ return x.it.sk === k; });
+    if(!r.length) return "";
+    var s = r.filter(function(x){ return x.ok; }).length;
+    return '<tr><td>' + SKN[k] + (k==="l" && !synth ? " (đọc lời thoại thay vì nghe)" : "") + '</td><td class="num">' + s + '/' + r.length + '</td><td class="num">' + Math.round(s/r.length*100) + '%</td></tr>';
+  }).join("");
+  var wrong = pt.res.filter(function(x){ return !x.ok; });
+  var wl = wrong.map(function(x){
+    var q = x.it;
+    return '<li><b>' + q.lv + ' · ' + SKN[q.sk] + ':</b> ' + esc(q.q) +
+      (q.p ? '<br><span class="fc-hint">(Câu hỏi đọc hiểu)</span>' : '') +
+      (q.sk === "l" ? '<br><span class="fc-hint">Lời nghe: ' + esc(q.audio) + '</span>' : '') +
+      '<br>Bạn trả lời: ' + (x.given === null || x.given === undefined ? (x.skipped ? "Chưa làm" : "Không biết") : esc(x.given)) +
+      ' · Đáp án: <b>' + esc(answerText(q)) + '</b><br><span class="fc-hint">' + esc(q.w) + '</span></li>';
+  }).join("");
+  var desc = out === "full"
+    ? "Bạn làm đúng gần hết câu A1 và A2. Bản ngắn không có câu từ B1 trở lên nên chưa cho biết bạn đang ở B1, B2 hay C1."
+    : LVDESC[out];
+  var rec = out === "full"
+    ? 'Làm <b>bản đầy đủ</b> (A1 → C1, có phần vốn từ) để biết bạn đang ở bậc nào, rồi mới chọn bài.'
+    : LVREC[out];
+  var n1 = SHORT_PLAN.A1.g + SHORT_PLAN.A1.r * 2 + SHORT_PLAN.A1.l, n2 = SHORT_PLAN.A2.g + SHORT_PLAN.A2.r * 2 + SHORT_PLAN.A2.l;
+  ptBox.innerHTML = '<div class="pt-box">' +
+    '<div class="pt-level"><div class="pt-badge">' + (out === "full" ? "≥ A2" : out) + '</div><div><div class="kicker" style="margin:0">Bản ngắn · trình độ ước lượng</div><p style="margin:.2rem 0">' + desc + '</p><span class="fc-hint">Đúng ' + total + '/' + pt.items.length + ' câu · bạn làm khoảng ' + mins + ' phút</span></div></div>' +
+    '<h3>Điểm từng bậc</h3><p class="fc-hint" style="margin:0">Đạt một bậc khi đúng từ 70% số câu của bậc: A1 cần ' + shortNeed(n1) + '/' + n1 + ', A2 cần ' + shortNeed(n2) + '/' + n2 + '. Nếu A1 chưa đạt thì kết quả là Dưới A1, bất kể A2.</p>' +
+    '<div class="lv-rows">' + rows + '</div>' +
+    '<h3>Theo kỹ năng</h3><div class="tbl"><table><tr><th>Kỹ năng</th><th>Đúng</th><th>Tỷ lệ</th></tr>' + skills + '</table></div>' +
+    '<div class="key"><h3>Nên bắt đầu từ đâu</h3><p style="margin:0">' + rec + '</p></div>' +
+    '<p class="note"><span class="tag hyp">Ước lượng</span>Bản ngắn chỉ có ' + n1 + ' câu A1 và ' + n2 + ' câu A2, nên kết quả có thể lệch một bậc. Ngưỡng 70% và quy ước "đạt A2 mà sai tối đa ' + SHORT_VUNG + ' câu A2 thì nên làm bản đầy đủ" là số do người soạn đặt, chưa kiểm với học viên thật. Đây là bài tự kiểm tra, không phải bài thi chuẩn hóa. Bản ngắn không đo vốn từ, nói và viết.</p>' +
+    (wrong.length ? '<details><summary>Xem lại ' + wrong.length + ' câu sai hoặc chưa biết</summary><ul class="wrong-list">' + wl + '</ul></details>' : '<p><b>Bạn đúng tất cả các câu.</b></p>') +
+    '<div class="row"><button class="btn' + (out === "full" ? "" : " ghost") + '" type="button" id="ptFull">Làm bản đầy đủ (A1 → C1)</button><button class="btn ghost" type="button" id="ptAgainShort">Làm lại bản ngắn</button></div></div>';
+  document.getElementById("ptFull").addEventListener("click", function(){ ptNew(); ptVocab(); });
+  document.getElementById("ptAgainShort").addEventListener("click", function(){ ptNew(true); ptShow(); });
+  var h = document.getElementById("ptLastHome"); if(h) h.innerHTML = ptLastBoth();
   try{ ptBox.scrollIntoView({block:"start"}); }catch(e){}
 }
 ptIntro();
-(function(){ var h = document.getElementById("ptLastHome"); if(h) h.innerHTML = ptLastLine(); })();
-window.__PT = {PTB: PTB, build: buildTest, ynScore: ynScore};
+(function(){ var h = document.getElementById("ptLastHome"); if(h) h.innerHTML = ptLastBoth(); })();
+window.__PT = {PTB: PTB, build: buildTest, ynScore: ynScore, buildShort: buildShort, shortOutcome: shortOutcome, SHORT_PLAN: SHORT_PLAN};
 
 /* ---------- Phân tích câu (dùng phan-tich/phan-tich.js) ---------- */
 (function(){

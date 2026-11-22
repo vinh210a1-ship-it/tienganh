@@ -7,7 +7,7 @@ Trang chính là `index.html`, cộng thêm bộ phân tích câu `phan-tich/pha
 ## Cấu trúc
 - **Khu 1 · Học để dùng:** Bài 0–9, Bài 2B (S + V + O, số ít/số nhiều, to be đầy đủ, bài tập A–H, 5 bài đọc), Bài 3B (đọc giờ, thứ–ngày–tháng–năm, số thứ tự, giá tiền, số điện thoại; hỏi và đáp, 3 hội thoại, bài tập A–E, 12 câu quiz), Bài 5B (so sánh, hiện tại hoàn thành, for/since), 12 tình huống Thực hành (6 đầu thiên về công việc, 6 sau 7–12 là đời sống: gia đình, hẹn lịch, mua hàng, hiệu thuốc, khách sạn, sân bay; mỗi tình huống mới khai "Học trước" và bị bộ kiểm dò cấu trúc), Lộ trình 8 tuần (186 thẻ từ ở Bài 4 cần khoảng 9–12 tuần để học hết; ô "Bộ của buổi dạy" cho ôn riêng từng bộ 20 từ, link dạng `#tu-vung?bo=1`).
 - **Khu 2 · Nâng cao và IELTS:** Bài 10 (AWL), Bài 11 (chuyên ngành), Bài 12 (IELTS).
-- **Kiểm tra trình độ** dùng chung (A1 → C1 và vốn từ).
+- **Kiểm tra trình độ** dùng chung: bản đầy đủ (A1 → C1 và vốn từ, 53 câu) và bản ngắn A1–A2 (15 câu).
 - **Công cụ · Bảng tổng hợp ngữ pháp:** trang tra cứu A1–A2 (link `#bang-ngu-phap`). Bài 2B và bảng này do người soạn tự viết, chưa người bản xứ duyệt, nên mỗi mục mang nhãn "Tự soạn".
 - **Công cụ · Phân tích câu:** dán hoặc tải tệp (.txt, .md, .docx), bật chế độ phân tích để gạch chân S, V, O, C, A, to-V theo màu. Chạy hoàn toàn trong trình duyệt, kết quả chỉ là gợi ý.
 
@@ -42,3 +42,9 @@ Nhật ký thay đổi: `NHAT-KY.md`.
 - Mỗi buổi thầy dạy một bộ 20 từ thì thêm một mục vào `BO_TU` (đầu phần "Thẻ từ" trong `index.html`): `{id, ten, tu:[khóa thẻ...]}`. Khóa thẻ là chữ đầu của thẻ trong `VOCAB` (thẻ ghép như `"easy / difficult"` đi nguyên một thẻ).
 - Chép file 20 từ của buổi vào `kiem/bo-tu-vung/bo-N.md` (bảng có cột `| số | **từ** |`) rồi thêm `N` vào vòng lặp ở mục 7 của `kiem/kiem-web.mjs`; phép kiểm so từng từ với `VOCAB` và với `BO_TU`.
 - Link gửi học viên: `.../tienganh/#tu-vung?bo=1`. Lịch ôn và khóa lưu `en8020.boxes`/`en8020.due` không đổi: xem theo bộ chỉ là bộ lọc.
+
+## Bài kiểm tra trình độ ngắn A1–A2 (gói F)
+- Cùng ngân hàng `PTB` với bản đầy đủ, không có ngân hàng riêng. `buildShort()` rút 15 câu: A1 7 (3 ngữ pháp + 1 đoạn đọc 2 câu + 2 nghe), A2 8 (4 + 2 + 2); kế hoạch ở `SHORT_PLAN`. Bản đầy đủ (`buildTest`, `ptResult`) không đổi; `ptFinish()` chỉ chọn màn kết quả.
+- Kết quả do `shortOutcome(a1, a2)`: đạt bậc khi đúng từ 70% (`SHORT_PASS`); A1 chưa đạt thì Dưới A1; đạt A2 mà sai tối đa 1 câu A2 (`SHORT_VUNG`) thì "nên làm bản đầy đủ". Cả hai là số do người soạn đặt ([G]), chưa kiểm với học viên thật; đổi thì sửa bảng gõ tay ở mục 11 của `kiem-web.mjs`.
+- Kết quả bản ngắn lưu ở khóa `en8020.ptLastShort`, tách khỏi `ptLast` của bản đầy đủ. Thời gian làm chưa đo với học viên thật nên khung giới thiệu không ghi phút (phép kiểm cấm).
+- Phép kiểm: mục 11 của `node kiem/kiem-web.mjs`. Bản đầy đủ luôn rút `PT_DAY_DU` = 53 câu; đổi ngân hàng cố ý thì sửa số này cùng PR.
