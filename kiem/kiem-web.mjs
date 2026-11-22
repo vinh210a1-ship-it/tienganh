@@ -15,6 +15,7 @@
 //  13. Gói H: Lộ trình 12 tuần: 186 thẻ chia đúng vào tuần 1–10 (bảng gõ tay), mỗi thẻ đúng một tuần; liên kết trong trang; tình huống 7–12 chỉ dùng cấu trúc đã dạy tới tuần được xếp; chế độ "theo lộ trình" của thẻ từ (bật, đổi tuần, tắt, nhớ sau tải lại, tiến độ ôn không đổi); tệp sao lưu có khóa mới, tệp cũ vẫn nạp được, giá trị lưu hỏng không làm vỡ trang; 390 px và tương phản ba chế độ.
 //  12. Gói G: trang Phân tích câu chạy thật với bộ phân tích đã sửa (4 câu lỗi cũ hiện đúng nhãn, 390 px không tràn, không lỗi console). Độ chính xác do kiem/kiem-phan-tich.mjs đo.
 //  13. Gói I: nạp gộp tiến độ (hàm gộp theo bảng đáp án gõ tay: máy trống, hai bản giống, xung đột thẻ, bài/lộ trình/ô kiểm, ngày kiểm tra, en8020.ltr12, khóa lạ, file hỏng, __proto__) và làm thật bằng trình duyệt (xem trước, Nạp gộp, Hủy, Thay hẳn, vòng xuất–nạp, tệp cũ); báo cáo tuần (số đếm gõ tay, không chép chữ lạ, chép vào clipboard, 390 px, tương phản).
+//  14. Gói J: giọng thầy. Công cụ kiem/tao-danh-sach-am-thanh.mjs (danh sách trong repo khớp; tệp đúng tên được nhận, sai tên bị báo, chạy lại không ghi thêm, cảnh báo tệp nặng); trên trang: câu có tệp mp3 thì phát tệp (phát được thật), câu không có, tệp hỏng, đường dẫn lạ, bị chặn phát, thiếu danh sách thì giọng máy; đọc chậm; dừng tệp cũ khi bấm câu khác.
 //   6. Các cụm chữ đã sửa không quay lại ("10–15 từ mới"; "Sau khóa này" không xếp việc đã dạy là việc tiếp theo).
 //
 // Khi cố ý thêm/bớt thẻ, mẫu câu hay câu quiz: sửa BAN_DAU bên dưới (cùng PR) để mốc luôn là số thật.
@@ -1148,6 +1149,131 @@ try {
       await c5.close();
     }
     for (const f of [fileB, fileHong, fileXuat, fileCu]) { try { fs.unlinkSync(f); } catch {} }
+  }
+
+  /* ---------- 14. Gói J: giọng thầy (tệp mp3) cho hội thoại, quay về giọng máy khi không có ---------- */
+  {
+    const bang = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+    const { spawnSync } = await import('node:child_process');
+    const congCu = path.join(here, 'tao-danh-sach-am-thanh.mjs');
+    const chayCongCu = (thuMuc, ...them) => { const r = spawnSync(process.execPath, [congCu, ...(thuMuc ? [thuMuc] : []), ...them], { encoding: 'utf8' }); return { ma: r.status, ra: (r.stdout || '') + (r.stderr || '') }; };
+    const goc = path.join(here, '..');
+    const taoBanSao = () => {
+      const t = fs.mkdtempSync(path.join(os.tmpdir(), 'trang-j-'));
+      fs.copyFileSync(path.join(goc, 'index.html'), path.join(t, 'index.html'));
+      fs.cpSync(path.join(goc, 'phan-tich'), path.join(t, 'phan-tich'), { recursive: true });
+      fs.cpSync(path.join(goc, 'am-thanh'), path.join(t, 'am-thanh'), { recursive: true });
+      return t;
+    };
+    const mau = path.join(here, 'am-thanh-mau', 'th1-01.mp3');
+    const CAU1 = "Hi, I'm Linh. Nice to meet you.", CAU2 = "Nice to meet you, too. I'm Tom. Where are you from?", CAU3 = "I'm from Vietnam. I work in food R&D.", CAU4 = 'Oh, interesting! What do you do exactly?', CAU5 = 'I develop sauces and drinks. And you?';
+
+    // (a) tệp danh sách trong repo đang đúng (công cụ chạy ở chế độ chỉ kiểm)
+    const rep = chayCongCu(null, '--kiem');
+    kiem(rep.ma === 0 && /17 hội thoại, 115 dòng/.test(rep.ra), 'gói J · am-thanh/danh-sach.js và CAU-CAN-GHI.md khớp các hội thoại và tệp mp3 hiện có (17 hội thoại, 115 dòng)', rep.ra.slice(0, 300));
+    const nDlgTrang = await trang.evaluate(() => ({ dlg: document.querySelectorAll('ul.dlg').length, dong: [...document.querySelectorAll('ul.dlg')].reduce((s, u) => s + u.querySelectorAll(':scope > li').length, 0) }));
+    kiem(nDlgTrang.dlg === 17 && nDlgTrang.dong === 115, 'gói J · số hội thoại và số dòng trên trang đúng bằng số công cụ đếm (17, 115): thêm hội thoại mới thì phải chạy lại công cụ', JSON.stringify(nDlgTrang));
+
+    // (b) công cụ trên bản sao: tệp đặt đúng tên được nhận, sai tên bị báo, chạy lại không ghi thêm
+    {
+      const t = taoBanSao();
+      fs.copyFileSync(mau, path.join(t, 'am-thanh', 'th1-01.mp3'));
+      const r1 = chayCongCu(t);
+      const js = fs.readFileSync(path.join(t, 'am-thanh', 'danh-sach.js'), 'utf8');
+      const md = fs.readFileSync(path.join(t, 'am-thanh', 'CAU-CAN-GHI.md'), 'utf8');
+      const mong = 'window.AM_THANH = {\n ' + JSON.stringify(CAU1) + ': "am-thanh/th1-01.mp3"\n};\n';
+      kiem(r1.ma === 0 && js.endsWith(mong) && /đã có tiếng 1\./.test(md) && /\| th1-01\.mp3 \| A \| Hi, I'm Linh\. Nice to meet you\. \| ✓ \|/.test(md) && /th1: 1\/6 dòng \(thiếu 02 03 04 05 06\)/.test(r1.ra),
+        'gói J · công cụ: một tệp th1-01.mp3 → danh sách có đúng một câu, bảng CAU-CAN-GHI đánh ✓ đúng dòng, báo "1/6 dòng"', r1.ra + js);
+      const r2 = chayCongCu(t);
+      const r3 = chayCongCu(t, '--kiem');
+      kiem(r2.ma === 0 && /không ghi lại/.test(r2.ra) && r3.ma === 0, 'gói J · công cụ: chạy lại lần hai không ghi gì, chế độ --kiem báo đúng', r2.ra + r3.ra);
+      // thêm tệp mà chưa chạy lại công cụ: --kiem phải báo danh sách đang cũ
+      fs.copyFileSync(mau, path.join(t, 'am-thanh', 'th1-05.mp3'));
+      const rCu = chayCongCu(t, '--kiem');
+      kiem(rCu.ma === 1 && /đang cũ/.test(rCu.ra), 'gói J · công cụ --kiem: thêm tệp mp3 mà chưa chạy lại công cụ thì báo danh sách đang cũ, thoát mã 1', rCu.ra);
+      fs.copyFileSync(mau, path.join(t, 'am-thanh', 'th1-2.mp3'));
+      fs.copyFileSync(mau, path.join(t, 'am-thanh', 'th99-01.mp3'));
+      fs.copyFileSync(mau, path.join(t, 'am-thanh', 'th1-03.wav'));
+      const r4 = chayCongCu(t, '--kiem');
+      kiem(r4.ma === 1 && /«th1-2\.mp3» không khớp dòng nào; có phải ý bạn là «th1-02\.mp3»/.test(r4.ra) && /«th99-01\.mp3» không khớp/.test(r4.ra) && /«th1-03\.wav» không khớp dòng nào \(chỉ nhận đuôi \.mp3/.test(r4.ra),
+        'gói J · công cụ: tệp sai tên (th1-2, th99-01, đuôi .wav) bị báo LỖI, thoát mã 1, gợi ý đúng tên', r4.ra);
+      // tệp quá nặng
+      fs.unlinkSync(path.join(t, 'am-thanh', 'th1-2.mp3')); fs.unlinkSync(path.join(t, 'am-thanh', 'th99-01.mp3')); fs.unlinkSync(path.join(t, 'am-thanh', 'th1-03.wav'));
+      // dòng có số: khóa là chữ đọc (data-say), không phải chữ số trên trang
+      fs.unlinkSync(path.join(t, 'am-thanh', 'th1-01.mp3'));
+      fs.copyFileSync(mau, path.join(t, 'am-thanh', 'gio-ngay-tien-1-02.mp3'));
+      const r6 = chayCongCu(t);
+      const js6 = fs.readFileSync(path.join(t, 'am-thanh', 'danh-sach.js'), 'utf8');
+      kiem(r6.ma === 0 && js6.includes('"It starts at two thirty p.m. on Thursday.": "am-thanh/gio-ngay-tien-1-02.mp3"') && !js6.includes('2:30'), 'gói J · công cụ: dòng có số (data-say) được khai bằng chữ đọc "two thirty", không phải "2:30"', js6);
+      fs.copyFileSync(mau, path.join(t, 'am-thanh', 'th1-01.mp3'));
+      fs.writeFileSync(path.join(t, 'am-thanh', 'th1-04.mp3'), Buffer.alloc(400 * 1024));
+      const r5 = chayCongCu(t);
+      kiem(/CẢNH BÁO th1-04\.mp3 nặng 400 KB/.test(r5.ra), 'gói J · công cụ: cảnh báo tệp nặng hơn 300 KB cho một dòng ngắn', r5.ra);
+      fs.rmSync(t, { recursive: true, force: true });
+    }
+
+    // (c) trình duyệt: tệp có thì phát tệp; không có, tệp hỏng, đường dẫn lạ, trình duyệt chặn phát thì giọng máy
+    const t = taoBanSao();
+    fs.copyFileSync(mau, path.join(t, 'am-thanh', 'th1-01.mp3'));
+    fs.writeFileSync(path.join(t, 'am-thanh', 'danh-sach.js'), 'window.AM_THANH = ' + JSON.stringify({
+      [CAU1]: 'am-thanh/th1-01.mp3', [CAU2]: 'am-thanh/th1-02.mp3' /* tệp không có thật */, [CAU3]: 'http://evil.example/x.mp3', [CAU4]: '../am-thanh/th1-01.mp3',
+    }) + ';\n');
+    const urlT = pathToFileURL(path.join(t, 'index.html')).href + '#thuc-hanh';
+    const cJ = await trinhDuyet.newContext({ viewport: { width: 390, height: 800 } });
+    const loiJ = [];
+    await cJ.addInitScript(() => {
+      window.__nhat = { play: [], tts: [], audios: [], chan: false };
+      const goc = HTMLMediaElement.prototype.play;
+      HTMLMediaElement.prototype.play = function () { window.__nhat.play.push({ src: this.src, toc: this.playbackRate }); window.__nhat.audios.push(this); return window.__nhat.chan ? Promise.reject(new Error('bị chặn')) : goc.call(this); };
+    });
+    const pJ = await cJ.newPage();
+    pJ.on('pageerror', e => loiJ.push('pageerror: ' + e.message));
+    await pJ.goto(urlT); await pJ.waitForFunction(() => window.__AM && document.querySelectorAll('#thuc-hanh .sit').length >= 6);
+    await pJ.evaluate(() => { const ss = window.speechSynthesis; ss.cancel = () => {}; ss.speak = u => window.__nhat.tts.push(u.text); });
+    const bam = (i) => pJ.evaluate(i => { window.__nhat.play.length = 0; window.__nhat.tts.length = 0; document.querySelectorAll('#thuc-hanh .sit')[0].querySelectorAll('ul.dlg > li .spk')[i].click(); }, i);
+    const nhat = () => pJ.evaluate(() => ({ play: window.__nhat.play.map(p => p.src.replace(/^.*\/am-thanh\//, 'am-thanh/')), toc: window.__nhat.play.map(p => p.toc), tts: window.__nhat.tts.slice() }));
+    kiem(await pJ.evaluate(() => Object.keys(window.__AM.map).length) === 4, 'gói J · trang đọc được danh sách am-thanh/danh-sach.js (4 mục thử)', '');
+    await bam(0); await pJ.waitForTimeout(150);
+    let k = await nhat();
+    kiem(bang(k.play, ['am-thanh/th1-01.mp3']) && k.tts.length === 0, 'gói J · câu có tệp: bấm loa phát tệp mp3, giọng máy không đọc', JSON.stringify(k));
+    const ketThuc = await pJ.waitForFunction(() => window.__nhat.audios[0] && (window.__nhat.audios[0].ended || window.__nhat.audios[0].currentTime > 0.2), null, { timeout: 4000 }).then(() => true, () => false);
+    kiem(ketThuc && await pJ.evaluate(() => !window.__nhat.audios[0].error), 'gói J · tệp mp3 thật sự phát được trong trình duyệt (chạy tới cuối hoặc quá 0,2 giây, không lỗi giải mã)', '');
+    await bam(4); await pJ.waitForTimeout(100);
+    k = await nhat();
+    kiem(k.play.length === 0 && bang(k.tts, [CAU5]), 'gói J · câu không có trong danh sách: giọng máy đọc như cũ, không phát tệp', JSON.stringify(k));
+    await bam(1); await pJ.waitForTimeout(600);
+    k = await nhat();
+    kiem(bang(k.play, ['am-thanh/th1-02.mp3']) && bang(k.tts, [CAU2]), 'gói J · danh sách ghi tệp nhưng tệp không có: thử phát, lỗi thì quay về giọng máy đúng câu đó', JSON.stringify(k));
+    await bam(2); await bam(3);
+    await pJ.waitForTimeout(150);
+    k = await nhat();
+    kiem(k.play.length === 0 && bang(k.tts, [CAU4]), 'gói J · đường dẫn lạ (http://..., ../...) trong danh sách bị bỏ qua: không phát, dùng giọng máy', JSON.stringify(k));
+    await pJ.evaluate(() => { window.__nhat.chan = true; });
+    await bam(0); await pJ.waitForTimeout(200);
+    k = await nhat();
+    kiem(bang(k.play, ['am-thanh/th1-01.mp3']) && bang(k.tts, [CAU1]), 'gói J · trình duyệt chặn phát (play bị từ chối): quay về giọng máy', JSON.stringify(k));
+    await pJ.evaluate(() => { window.__nhat.chan = false; });
+    await pJ.check('#slowToggle'); await bam(0); await pJ.waitForTimeout(100);
+    k = await nhat();
+    kiem(k.toc[0] === 0.8, 'gói J · bật "đọc chậm": tệp mp3 phát với tốc độ 0,8', JSON.stringify(k));
+    await pJ.uncheck('#slowToggle');
+    // bấm câu khác khi đang phát: tệp cũ dừng
+    await bam(0); await bam(4); await pJ.waitForTimeout(100);
+    kiem(await pJ.evaluate(() => window.__nhat.audios[window.__nhat.audios.length - 1].paused), 'gói J · bấm loa câu khác khi tệp đang phát: tệp cũ dừng', '');
+    kiem(loiJ.length === 0, 'gói J · các thao tác trên không gây lỗi JS', loiJ.slice(0, 3).join(' || '));
+    await cJ.close();
+
+    // (d) không có tệp danh sách (bị xóa) hoặc rỗng: trang vẫn chạy, mọi câu dùng giọng máy
+    fs.unlinkSync(path.join(t, 'am-thanh', 'danh-sach.js'));
+    const cK = await trinhDuyet.newContext({ viewport: { width: 390, height: 800 } });
+    await cK.addInitScript(() => { window.__nhat = { tts: [] }; });
+    const pK = await cK.newPage(); const loiK2 = [];
+    pK.on('pageerror', e => loiK2.push('pageerror: ' + e.message));
+    await pK.goto(urlT); await pK.waitForFunction(() => window.__AM && document.querySelectorAll('#thuc-hanh .sit').length >= 6);
+    await pK.evaluate(() => { const ss = window.speechSynthesis; ss.cancel = () => {}; ss.speak = u => window.__nhat.tts.push(u.text); document.querySelectorAll('#thuc-hanh .sit')[0].querySelector('ul.dlg > li .spk').click(); });
+    kiem(bang(await pK.evaluate(() => window.__nhat.tts), [CAU1]) && loiK2.length === 0 && await pK.evaluate(() => Object.keys(window.__AM.map).length) === 0, 'gói J · thiếu tệp danh-sach.js: trang vẫn chạy, câu dùng giọng máy, không lỗi JS', loiK2.join(' | '));
+    await cK.close();
+    fs.rmSync(t, { recursive: true, force: true });
   }
 } finally {
   await trinhDuyet.close();
