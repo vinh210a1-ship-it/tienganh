@@ -12,6 +12,7 @@
 //   9. Gói D: Bài 3B (giờ, thứ–ngày–tháng, tiền, số điện thoại): mọi số trên trang có chữ đọc kèm, chữ đọc khớp số theo bộ đổi số độc lập (kiem/doc-so.mjs, tự kiểm bằng kiem/gold-doc-so.mjs); nút loa đọc đúng chữ đã ghi; mỗi mục có nhãn "Tự soạn"; đáp án đóng; vị trí trong mục lục; câu quiz; lộ trình nối vào cuối tuần.
 //  10. Gói E: 12 tình huống Thực hành: sáu khóa lưu cũ còn nguyên, khóa mới không trùng; mỗi tình huống mới có nhãn Tự soạn, mục Học trước, 8–10 lượt, câu then chốt, danh sách kiểm; số/giờ/giá có chữ đọc ghi sẵn; chỉ dùng cấu trúc đã khai (bộ dò cấu trúc, tự thử đỏ); nối đúng tuần ở Lộ trình; trang, mục lục, trang chủ ghi "12"; Bài 3B trỏ Bài 2B.
 //  11. Gói F: bài kiểm tra trình độ ngắn A1–A2: đúng 15 câu mỗi lần (300 lần rút), không câu nào vượt A2, mọi câu A1/A2 của ngân hàng đều có thể xuất hiện; bảng kết quả (Dưới A1/A1/A2/nên làm bản đầy đủ) khớp bảng gõ tay cho mọi cặp điểm; 7 kịch bản làm bài thật; bản đầy đủ vẫn 53 câu, vẫn mở bằng phần vốn từ; kết quả bản ngắn không ghi đè kết quả bản đầy đủ; khung giới thiệu không ghi thời gian chưa đo; 390 px không tràn; tương phản chế độ tối.
+//  12. Gói H: Lộ trình 12 tuần: 186 thẻ chia đúng vào tuần 1–10 (bảng gõ tay), mỗi thẻ đúng một tuần; liên kết trong trang; tình huống 7–12 chỉ dùng cấu trúc đã dạy tới tuần được xếp; chế độ "theo lộ trình" của thẻ từ (bật, đổi tuần, tắt, nhớ sau tải lại, tiến độ ôn không đổi); tệp sao lưu có khóa mới, tệp cũ vẫn nạp được, giá trị lưu hỏng không làm vỡ trang; 390 px và tương phản ba chế độ.
 //   6. Các cụm chữ đã sửa không quay lại ("10–15 từ mới"; "Sau khóa này" không xếp việc đã dạy là việc tiếp theo).
 //
 // Khi cố ý thêm/bớt thẻ, mẫu câu hay câu quiz: sửa BAN_DAU bên dưới (cùng PR) để mốc luôn là số thật.
@@ -19,6 +20,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { pathToFileURL } from 'node:url';
+import os from 'node:os';
 import { khopCau, bienThe } from './doc-so.mjs';
 import { DUNG, SAI } from './gold-doc-so.mjs';
 
@@ -706,6 +708,183 @@ try {
       });
       for (const r of tp3) kiem(r.tp >= NGUONG_TUONG_PHAN, `gói F · ${cach === 'sang' ? 'chế độ sáng' : cach === 'auto-toi' ? 'tối tự động' : 'tối ép data-theme'}: ${r.ten} tương phản ${r.tp.toFixed(2)}:1`, `thấp hơn ${NGUONG_TUONG_PHAN}:1`);
       await c3.close();
+    }
+  }
+
+  // 12. Gói H: Lộ trình 12 tuần. Dữ liệu (thẻ theo tuần, liên kết, tình huống đúng tuần), chế độ "theo lộ trình" của thẻ từ, tương thích tệp sao lưu cũ.
+  {
+    // Bảng GÕ TAY từ giáo trình 12 tuần (mục 5, 7), không tính lại từ mã: số thẻ mỗi tuần, nhóm thẻ, bài bắt buộc phải có liên kết.
+    const THE_TUAN = [15, 14, 20, 20, 21, 20, 20, 24, 20, 12];
+    const NHOM_TUAN = ['f', 'f', 'v', 'v', 'v', 'n', 'n', 'a', 't', 'q'];
+    const BAI_TUAN = { 1: ['phuong-phap', 'phat-am', 'mau-cau', 'kiem-tra'], 2: ['to-be', 'cau-co-ban'], 3: ['hien-tai-don', 'gio-ngay-tien'], 4: ['tu-vung'], 5: ['qua-khu-tuong-lai'], 6: ['qua-khu-tuong-lai', 'mau-cau', 'gio-ngay-tien'], 7: ['modal', 'gio-ngay-tien'], 8: ['ghep-cau'], 9: ['so-sanh'], 10: ['cong-viec', 'gio-ngay-tien'], 11: ['thuc-hanh'], 12: ['kiem-tra', 'lo-trinh'] };
+    // Tuần đầu tiên mà mỗi nhóm cấu trúc được dạy (theo giáo trình 12 tuần): will 6, tiếp diễn 6, Bài 6 modal 7, Bài 7 there is + từ nối 8, Bài 5B so sánh và hoàn thành 9.
+    const TUAN_DAY = { 'tuong-lai': 6, 'dang-lam': 6, 'modal': 7, 'there-is': 8, 'noi-cau': 8, 'so-sanh': 9, 'hoan-thanh': 9 };
+    const hamTuanSit = w12 => { const kq = {}; for (const w of w12) { const ds = [...(w.th || []), ...((w.nhanh || []).flatMap(nh => nh.th))]; for (const [, chu] of ds) { const m = /^Tình huống (\d+)/.exec(chu); if (m) (kq[m[1]] = kq[m[1]] || []).push(w.w); } } return kq; };
+
+    const d = await trang.evaluate(() => ({ tuan: window.__BO.tuan.map(b => ({ id: b.id, tuan: b.tuan, tu: b.tu })), w12: window.__BO.w12, vocab: window.__BO.vocab, nhom: window.__BO.nhom, bo: window.__BO.bo.map(b => b.id),
+      lessons: [...document.querySelectorAll('section.lesson')].map(s => s.id) }));
+    const tong = d.tuan.reduce((a, b) => a + b.tu.length, 0);
+    kiem(tong === BAN_DAU.vocab && tong === 186, `gói H · bộ thẻ theo tuần: cộng lại đúng ${BAN_DAU.vocab} thẻ`, 'cộng được ' + tong);
+    // Thẻ nhận diện bằng "chữ|nhóm" vì VOCAB có hai thẻ cùng chữ (work: động từ và danh từ).
+    const khoaThe = d.vocab.map((w, i) => w + '|' + d.nhom[i]);
+    kiem(new Set(khoaThe).size === khoaThe.length, 'gói H · mỗi thẻ có khóa "chữ|nhóm" duy nhất trong VOCAB', 'trùng: ' + khoaThe.filter((k, i) => khoaThe.indexOf(k) !== i).join(','));
+    const dem = {}; for (const b of d.tuan) for (const w of b.tu) dem[w] = (dem[w] || 0) + 1;
+    const thieu = khoaThe.filter(w => !dem[w]), lap = Object.keys(dem).filter(w => dem[w] > 1), la = Object.keys(dem).filter(w => !khoaThe.includes(w));
+    kiem(thieu.length === 0 && lap.length === 0 && la.length === 0, 'gói H · mỗi thẻ trong VOCAB nằm đúng một tuần, không thẻ lạ', `thiếu ${thieu.slice(0, 4)} · lặp ${lap.slice(0, 4)} · lạ ${la.slice(0, 4)}`);
+    kiem(JSON.stringify(d.tuan.map(b => b.tu.length)) === JSON.stringify(THE_TUAN), 'gói H · số thẻ mỗi tuần khớp bảng giáo trình (gõ tay)', d.tuan.map(b => b.tu.length).join(','));
+    const loiNhom = [];
+    d.tuan.forEach((b, i) => { for (const w of b.tu) { const k = w.split('|')[1]; if (k !== NHOM_TUAN[i]) loiNhom.push(`tuần ${b.tuan}: «${w}» thuộc nhóm ${k}, mong ${NHOM_TUAN[i]}`); } });
+    kiem(loiNhom.length === 0, 'gói H · thẻ của mỗi tuần đúng nhóm theo giáo trình (chức năng → động từ → danh từ → tính từ → thời gian → số lượng)', loiNhom.slice(0, 3).join(' ; '));
+    kiem(d.tuan.every((b, i) => b.id === 't' + (i + 1) && !d.bo.includes(b.id)) && d.tuan.length === 10, 'gói H · mã bộ t1..t10 không trùng bộ buổi dạy (1, 2)', d.tuan.map(b => b.id).join(','));
+    kiem(d.w12.length === 12 && d.w12.every((x, i) => x.w === i + 1 && x.ten && x.noi && x.kiem), 'gói H · đủ 12 tuần, mỗi tuần có tên, "nói được gì", phép kiểm cuối tuần', 'số tuần ' + d.w12.length);
+
+    // liên kết trong dữ liệu: mọi mã bài có thật; mỗi tuần có đủ bài bắt buộc
+    const lkTuan = w => [...(w.bai || []), ...(w.th || []), ...((w.nhanh || []).flatMap(nh => [...nh.bai, ...nh.th]))].map(a => a[0]);
+    const loiLk = [];
+    for (const w of d.w12) {
+      for (const id of lkTuan(w)) if (!d.lessons.includes(id)) loiLk.push(`tuần ${w.w}: bài «${id}» không có trong trang`);
+      for (const id of BAI_TUAN[w.w]) if (!lkTuan(w).includes(id)) loiLk.push(`tuần ${w.w}: thiếu liên kết tới «${id}»`);
+    }
+    kiem(loiLk.length === 0, 'gói H · mọi liên kết trong dữ liệu trỏ tới bài có thật, mỗi tuần đủ bài chính theo giáo trình', loiLk.slice(0, 4).join(' ; '));
+
+    // tình huống: 12 tình huống đều có chỗ; tình huống 7–12 chỉ dùng cấu trúc đã dạy tới tuần được xếp
+    const tuanSit = hamTuanSit(d.w12);
+    const thieuSit = []; for (let n = 1; n <= 12; n++) if (!tuanSit[n]) thieuSit.push(n);
+    kiem(thieuSit.length === 0, 'gói H · cả 12 tình huống đều được xếp vào một tuần', 'chưa xếp: ' + thieuSit.join(','));
+    const cho = await trang.evaluate(() => [...document.querySelectorAll('#thuc-hanh .sit[data-sit]')].map(s => ({ n: Number(s.getAttribute('data-sit')), cho: (s.getAttribute('data-cho-phep') || '').split(/\s+/).filter(Boolean) })));
+    const loiSit = [];
+    for (const s of cho) {
+      const tuans = tuanSit[s.n] || [];
+      for (const k of s.cho) {
+        if (!(k in TUAN_DAY)) { if (!(k in CAU_TRUC)) loiSit.push(`tình huống ${s.n}: nhóm lạ «${k}»`); continue; }
+        for (const w of tuans) if (TUAN_DAY[k] > w) loiSit.push(`tình huống ${s.n} xếp ở tuần ${w} nhưng dùng «${k}» (dạy ở tuần ${TUAN_DAY[k]})`);
+      }
+    }
+    kiem(loiSit.length === 0 && cho.length === 6, 'gói H · tình huống 7–12 chỉ dùng cấu trúc đã dạy tới tuần được xếp trong lộ trình 12 tuần', loiSit.join(' ; ') || 'số tình huống mới ' + cho.length);
+
+    // DOM sau khi vẽ
+    const g = await trang.evaluate(() => {
+      const tuans = [...document.querySelectorAll('#plan12 .week')];
+      const bang = document.querySelectorAll('#lo-trinh-12 table');
+      return {
+        so: tuans.length,
+        bo: tuans.map(w => { const a = w.querySelector('a[href^="#tu-vung?bo="]'); return { w: Number(w.getAttribute('data-w')), href: a ? a.getAttribute('href') : null, tag: !!w.querySelector('.tag.hyp') }; }),
+        tongO: (document.getElementById('ov12Tong') || {}).textContent,
+        hang: document.querySelectorAll('#ov12 tr').length,
+        lk: [...document.querySelectorAll('#lo-trinh-12 a[href^="#"]')].map(a => a.getAttribute('href').slice(1).split('?')[0]),
+        tuan8: document.querySelectorAll('#plan .week').length,
+        mocBang: bang[1] ? bang[1].querySelectorAll('tr').length : 0,
+        ghiChu: document.querySelector('#lo-trinh-12 .note') ? document.querySelector('#lo-trinh-12 .note').textContent : ''
+      };
+    });
+    kiem(g.so === 12 && g.tongO === '186' && g.hang === 14, 'gói H · trang vẽ 12 tuần, bảng tổng quan cộng đúng 186', JSON.stringify({ so: g.so, tong: g.tongO, hang: g.hang }));
+    kiem(g.bo.slice(0, 10).every((x, i) => x.href === '#tu-vung?bo=t' + (i + 1)) && g.bo.slice(10).every(x => x.href === null), 'gói H · tuần 1–10 có liên kết tới đúng bộ thẻ của tuần, tuần 11–12 không có', JSON.stringify(g.bo.map(x => x.href)));
+    kiem(g.bo.every(x => x.tag), 'gói H · mọi tuần ghi nhãn "Số tự đặt" cho ngưỡng đạt', 'có tuần thiếu nhãn');
+    kiem(g.lk.length > 60 && g.lk.every(id => d.lessons.includes(id)), `gói H · ${g.lk.length} liên kết nội bộ trên trang đều trỏ tới bài có thật`, 'liên kết hỏng: ' + g.lk.filter(id => !d.lessons.includes(id)).join(','));
+    kiem(/chưa thử với học viên thật/.test(g.ghiChu) && /số tự đặt/.test(g.ghiChu), 'gói H · ghi chú đầu trang nói rõ chưa thử với học viên thật và ngưỡng là số tự đặt', g.ghiChu.slice(0, 80));
+    kiem(g.tuan8 === 8 && g.mocBang === 5, 'gói H · Lộ trình 8 tuần vẫn đủ 8 tuần; bảng ba mốc có 4 mốc', `8 tuần: ${g.tuan8} · dòng bảng mốc ${g.mocBang}`);
+
+    // Kịch bản: danh sách bộ khi TẮT chế độ, và từng bộ tuần mở bằng link (kho trống)
+    const ctxH = await trinhDuyet.newContext({ viewport: { width: 390, height: 800 } });
+    const ph = await ctxH.newPage();
+    const loiH = [];
+    ph.on('pageerror', e => loiH.push(e.message));
+    ph.on('console', m => { if (m.type() === 'error') loiH.push(m.text()); });
+    const thongKe = () => ph.evaluate(() => document.querySelector('#fc-core .fc-stats').textContent);
+    const opt = () => ph.evaluate(() => [...document.querySelectorAll('#fc-core-b option')].map(o => o.value));
+    const luu = () => ph.evaluate(() => localStorage.getItem('en8020.ltr12'));
+    await ph.goto(URL_TRANG + '#tu-vung'); await ph.waitForSelector('#fc-core-b');
+    kiem(JSON.stringify(await opt()) === JSON.stringify(['all', '1', '2', ...THE_TUAN.map((_, i) => 't' + (i + 1))]), 'gói H · chế độ tắt: ô "Bộ thẻ" có Tất cả, Bộ 1, Bộ 2, Tuần 1–10; mặc định vẫn "Tất cả"', (await opt()).join(','));
+    kiem((await ph.inputValue('#fc-core-b')) === 'all' && /\/186/.test(await thongKe()) && (await luu()) === null, 'gói H · học viên mới: mặc định "Tất cả" 186 thẻ, chưa ghi gì vào kho lộ trình', await thongKe());
+    for (let i = 0; i < 10; i++) {
+      await ph.goto(URL_TRANG + '#tu-vung?bo=t' + (i + 1)); await ph.reload(); await ph.waitForSelector('#fc-core-b');
+      const st = await thongKe();
+      kiem((await ph.inputValue('#fc-core-b')) === 't' + (i + 1) && new RegExp('Thẻ mới: ' + THE_TUAN[i] + ' · Đã thuộc: 0/' + THE_TUAN[i]).test(st), `gói H · link #tu-vung?bo=t${i + 1}: đúng bộ, ${THE_TUAN[i]} thẻ mới`, st);
+    }
+    // học hết bộ tuần 5 (21 thẻ): chỉ thẻ của bộ, không lặp, rồi dừng
+    await ph.goto(URL_TRANG + '#tu-vung?bo=t5'); await ph.reload(); await ph.waitForSelector('#fc-core-b');
+    const bo5 = d.tuan[4].tu.map(k => k.split('|')[0]), thay = [];
+    for (let i = 0; i < 21; i++) { thay.push(await ph.evaluate(() => document.querySelector('#fc-core .fc-word').textContent)); try { await ph.click('#fc-core .btn.yes', { timeout: 3000 }); } catch { break; } }
+    const sau5 = await ph.evaluate(() => document.querySelector('#fc-core .fc-word').textContent);
+    kiem(thay.every(w => bo5.includes(w)) && new Set(thay).size === 21 && /Hết thẻ đến hạn/.test(sau5), 'gói H · học hết bộ tuần 5: 21 thẻ đều của bộ, không lặp, rồi dừng (không đẩy sang 186 thẻ)', `ngoài bộ: ${thay.filter(w => !bo5.includes(w)).join(',')} · sau: ${sau5}`);
+
+    // Chế độ theo lộ trình: bật, đổi tuần, tắt, ghi nhớ sau tải lại
+    await ph.evaluate(() => localStorage.clear());
+    await ph.goto(URL_TRANG + '#lo-trinh-12'); await ph.reload(); await ph.waitForSelector('#ltrOn');
+    await ph.check('#ltrOn'); await ph.selectOption('#ltrW', '3');
+    kiem((await luu()) === JSON.stringify({ on: true, w: 3 }), 'gói H · bật theo lộ trình, tuần 3: kho ghi {on:true, w:3}', String(await luu()));
+    kiem(await ph.evaluate(() => !!document.querySelector('#plan12 .week.cur') && document.querySelector('#plan12 .week.cur').getAttribute('data-w') === '3' && document.querySelectorAll('#plan12 .week.cur').length === 1), 'gói H · tuần đang học được tô khung', '');
+    await ph.evaluate(() => { location.hash = '#tu-vung'; }); await ph.waitForSelector('#fc-core-b');
+    const o3 = await opt();
+    kiem(JSON.stringify(o3) === JSON.stringify(['ltr', '1', '2', 't1', 't2', 't3']) && (await ph.inputValue('#fc-core-b')) === 'ltr', 'gói H · theo lộ trình tuần 3: chỉ còn "thẻ đến hết tuần 3", Bộ 1, Bộ 2, Tuần 1–3; không còn "Tất cả" và tuần 4 trở đi', o3.join(','));
+    kiem(/\/49\b/.test(await thongKe()), 'gói H · theo lộ trình tuần 3: 49 thẻ (15 + 14 + 20)', await thongKe());
+    // đổi tuần rồi quay lại Bài 4 (không tải lại): danh sách và số thẻ đổi theo
+    await ph.evaluate(() => { location.hash = '#lo-trinh-12'; }); await ph.selectOption('#ltrW', '5');
+    await ph.evaluate(() => { location.hash = '#tu-vung'; });
+    kiem((await ph.inputValue('#fc-core-b')) === 'ltr' && /\/90\b/.test(await thongKe()) && (await opt()).includes('t5') && !(await opt()).includes('t6'), 'gói H · đổi sang tuần 5 không cần tải lại: 90 thẻ (15 + 14 + 20 + 20 + 21), có Tuần 5, không có Tuần 6', await thongKe());
+    // link tới bộ của tuần chưa tới: rơi về "thẻ đến hết tuần"
+    await ph.evaluate(() => { location.hash = '#tu-vung?bo=t8'; }); await ph.waitForTimeout(80);
+    kiem((await ph.inputValue('#fc-core-b')) === 'ltr', 'gói H · đang theo lộ trình tuần 5, link tới bộ tuần 8 (chưa tới) thì về "thẻ đến hết tuần 5"', 'ô = ' + (await ph.inputValue('#fc-core-b')));
+    // nhớ sau khi tải lại
+    await ph.goto(URL_TRANG + '#tu-vung'); await ph.reload(); await ph.waitForSelector('#fc-core-b');
+    kiem((await ph.inputValue('#fc-core-b')) === 'ltr' && /\/90\b/.test(await thongKe()), 'gói H · tải lại trang: chế độ theo lộ trình vẫn bật, vẫn tuần 5', await thongKe());
+    // tuần 12 = đủ 186
+    await ph.evaluate(() => { location.hash = '#lo-trinh-12'; }); await ph.selectOption('#ltrW', '12'); await ph.evaluate(() => { location.hash = '#tu-vung'; });
+    kiem(/\/186\b/.test(await thongKe()) && JSON.stringify(await opt()) === JSON.stringify(['ltr', '1', '2', ...THE_TUAN.map((_, i) => 't' + (i + 1))]), 'gói H · theo lộ trình tuần 12: đủ 186 thẻ, đủ mọi bộ tuần', await thongKe());
+    // tiến độ ôn không đổi khi bật/tắt: ôn 3 thẻ ở tuần 3 rồi tắt chế độ
+    await ph.evaluate(() => { location.hash = '#lo-trinh-12'; }); await ph.selectOption('#ltrW', '3'); await ph.evaluate(() => { location.hash = '#tu-vung'; });
+    for (let i = 0; i < 3; i++) await ph.click('#fc-core .btn.yes');
+    const khoTruoc = await ph.evaluate(() => ({ b: localStorage.getItem('en8020.boxes'), d: localStorage.getItem('en8020.due') }));
+    await ph.evaluate(() => { location.hash = '#lo-trinh-12'; }); await ph.uncheck('#ltrOn'); await ph.evaluate(() => { location.hash = '#tu-vung'; });
+    const khoSau = await ph.evaluate(() => ({ b: localStorage.getItem('en8020.boxes'), d: localStorage.getItem('en8020.due') }));
+    kiem(JSON.stringify(khoTruoc) === JSON.stringify(khoSau) && Object.keys(JSON.parse(khoSau.b)).length === 3, 'gói H · tắt chế độ không đổi hộp và ngày hẹn của thẻ (3 thẻ vừa ôn còn nguyên)', JSON.stringify(khoSau));
+    kiem((await ph.inputValue('#fc-core-b')) === 'all' && /\/186\b/.test(await thongKe()) && !(await opt()).includes('ltr'), 'gói H · tắt chế độ: ô về "Tất cả" 186 thẻ, hết "ltr"', await thongKe());
+
+    // Sao lưu: tệp sao lưu có khóa mới; tệp sao lưu cũ (không có khóa này) vẫn nạp được; giá trị hỏng không làm vỡ trang
+    await ph.evaluate(() => { location.hash = '#lo-trinh-12'; }); await ph.check('#ltrOn'); await ph.selectOption('#ltrW', '4');
+    await ph.evaluate(() => { location.hash = '#lo-trinh'; }); await ph.waitForSelector('#bkExport');
+    const [dl] = await Promise.all([ph.waitForEvent('download'), ph.click('#bkExport')]);
+    const fileTam = path.join(os.tmpdir(), 'sao-luu-' + process.pid + '.json');
+    await dl.saveAs(fileTam);
+    const sl = JSON.parse(fs.readFileSync(fileTam, 'utf8'));
+    kiem(sl.keys && sl.keys['en8020.ltr12'] === JSON.stringify({ on: true, w: 4 }), 'gói H · tệp sao lưu có khóa en8020.ltr12 của chế độ theo lộ trình', JSON.stringify(sl.keys && sl.keys['en8020.ltr12']));
+    const cu2 = { app: 'tieng-anh-8020', version: 1, saved: '2026-11-01T00:00:00.000Z', keys: { 'en8020.boxes': JSON.stringify({ want: 2 }), 'en8020.due': JSON.stringify({ want: 99999 }) } };
+    fs.writeFileSync(fileTam, JSON.stringify(cu2));
+    await ph.evaluate(() => localStorage.removeItem('en8020.ltr12'));
+    await ph.setInputFiles('#bkImport', fileTam);
+    await ph.waitForSelector('#bkMsg button'); await ph.click('#bkMsg button');
+    await ph.waitForTimeout(1500);
+    await ph.goto(URL_TRANG + '#tu-vung'); await ph.reload(); await ph.waitForSelector('#fc-core-b');
+    const hauNap = await ph.evaluate(() => ({ b: localStorage.getItem('en8020.boxes'), l: localStorage.getItem('en8020.ltr12') }));
+    kiem(hauNap.b === JSON.stringify({ want: 2 }) && hauNap.l === null && (await ph.inputValue('#fc-core-b')) === 'all', 'gói H · nạp tệp sao lưu CŨ (không có khóa lộ trình): nạp được, chế độ theo lộ trình tắt, mặc định "Tất cả"', JSON.stringify(hauNap));
+    fs.unlinkSync(fileTam);
+    // giá trị lưu hỏng: không làm vỡ trang. Mong đợi gõ tay: [chế độ bật?, tuần]
+    const HONG = [['"rac"', false, '1'], ['{"on":"có","w":99}', false, '1'], ['{"on":true,"w":"3"}', true, '1'], ['null', false, '1'], ['[1,2]', false, '1'], ['{"on":true,"w":7}', true, '7']];
+    for (const [hong, mongBat, mongTuan] of HONG) {
+      await ph.evaluate(v => localStorage.setItem('en8020.ltr12', v), hong);
+      await ph.goto(URL_TRANG + '#tu-vung'); await ph.reload(); await ph.waitForSelector('#fc-core-b');
+      const v = await ph.evaluate(() => ({ on: document.getElementById('ltrOn').checked, w: document.getElementById('ltrW').value }));
+      kiem(v.on === mongBat && v.w === mongTuan, `gói H · giá trị lưu ${hong}: trang vẫn mở, bật=${mongBat}, tuần ${mongTuan}`, JSON.stringify(v));
+    }
+    kiem(loiH.length === 0, 'gói H · các kịch bản thẻ theo tuần và chế độ theo lộ trình: không lỗi console', loiH.slice(0, 3).join(' || '));
+    await ctxH.close();
+
+    // 390 px không tràn ngang; chế độ sáng, tối tự động, tối ép: chữ, liên kết, nhãn, khung điều khiển đủ tương phản
+    for (const cach of ['sang', 'auto-toi', 'ep-toi']) {
+      const c4 = await trinhDuyet.newContext({ viewport: { width: 390, height: 800 }, colorScheme: cach === 'auto-toi' ? 'dark' : 'light' });
+      const p4 = await c4.newPage();
+      await p4.goto(URL_TRANG + '#lo-trinh-12'); await p4.waitForSelector('#plan12 .week');
+      if (cach === 'ep-toi') await p4.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
+      const kq = await p4.evaluate(() => {
+        const toi = s => { const c = s.match(/[\d.]+/g).map(Number); const f = v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }; return .2126 * f(c[0]) + .7152 * f(c[1]) + .0722 * f(c[2]); };
+        const nen = el => { for (let e = el; e; e = e.parentElement) { const b = getComputedStyle(e).backgroundColor; if (b && !/rgba?\(.*,\s*0\)$|transparent/.test(b)) return b; } return 'rgb(0,0,0)'; };
+        const tp = el => { const x = toi(getComputedStyle(el).color), y = toi(nen(el)); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); };
+        const mau = [['liên kết trong tuần', '#plan12 .week a'], ['nhãn Số tự đặt', '#plan12 .week .tag.hyp'], ['chữ khung điều khiển', '.ltr-ctl label'], ['chữ trong tuần', '#plan12 .week li'], ['chữ bảng mốc', '#lo-trinh-12 table td']];
+        return { tran: document.documentElement.scrollWidth - window.innerWidth, tp: mau.map(([ten, s]) => { const el = document.querySelector(s); return { ten, tp: el ? tp(el) : 0 }; }) };
+      });
+      kiem(kq.tran <= 1, `gói H · ${cach}: 390 px, trang Lộ trình 12 tuần không tràn ngang`, 'tràn ' + kq.tran + ' px');
+      for (const r of kq.tp) kiem(r.tp >= NGUONG_TUONG_PHAN, `gói H · ${cach === 'sang' ? 'chế độ sáng' : cach === 'auto-toi' ? 'tối tự động' : 'tối ép data-theme'}: ${r.ten} tương phản ${r.tp.toFixed(2)}:1`, `thấp hơn ${NGUONG_TUONG_PHAN}:1`);
+      await c4.close();
     }
   }
 } finally {
