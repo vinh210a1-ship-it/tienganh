@@ -1319,6 +1319,7 @@ try {
     kiem(yn.tran === 9000 && /2\.001–5\.000/.test(yn.nhan.b2) && /5\.001–9\.000/.test(yn.nhan.b3) && yn.ten.every(([, n]) => n === 12), 'gói L · kiểm vốn từ: công thức tối đa 9.000 họ từ khớp nhãn nhóm (1–2.000 / 2.001–5.000 / 5.001–9.000), mỗi nhóm 12 từ', JSON.stringify(yn));
     kiem(yn.nua === 2000 + 1500, 'gói L · kiểm vốn từ: biết hết nhóm 1 và nửa nhóm 2 → 3.500 họ từ (bảng gõ tay)', String(yn.nua));
     kiem(/class="tag hyp">Số tự đặt<\/span>Bốn nhóm từ do người soạn chọn/.test(SRC), 'gói L · bảng kết quả vốn từ có nhãn "Số tự đặt" nói rõ ranh giới nhóm là quy ước', '');
+    kiem(!/Only 9% of plastic/.test(SRC) && /chỉ minh họa cách đặt câu, không phải số liệu thật/.test(b10) && /chỉ minh họa cách đặt câu, không phải số liệu thật/.test(await vanBan('chuyen-nganh')), 'gói L · câu ví dụ có số: Bài 10 và 11 ghi rõ là minh họa; câu "Only 9% of plastic" (số thế giới thật, dễ cũ) đã đổi thành câu không số', '');
     // (e) trang chủ Khu 2 giữ số 570 / 10% / 1,4%
     kiem(/570 họ từ/.test(home) && /1,4%/.test(home), 'gói L · trang chủ Khu 2 vẫn ghi 570 họ từ và 1,4% (khớp bảng gốc)', '');
     kiem(loiL.length === 0, 'gói L · không lỗi JS khi mở trang', loiL.slice(0, 3).join(' || '));
