@@ -17,6 +17,7 @@
 //  13. Gói I: nạp gộp tiến độ (hàm gộp theo bảng đáp án gõ tay: máy trống, hai bản giống, xung đột thẻ, bài/lộ trình/ô kiểm, ngày kiểm tra, en8020.ltr12, khóa lạ, file hỏng, __proto__) và làm thật bằng trình duyệt (xem trước, Nạp gộp, Hủy, Thay hẳn, vòng xuất–nạp, tệp cũ); báo cáo tuần (số đếm gõ tay, không chép chữ lạ, chép vào clipboard, 390 px, tương phản).
 //  14. Gói J: giọng thầy. Công cụ kiem/tao-danh-sach-am-thanh.mjs (danh sách trong repo khớp; tệp đúng tên được nhận, sai tên bị báo, chạy lại không ghi thêm, cảnh báo tệp nặng); trên trang: câu có tệp mp3 thì phát tệp (phát được thật), câu không có, tệp hỏng, đường dẫn lạ, bị chặn phát, thiếu danh sách thì giọng máy; đọc chậm; dừng tệp cũ khi bấm câu khác.
 //  15. Gói K: ghi âm trong trình duyệt ở trang Thực hành: nút micro ở mọi câu; ghi thật bằng micro giả (ghi, dừng, nghe lại bản blob, trả micro, đổi câu, bấm loa, rời bài, tự dừng sau thời gian tối đa); không lưu (localStorage, file sao lưu), không gửi mạng, mất khi tải lại; 7 kịch bản lỗi (chặn quyền, không có micro, micro bận, lỗi lạ, không có mediaDevices, không có MediaRecorder, bản ghi rỗng); 390 px; tương phản sáng/tối.
+//  16. Gói L: số liệu Khu 2 khớp nguồn đã đọc ngày 2026-11-22 (Coxhead 2000 Table 4-5, độ phủ sublist, 118 thẻ AWL đúng sublist theo kiem/nguon-awl-sublist.json, số IELTS của British Council/ielts.org, công thức kiểm vốn từ 9.000 họ từ); nhãn nguồn thứ cấp / suy luận / tự soạn ở chỗ chưa kiểm được.
 //   6. Các cụm chữ đã sửa không quay lại ("10–15 từ mới"; "Sau khóa này" không xếp việc đã dạy là việc tiếp theo).
 //
 // Khi cố ý thêm/bớt thẻ, mẫu câu hay câu quiz: sửa BAN_DAU bên dưới (cùng PR) để mốc luôn là số thật.
@@ -1275,6 +1276,55 @@ try {
     kiem(bang(await pK.evaluate(() => window.__nhat.tts), [CAU1]) && loiK2.length === 0 && await pK.evaluate(() => Object.keys(window.__AM.map).length) === 0, 'gói J · thiếu tệp danh-sach.js: trang vẫn chạy, câu dùng giọng máy, không lỗi JS', loiK2.join(' | '));
     await cK.close();
     fs.rmSync(t, { recursive: true, force: true });
+  }
+  // 16. Gói L: rà số liệu Khu 2. Mọi số dưới đây GÕ TAY từ nguồn đã đọc ngày 2026-11-22 (Coxhead 2000 Table 4-5; Victoria University of Wellington; British Council; ielts.org), không tính lại từ trang.
+  {
+    const cL = await trinhDuyet.newContext({ viewport: { width: 1280, height: 900 } });
+    const pL = await cL.newPage(); const loiL = [];
+    pL.on('pageerror', e => loiL.push('pageerror: ' + e.message));
+    await pL.goto(URL_TRANG);
+    await pL.waitForFunction(() => window.__COUNTS && document.getElementById('hoc-thuat'));
+    const vanBan = id => pL.evaluate(i => document.getElementById(i).textContent.replace(/\s+/g, ' '), id);
+    const b10 = await vanBan('hoc-thuat'), b12 = await vanBan('ielts'), home = await vanBan('home');
+    // (a) số học thuật khớp bảng gốc; số cũ đã bỏ không quay lại
+    const so = { gsl1: 71.4, gsl2: 4.7, awl: 10.0, subs: [3.6, 1.8, 1.2, 0.9, 0.8, 0.6, 0.5, 0.3, 0.2, 0.1], kh: [9.1, 65.7, 5.0], fic: 1.4 };
+    const r1 = n => Math.round(n * 10) / 10;
+    kiem(r1(so.gsl1 + so.gsl2) === 76.1 && r1(so.gsl1 + so.gsl2 + so.awl) === 86.1 && r1(so.subs.reduce((a, b) => a + b, 0)) === 10.0 && r1(so.kh[0] + so.kh[1] + so.kh[2]) === 79.8, 'gói L · bảng gốc Coxhead gõ tay tự khớp: 71,4 + 4,7 = 76,1; + 10,0 = 86,1; mười sublist cộng 10,0; khoa học 9,1 + 65,7 + 5,0 = 79,8', '');
+    const vn = n => n.toFixed(1).replace('.', ',') + '%';
+    kiem([so.gsl1, so.gsl2, 76.1, 86.1, 79.8, 12.0, 9.1].every(n => b10.includes(vn(n))), 'gói L · Bài 10 ghi 71,4% · 4,7% · 76,1% · 86,1% · 79,8% · 12,0% · 9,1% (khớp Coxhead 2000, Table 4-5)', b10.slice(0, 120));
+    kiem([3.6, 1.8, 1.2, 0.2].every(n => b10.includes(vn(n))) && b10.includes('570 họ từ') && b10.includes('1,4%'), 'gói L · Bài 10 giữ đúng 570 họ từ, 1,4% tiểu thuyết, độ phủ sublist 3,6 / 1,8 / 1,2 / 0,2', '');
+    kiem(!/90% chữ trong văn bản học thuật|khoảng 90%/.test(b10.replace(/Số đã bỏ[\s\S]*?nữa\./, '')) && !/Có nguồn thứ cấp/.test(b10), 'gói L · Bài 10 không còn số "khoảng 90%" của infographic (chỉ còn trong ghi chú "Số đã bỏ") và không còn nhãn nguồn thứ cấp cho nó', '');
+    kiem(!/EAP Foundation[^.]*phủ khoảng 80%/.test(b10), 'gói L · Bài 10 không còn câu gán "GSL phủ khoảng 80%" cho EAP', '');
+    // (b) bộ thẻ AWL khớp danh sách gốc (kiem/nguon-awl-sublist.json: 180 họ từ sublist 1-3)
+    const goc = JSON.parse(fs.readFileSync(path.join(here, 'nguon-awl-sublist.json'), 'utf8'));
+    kiem(goc.sublist1.length === 60 && goc.sublist2.length === 60 && goc.sublist3.length === 60, 'gói L · tệp nguồn AWL có đúng 60 + 60 + 60 họ từ', `${goc.sublist1.length}/${goc.sublist2.length}/${goc.sublist3.length}`);
+    const khoiAWL = SRC.slice(SRC.indexOf('var AWL = ['), SRC.indexOf('];', SRC.indexOf('var AWL = [')));
+    const the = [...khoiAWL.matchAll(/\["([^"]+)","[^"]*","[^"]*","(s[123])"\]/g)].map(m => [m[1], m[2]]);
+    const sai3 = the.filter(([w, g]) => !(goc['sublist' + g.slice(1)] || []).includes(w));
+    const thieuS1 = goc.sublist1.filter(w => !the.some(([x, g]) => x === w && g === 's1'));
+    kiem(the.length === 118 && sai3.length === 0 && thieuS1.length === 0, 'gói L · bộ thẻ AWL: 118 thẻ, mỗi thẻ đúng sublist theo danh sách gốc, sublist 1 đủ 60', `thẻ=${the.length}; sai: ${sai3.slice(0, 5).join(',')}; thiếu s1: ${thieuS1.slice(0, 5).join(',')}`);
+    kiem(/118 họ từ/.test(b10) && /32 và 26 họ từ/.test(b10) && the.filter(x => x[1] === 's2').length === 32 && the.filter(x => x[1] === 's3').length === 26, 'gói L · câu ghi "118 họ từ", "32 và 26 họ từ" khớp số thẻ thật', '');
+    // (c) IELTS: số gõ tay từ British Council / ielts.org
+    const b12ok = ['2 giờ 45 phút', 'khoảng 30 phút', '60 phút', '150', '250', '11–14', '40 câu', '25%', '2/3', '8.5', '7.0', '5.5 – 6.5', '4.0 – 5.0'].filter(s => !b12.includes(s));
+    kiem(b12ok.length === 0, 'gói L · Bài 12 còn đủ số thi đã đối chiếu (2 giờ 45; 30/60/60/11–14 phút; 150/250 chữ; 40 câu; 25% mỗi tiêu chí; Task 2 = 2/3)', 'thiếu: ' + b12ok.join(' | '));
+    kiem(/band 5 cũng ở ranh B1\/B2/.test(b12) && /band 8 là giáp ranh C1\/C2/.test(b12) && /Có nguồn thứ cấp/.test(b12), 'gói L · Bài 12 nêu band 5 và band 8 là ranh giới, và ghi bảng CEFR là nguồn thứ cấp (biểu đồ là hình)', '');
+    kiem(/class="tag inf">Suy luận<\/span>NOT GIVEN/.test(await pL.evaluate(() => document.getElementById('ielts').innerHTML)) && !/Theo hướng dẫn chính thức của IELTS, kiến thức ngoài/.test(b12), 'gói L · Bài 12: "không dùng kiến thức ngoài bài" hạ xuống Suy luận (chưa thấy câu chữ chính thức)', '');
+    kiem(/10 lỗi người Việt hay mất điểm Tự soạn/.test(b12) && /chưa có khảo sát/.test(b12), 'gói L · Bài 12: "10 lỗi người Việt" có nhãn Tự soạn và ghi chưa có khảo sát', '');
+    // (d) Kiểm vốn từ: nhãn nhóm khớp công thức, ghi rõ số tự đặt
+    const mYNB = SRC.match(/var YNB = \{b1:"([^"]*)", b2:"([^"]*)", b3:"([^"]*)"/);
+    const khoiYN = SRC.slice(SRC.indexOf('var YN = {'), SRC.indexOf('};', SRC.indexOf('var YN = {')));
+    const dem12 = k => ((khoiYN.match(new RegExp(k + ':\\[([^\\]]*)\\]')) || [, ''])[1].match(/"[^"]+"/g) || []).length;
+    const yn = await pL.evaluate(() => ({ tran: window.__PT.ynScore({ b1: 12, b2: 12, b3: 12, awl: 12, fake: 0 }).size, nua: window.__PT.ynScore({ b1: 12, b2: 6, b3: 0, awl: 0, fake: 0 }).size }));
+    yn.nhan = { b2: mYNB ? mYNB[2] : '', b3: mYNB ? mYNB[3] : '' };
+    yn.ten = ['b1', 'b2', 'b3', 'awl'].map(k => [k, dem12(k)]);
+    kiem(yn.tran === 9000 && /2\.001–5\.000/.test(yn.nhan.b2) && /5\.001–9\.000/.test(yn.nhan.b3) && yn.ten.every(([, n]) => n === 12), 'gói L · kiểm vốn từ: công thức tối đa 9.000 họ từ khớp nhãn nhóm (1–2.000 / 2.001–5.000 / 5.001–9.000), mỗi nhóm 12 từ', JSON.stringify(yn));
+    kiem(yn.nua === 2000 + 1500, 'gói L · kiểm vốn từ: biết hết nhóm 1 và nửa nhóm 2 → 3.500 họ từ (bảng gõ tay)', String(yn.nua));
+    kiem(/class="tag hyp">Số tự đặt<\/span>Bốn nhóm từ do người soạn chọn/.test(SRC), 'gói L · bảng kết quả vốn từ có nhãn "Số tự đặt" nói rõ ranh giới nhóm là quy ước', '');
+    kiem(!/Only 9% of plastic/.test(SRC) && /chỉ minh họa cách đặt câu, không phải số liệu thật/.test(b10) && /chỉ minh họa cách đặt câu, không phải số liệu thật/.test(await vanBan('chuyen-nganh')), 'gói L · câu ví dụ có số: Bài 10 và 11 ghi rõ là minh họa; câu "Only 9% of plastic" (số thế giới thật, dễ cũ) đã đổi thành câu không số', '');
+    // (e) trang chủ Khu 2 giữ số 570 / 10% / 1,4%
+    kiem(/570 họ từ/.test(home) && /1,4%/.test(home), 'gói L · trang chủ Khu 2 vẫn ghi 570 họ từ và 1,4% (khớp bảng gốc)', '');
+    kiem(loiL.length === 0, 'gói L · không lỗi JS khi mở trang', loiL.slice(0, 3).join(' || '));
+    await cL.close();
   }
 
   /* ---------- 15. Gói K: ghi âm trong trình duyệt ở trang Thực hành ---------- */
