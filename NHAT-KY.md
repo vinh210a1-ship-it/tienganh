@@ -1,5 +1,15 @@
 # Nhật ký web Tiếng Anh 80/20 (mục mới nhất ở trên)
 
+## 2026-11-22 tối · gói B: thẻ từ ôn theo bộ của buổi dạy (nhánh claude/project-thread-ovb6lb)
+- Làm gì: Bài 4 có ô "Bộ của buổi dạy" (Tất cả / Bộ 1 / Bộ 2, mỗi bộ 20 từ dạy ngày 22/11), nằm cạnh ô "Nhóm"; hai ô lọc cùng lúc. Mặc định vẫn "Tất cả". Mở link `#tu-vung?bo=1` hoặc `?bo=2` là vào đúng bộ; đổi ô thì địa chỉ đổi theo; có nút "Sao chép link bộ này" cho thầy. Bộ không có trong link thì về "Tất cả". Bộ lọc thuần túy: lịch ôn (hộp 1/3/7/14/30 ngày), khóa lưu `en8020.boxes`, `en8020.due` không đổi, không thẻ nào đổi hộp.
+- Khi học xong 20 thẻ của bộ thì dừng ("Hết thẻ đến hạn"), không đẩy sang 186 thẻ.
+- Ba thẻ ghép ("child (children)", "easy / difficult", "cheap / expensive") là một thẻ trong VOCAB, nên Bộ 2 hiện luôn từ "easy" và "cheap" đi kèm "difficult", "expensive" (vẫn 20 thẻ mỗi bộ). Không tách thẻ để khỏi đổi khóa lưu cũ.
+- Phép kiểm tự động mới (mục 7 trong `kiem/kiem-web.mjs`, nguồn từ ở `kiem/bo-tu-vung/bo-1.md`, `bo-2.md` là bản sao hai file 20 từ của buổi dạy): mọi từ của hai file có mặt trong VOCAB đúng một thẻ và đúng bộ, không thừa thẻ, hai bộ không trùng; kịch bản học viên mới (link bộ 1, bộ 2: 20 thẻ hiện ra đều thuộc bộ, không lặp, học xong thì dừng; đổi link khi đang mở trang); kịch bản có tiến độ sẵn (gieo kho cũ: hộp cũ đọc đúng theo bộ, học một thẻ chỉ đổi thẻ đó, nạp lại không mất khóa nào). Cố ý làm hỏng BO_TU (bỏ "need", thêm "understand" vào Bộ 1) → 11 phép đỏ. Bản đã sửa: xanh toàn bộ (cũ + mới).
+- Phụ: `route()` bỏ phần sau `?` của địa chỉ (trước đây `#tu-vung?bo=1` sẽ rơi về trang chủ); phép kiểm liên kết `#` cũng bỏ phần `?`. Đã chụp màn hình 390 px: ô chọn và nút không tràn.
+- Chưa kiểm được (cloud): trang live github.io (link `#tu-vung?bo=1` sau khi đăng), nút sao chép link trên Safari iPhone, nghe bằng tai. Từ "work" có hai thẻ trùng khóa trong VOCAB từ trước (không thuộc bộ nào, không ảnh hưởng gói B; nếu sửa thì đụng khóa lưu "work").
+- Bộ các tuần sau (mục 5 giáo trình): thêm theo hướng dẫn trong README mục "Bộ từ theo buổi dạy".
+- Chưa chép sang E:\web tiếng anh (chờ gộp PR).
+
 ## 2026-11-22 chiều · gói A: sửa chỗ web nói sai + bộ kiểm chung (nhánh claude/project-thread-t6ipwc)
 - Bài 4: bỏ câu "Mỗi ngày thêm 10–15 từ mới… Sau 8 tuần thuộc hết bộ này" (mâu thuẫn bộ 186 thẻ). Thay bằng: bộ có 186 thẻ; nhịp gợi ý khoảng 15–20 từ mới mỗi tuần (2–3 từ mỗi ngày) cộng ôn thẻ đến hạn; học hết bộ khoảng 9–12 tuần (186/20 ≈ 9,3; 186/15 ≈ 12,4). Nhịp này gắn nhãn Ước lượng (nhãn [G]), không phải kết quả nghiên cứu.
 - Trang Lộ trình: câu "Mục tiêu tuần 8: thuộc hết bộ thẻ" cũng mâu thuẫn nên sửa thành "đã mở hết các nhóm thẻ ghi trong lộ trình và không dồn thẻ quá hạn; thuộc cả 186 thẻ cần khoảng 9–12 tuần".
