@@ -10,6 +10,7 @@
 //   7. Bộ từ theo buổi dạy (gói B): hai bộ 20 từ khớp hai file kiem/bo-tu-vung/*.md; hai kịch bản (học viên mới, học viên có tiến độ sẵn).
 //   8. Gói C: trang "Bảng tổng hợp ngữ pháp" và Bài 2B: mọi ví dụ tiếng Anh, bài tập, bài đọc đều có trong file gốc (kiem/nguon-ngu-phap/*.md); mỗi mục (h2) có nhãn "Tự soạn"; đáp án ẩn trong <details> đóng; bảng cuộn trong khung ở 390 px; số "bài nền tảng" ở trang chủ khớp mục lục.
 //   9. Gói D: Bài 3B (giờ, thứ–ngày–tháng, tiền, số điện thoại): mọi số trên trang có chữ đọc kèm, chữ đọc khớp số theo bộ đổi số độc lập (kiem/doc-so.mjs, tự kiểm bằng kiem/gold-doc-so.mjs); nút loa đọc đúng chữ đã ghi; mỗi mục có nhãn "Tự soạn"; đáp án đóng; vị trí trong mục lục; câu quiz; lộ trình nối vào cuối tuần.
+//  10. Gói E: 12 tình huống Thực hành: sáu khóa lưu cũ còn nguyên, khóa mới không trùng; mỗi tình huống mới có nhãn Tự soạn, mục Học trước, 8–10 lượt, câu then chốt, danh sách kiểm; số/giờ/giá có chữ đọc ghi sẵn; chỉ dùng cấu trúc đã khai (bộ dò cấu trúc, tự thử đỏ); nối đúng tuần ở Lộ trình; trang, mục lục, trang chủ ghi "12"; Bài 3B trỏ Bài 2B.
 //   6. Các cụm chữ đã sửa không quay lại ("10–15 từ mới"; "Sau khóa này" không xếp việc đã dạy là việc tiếp theo).
 //
 // Khi cố ý thêm/bớt thẻ, mẫu câu hay câu quiz: sửa BAN_DAU bên dưới (cùng PR) để mốc luôn là số thật.
@@ -33,6 +34,21 @@ const SRC = fs.readFileSync(path.resolve(FILE), 'utf8');
 // Mốc số đếm hiện tại (đếm lại ngày 2026-11-22 bằng window.__COUNTS; quiz 87 → 99 khi thêm 12 câu của Bài 2B ở gói C; 99 → 111 khi thêm 12 câu của Bài 3B ở gói D).
 const BAN_DAU = { vocab: 186, phrases: 80, quiz: 111 };
 const NGUONG_TUONG_PHAN = 4.5;
+
+// Gói E: bộ dò "cấu trúc chưa dạy" cho các tình huống mới. Mỗi tình huống khai data-cho-phep = các nhóm cấu trúc ĐÃ học; nhóm nào không được khai mà xuất hiện trong hội thoại là lỗi.
+// Cố ý thô: chỉ để bắt lỗi dùng sớm cấu trúc, không thay người đọc ngữ pháp. Cụm học như một khối khai ở data-cum (được bỏ qua).
+const CAU_TRUC = {
+  'modal': /\b(can|can't|cannot|could|should|shouldn't|must|mustn't|may|might|would|have to|has to|had to)\b|'d like/i,
+  'tuong-lai': /\bwill\b|\bwon't\b|'ll\b|\bgoing to\b/i,
+  'dang-lam': /\b(am|is|are|was|were|i'm|you're|he's|she's|it's|we're|they're)\s+(?!going to\b)\w{3,}ing\b/i,
+  'so-sanh': /\b\w+er than\b|\bmore \w+ than\b|\b(smaller|cheaper|bigger|larger|better|worse|older|younger)\b|\bthe (most|\w+est)\b/i,
+  'hoan-thanh': /\b(have|has|haven't|hasn't|i've|you've|we've|they've)\s+(already|just|ever|never|yet|been|gone|done|seen|taken|eaten|made|had|\w+ed)\b/i,
+  'there-is': /\bthere (is|are|isn't|aren't|was|were)\b|\b(is|are) there\b/i,
+  'noi-cau': /\b(because|when|if|so|but|or)\b/i,
+  'bi-dong': /\b(is|are|was|were)\s+(\w+\s+)?\w+ed\b/i,
+};
+export const timCauTruc = chu => Object.entries(CAU_TRUC).filter(([, re]) => re.test(chu)).map(([k]) => k);
+
 
 let loi = 0;
 const ok = (ten, chiTiet = '') => console.log('OK    ' + ten + (chiTiet ? ' · ' + chiTiet : ''));
@@ -402,10 +418,129 @@ try {
   kiem(thuTuD[iD + 1] === 'gio-ngay-tien' && thuTuD[iD + 2] === 'tu-vung', 'gói D · mục lục: Bài 3 → Bài 3B → Bài 4', thuTuD.slice(iD, iD + 3).join(' > '));
   const tuanCuoi = [...SRC.matchAll(/\{t:"(Tuần \d+[^"]*)", k:\[((?:"[^"]*",?)+)\]\}/g)].map(m => ({ t: m[1], k: [...m[2].matchAll(/"([^"]*)"/g)].map(x => x[1]) }));
   const tuanCo3B = tuanCuoi.filter(w => w.k.some(x => /Bài 3B/.test(x)));
-  kiem(tuanCo3B.length === 2 && tuanCo3B.every(w => /Bài 3B/.test(w.k[w.k.length - 1]) && w.k.filter(x => /Bài 3B/.test(x)).length === 1),
-    'gói D · Lộ trình: Bài 3B có ở 2 tuần, mỗi nơi là mục CUỐI của tuần (không làm lệch khóa tiến độ w…t… đã lưu)', tuanCo3B.map(w => w.t).join(' | '));
+  // Vị trí cố định (không làm lệch khóa w{tuần}t{số} đã lưu): tuần 3 mục thứ 4, tuần 7 mục thứ 5. Gói E nối thêm tình huống vào CUỐI tuần, nên Bài 3B không còn là mục cuối ở tuần 7.
+  const viTri3B = tuanCo3B.map(w => w.t.split(':')[0] + '#' + (w.k.findIndex(x => /Bài 3B/.test(x)) + 1));
+  kiem(tuanCo3B.length === 2 && tuanCo3B.every(w => w.k.filter(x => /Bài 3B/.test(x)).length === 1) && viTri3B.join(' ') === 'Tuần 3#4 Tuần 7#5',
+    'gói D · Lộ trình: Bài 3B có ở 2 tuần, đúng vị trí cũ (tuần 3 mục 4, tuần 7 mục 5; không làm lệch khóa tiến độ w…t… đã lưu)', viTri3B.join(' | '));
   const homeD = await trang.evaluate(() => { location.hash = '#home'; return { chu: (document.querySelector('#home .zone ul li') || {}).textContent || '', tiendo: document.getElementById('progText').textContent }; });
   kiem(/14 bài nền tảng/.test(homeD.chu) && /Khu 1: \d+\/14/.test(homeD.tiendo), 'gói D · trang chủ ghi "14 bài nền tảng", khớp mục lục Khu 1', `${homeD.chu} | ${homeD.tiendo}`);
+
+  /* ---------- 10. Gói E: 12 tình huống Thực hành ---------- */
+  // (0) chính bộ dò cấu trúc phải đúng trước khi dùng nó (thử đỏ: câu sai phải bị bắt, câu đúng không bị bắt nhầm)
+  {
+    const phaiBat = [['I can swim.', 'modal'], ['I will call you.', 'tuong-lai'], ["She is reading a book.", 'dang-lam'], ['It is cheaper than that one.', 'so-sanh'], ["I've just finished.", 'hoan-thanh'], ['There is a park here.', 'there-is'], ['Call me when you arrive.', 'noi-cau'], ['The door is closed.', 'bi-dong']];
+    const khongBat = ['Do you live with your family?', 'I have two sisters.', 'My mother works at a school.', 'We moved here in 2015.', 'Hello, this is Linh.', "It's next to a park.", 'Good morning.'];
+    const thieu = phaiBat.filter(([c, k]) => !timCauTruc(c).includes(k)).map(([c]) => c);
+    const nham = khongBat.filter(c => timCauTruc(c).length).map(c => c + ' → ' + timCauTruc(c).join(','));
+    kiem(thieu.length === 0 && nham.length === 0, `gói E · bộ dò cấu trúc: bắt đủ ${phaiBat.length} câu sai, không bắt nhầm ${khongBat.length} câu đúng`, 'không bắt: ' + thieu.join(' | ') + ' · bắt nhầm: ' + nham.join(' | '));
+  }
+  await trang.setViewportSize({ width: 1280, height: 900 });
+  await trang.evaluate(() => { location.hash = '#thuc-hanh'; });
+  await trang.waitForTimeout(80);
+  const eE = await trang.evaluate(() => {
+    const sec = document.getElementById('thuc-hanh');
+    const lay = el => el.textContent.replace(/\s+/g, ' ').trim();
+    const sits = [...sec.querySelectorAll('.sit')].map(s => ({
+      n: Number(s.getAttribute('data-sit')) || null,
+      tieuDe: lay(s.querySelector('h2')),
+      tuSoan: !!s.querySelector('h2 .tag') && /Tự soạn/.test(lay(s.querySelector('h2'))),
+      tuan: Number(s.getAttribute('data-tuan')) || null,
+      cho: (s.getAttribute('data-cho-phep') || '').split(/\s+/).filter(Boolean),
+      cum: (s.getAttribute('data-cum') || '').split('|').filter(Boolean),
+      hocLienKet: s.querySelectorAll('.note a[href^="#"]').length,
+      coHocTruoc: /Học trước/.test(lay(s)),
+      dlg: [...s.querySelectorAll('ul.dlg li')].map(li => { const sp = li.querySelector('.say'); return { vai: lay(li.querySelector('b')), chu: lay(sp), dataSay: sp.getAttribute('data-say'), nut: !!sp.querySelector('button.spk') }; }),
+      then: s.querySelectorAll('ul.phr li').length,
+      luot: [...s.querySelectorAll('p.luot')].length,
+      luotI: [...s.querySelectorAll('p.luot i')].map(lay),
+      khoa: [...s.querySelectorAll('.chk-row input[data-k]')].map(i => i.getAttribute('data-k')),
+    }));
+    return { sits, h1: lay(sec.querySelector('h1')), tieuDeTrang: sec.getAttribute('data-title'), bang: [...sec.querySelectorAll('.tbl tr')].map(r => [...r.children].map(lay)) };
+  });
+  // (a) số tình huống, khóa lưu
+  const khoaCu = ['s1a', 's1b', 's1c', 's2a', 's2b', 's2c', 's3a', 's3b', 's3c', 's4a', 's4b', 's4c', 's5a', 's5b', 's5c', 's6a', 's6b', 's6c', 's6d'];
+  const sitMoi = eE.sits.filter(s => s.n);
+  const tatCaKhoa = eE.sits.flatMap(s => s.khoa);
+  const trung = tatCaKhoa.filter((k, i) => tatCaKhoa.indexOf(k) !== i);
+  kiem(eE.sits.length === 12 && sitMoi.length === 6 && sitMoi.map(s => s.n).join() === '7,8,9,10,11,12', 'gói E · trang Thực hành có đúng 12 tình huống (6 cũ + 6 mới đánh số 7–12)', `tổng ${eE.sits.length}, mới ${sitMoi.map(s => s.n).join()}`);
+  kiem(khoaCu.every(k => tatCaKhoa.includes(k)) && trung.length === 0, 'gói E · 19 khóa lưu cũ (s1a…s6d) còn nguyên, khóa mới không trùng khóa nào', 'thiếu: ' + khoaCu.filter(k => !tatCaKhoa.includes(k)).join(',') + ' · trùng: ' + [...new Set(trung)].join(','));
+  const khoaMoiSai = sitMoi.filter(s => s.khoa.length < 4 || !['a', 'b', 'c'].every(c => s.khoa.includes('s' + s.n + c))).map(s => s.n);
+  kiem(khoaMoiSai.length === 0, 'gói E · mỗi tình huống mới có ≥ 4 ô danh sách kiểm, khóa dạng s<số><chữ>', 'sai: ' + khoaMoiSai.join(','));
+  // (b) cấu trúc từng tình huống mới
+  const loiCauTruc = [], loiKhung = [];
+  for (const s of sitMoi) {
+    if (!s.tuSoan) loiKhung.push(`${s.n}: thiếu nhãn Tự soạn`);
+    if (!s.coHocTruoc || s.hocLienKet < 3) loiKhung.push(`${s.n}: mục "Học trước" thiếu hoặc < 3 liên kết`);
+    if (s.dlg.length < 8 || s.dlg.length > 10) loiKhung.push(`${s.n}: ${s.dlg.length} lượt (cần 8–10)`);
+    if (s.then < 4) loiKhung.push(`${s.n}: ${s.then} câu then chốt (cần ≥ 4)`);
+    if (s.luot !== 1) loiKhung.push(`${s.n}: thiếu "Lượt của bạn"`);
+    const dongTien = s.dlg.filter(d => d.vai === 'You').length;
+    if (dongTien < 3) loiKhung.push(`${s.n}: vai You chỉ có ${dongTien} lượt`);
+    const cum = s.cum.map(x => x.toLowerCase());
+    const quet = [...s.dlg.map(d => d.chu), ...s.luotI];
+    for (const chu of quet) {
+      let t = chu.toLowerCase();
+      for (const c of cum) t = t.split(c).join(' ');
+      const bat = timCauTruc(t).filter(k => !s.cho.includes(k));
+      if (bat.length) loiCauTruc.push(`${s.n}: «${chu}» dùng ${bat.join(',')} (chưa khai)`);
+    }
+    for (const k of s.cho) if (!(k in CAU_TRUC)) loiCauTruc.push(`${s.n}: nhóm cấu trúc lạ «${k}»`);
+    // khai đúng, không khai thừa: nhóm đã khai mà hội thoại không dùng là khai sai (bảng "Học trước" sẽ nói dối)
+    const daDung = new Set(quet.flatMap(chu => { let t = chu.toLowerCase(); for (const c of cum) t = t.split(c).join(' '); return timCauTruc(t); }));
+    for (const k of s.cho) if (k in CAU_TRUC && !daDung.has(k)) loiCauTruc.push(`${s.n}: khai «${k}» nhưng hội thoại không dùng`);
+  }
+  kiem(loiKhung.length === 0, 'gói E · mỗi tình huống mới: nhãn Tự soạn, mục Học trước (≥ 3 liên kết), 8–10 lượt, ≥ 4 câu then chốt, Lượt của bạn', loiKhung.slice(0, 6).join(' ; '));
+  kiem(loiCauTruc.length === 0, `gói E · cấu trúc: ${sitMoi.reduce((t, s) => t + s.dlg.length, 0)} lượt hội thoại chỉ dùng nhóm cấu trúc đã khai (tình huống 7 và 8 không có there is, so sánh, từ nối; v.v.)`, loiCauTruc.slice(0, 5).join(' ; '));
+  // (c) số, giờ, giá
+  const loiSo = [];
+  for (const s of sitMoi) for (const d of s.dlg) {
+    if (/\d/.test(d.chu)) {
+      if (!d.dataSay) loiSo.push(`${s.n}: «${d.chu}» thiếu data-say`);
+      else if (/\d/.test(d.dataSay)) loiSo.push(`${s.n}: data-say còn chữ số «${d.dataSay}»`);
+      else if (!khopCau(d.chu, d.dataSay)) loiSo.push(`${s.n}: «${d.chu}» ≠ «${d.dataSay}»`);
+    }
+  }
+  const soCauCoSo = sitMoi.reduce((t, s) => t + s.dlg.filter(d => /\d/.test(d.chu)).length, 0);
+  kiem(soCauCoSo >= 10 && loiSo.length === 0, `gói E · ${soCauCoSo} lượt có số/giờ/giá đều có chữ đọc ghi sẵn và khớp số (bộ đổi số)`, loiSo.slice(0, 5).join(' ; '));
+  const noiE = await trang.evaluate(() => {
+    const ss = window.speechSynthesis, bat = [];
+    if (!ss) return { loi: 'trình duyệt không có speechSynthesis' };
+    ss.cancel = () => {}; ss.speak = u => { bat.push(u.text); };
+    const kq = [];
+    for (const s of document.querySelectorAll('#thuc-hanh .sit[data-sit]')) for (const el of s.querySelectorAll('ul.dlg .say, ul.phr .say')) {
+      const b = el.querySelector('button.spk'); if (!b) { kq.push({ thieuNut: el.textContent.trim() }); continue; }
+      bat.length = 0; b.click();
+      kq.push({ mong: (el.getAttribute('data-say') || el.textContent.replace(/\s+/g, ' ').trim()).replace(/\s*\/\s*/g, '. '), nhan: bat[0], coSo: /\d/.test(bat[0] || '') });
+    }
+    return { kq };
+  });
+  const noiSaiE = noiE.loi ? [noiE.loi] : noiE.kq.filter(x => x.thieuNut || x.mong !== x.nhan || x.coSo).map(x => x.thieuNut ? 'thiếu nút: ' + x.thieuNut : `mong «${x.mong}», máy nhận «${x.nhan}»`);
+  kiem(!noiE.loi && noiE.kq.length >= 60 && noiSaiE.length === 0, `gói E · bấm loa ${noiE.kq ? noiE.kq.length : 0} câu của 6 tình huống mới: máy nhận đúng chữ đã ghi, không có chữ số`, noiSaiE.slice(0, 4).join(' ; '));
+  // (d) Lộ trình: tuần của từng tình huống, khóa tiến độ cũ không lệch
+  const tuanE = [...SRC.matchAll(/\{t:"(Tuần (\d+)[^"]*)", k:\[((?:"[^"]*",?)+)\]\}/g)].map(m => ({ so: Number(m[2]), k: [...m[3].matchAll(/"([^"]*)"/g)].map(x => x[1]) }));
+  const sauCu = { 5: 4, 6: 4, 7: 5, 8: 5 }; // số mục đã có trước gói E: mục mới chỉ được NỐI vào cuối
+  const loiLoTrinh = [];
+  for (const [tuan, soCu] of Object.entries(sauCu)) {
+    const w = tuanE.find(x => x.so === Number(tuan));
+    if (!w) { loiLoTrinh.push('thiếu tuần ' + tuan); continue; }
+    if (w.k.length !== soCu + 1) loiLoTrinh.push(`tuần ${tuan} có ${w.k.length} mục (mong ${soCu + 1})`);
+    if (!/^Thực hành: tình huống/.test(w.k[soCu] || '')) loiLoTrinh.push(`tuần ${tuan}: mục ${soCu + 1} không phải tình huống mới`);
+  }
+  for (const s of sitMoi) {
+    const w = tuanE.find(x => x.so === s.tuan);
+    const nhac = w && w.k.slice(sauCu[s.tuan]).some(x => new RegExp('tình huống (?:\\d+–)?' + s.n + '\\b|tình huống ' + (s.n - 1) + '–' + s.n + '\\b').test(x));
+    if (!nhac) loiLoTrinh.push(`tình huống ${s.n} không có ở cuối tuần ${s.tuan}`);
+    const dong = eE.bang.find(r => r[0] === String(s.tuan));
+    if (!dong || !new RegExp('(^|[^0-9])' + s.n + '\\. ').test(dong[1])) loiLoTrinh.push(`bảng tuần: thiếu tình huống ${s.n} ở tuần ${s.tuan}`);
+  }
+  kiem(loiLoTrinh.length === 0, 'gói E · Lộ trình: tình huống 7–12 nối vào CUỐI tuần 5, 6, 7, 8 (khóa w…t… cũ không lệch) và khớp bảng "Làm tình huống nào vào tuần nào"', loiLoTrinh.slice(0, 5).join(' ; '));
+  // (e) tên "12" ở mọi chỗ, Bài 3B trỏ Bài 2B
+  const dsLoc = await trang.evaluate(() => { location.hash = '#home'; return { home: [...document.querySelectorAll('#home .zone ul li')].map(x => x.textContent).join(' | '), toc: (document.querySelector('nav.toc a[data-id="thuc-hanh"]') || {}).textContent || '' }; });
+  kiem(/12 tình huống/.test(eE.h1) && /12 tình huống/.test(eE.tieuDeTrang) && /12 tình huống/.test(dsLoc.toc) && /12 tình huống/.test(dsLoc.home) && !/\b6 tình huống/.test(SRC.replace(/sáu tình huống|Sáu tình huống/g, '')), 'gói E · tiêu đề, mục lục, trang chủ đều ghi "12 tình huống" (không còn "6 tình huống")', `${eE.h1} | ${eE.tieuDeTrang} | ${dsLoc.toc}`);
+  const dongGio = (SRC.match(/<p>Hỏi bằng <b>What time<\/b>[\s\S]*?<\/p>/) || [''])[0];
+  kiem(/href="#cau-co-ban">Bài 2B</.test(dongGio) && !/href="#to-be">Bài 2</.test(dongGio), 'gói E · Bài 3B: "cách dùng thứ 8 của to be" trỏ Bài 2B (#cau-co-ban), không còn trỏ Bài 2', dongGio.slice(0, 160));
+  const cach8 = await trang.evaluate(() => { const r = [...document.querySelectorAll('#cau-co-ban table tr')].find(t => t.children[0] && t.children[0].textContent.trim() === '8'); return r ? r.textContent.replace(/\s+/g, ' ') : ''; });
+  kiem(/giờ/.test(cach8) && /chủ ngữ giả/i.test(cach8), 'gói E · Bài 2B có đúng dòng "cách dùng thứ 8 của to be" (giờ, chủ ngữ giả it) mà Bài 3B trỏ tới', cach8);
 } finally {
   await trinhDuyet.close();
 }
