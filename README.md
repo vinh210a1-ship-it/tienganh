@@ -12,7 +12,7 @@ Trang chính là `index.html`, cộng thêm bộ phân tích câu `phan-tich/pha
 - **Công cụ · Phân tích câu:** dán hoặc tải tệp (.txt, .md, .docx), bật chế độ phân tích để gạch chân S, V, O, C, A, to-V theo màu. Chạy hoàn toàn trong trình duyệt, kết quả chỉ là gợi ý.
 
 ## Tiến độ
-Lưu trong trình duyệt (localStorage, khóa bắt đầu bằng `en8020.`). Sao lưu và nạp lại ở trang "Lộ trình và kiểm tra".
+Lưu trong trình duyệt (localStorage, khóa bắt đầu bằng `en8020.`). Sao lưu, nạp lại (mặc định nạp **gộp** với tiến độ trên máy, có xem trước; "Thay hẳn" là ghi đè) và "Báo cáo tuần" (khối chữ số đếm để dán Zalo cho thầy) ở trang "Lộ trình và kiểm tra".
 
 ## Quay lại bản cũ
 `goc/ban-goc-artifact-2026-11-19.html` là bản nguyên gốc trước khi sửa.

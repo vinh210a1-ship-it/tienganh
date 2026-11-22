@@ -14,6 +14,7 @@
 //  11. Gói F: bài kiểm tra trình độ ngắn A1–A2: đúng 15 câu mỗi lần (300 lần rút), không câu nào vượt A2, mọi câu A1/A2 của ngân hàng đều có thể xuất hiện; bảng kết quả (Dưới A1/A1/A2/nên làm bản đầy đủ) khớp bảng gõ tay cho mọi cặp điểm; 7 kịch bản làm bài thật; bản đầy đủ vẫn 53 câu, vẫn mở bằng phần vốn từ; kết quả bản ngắn không ghi đè kết quả bản đầy đủ; khung giới thiệu không ghi thời gian chưa đo; 390 px không tràn; tương phản chế độ tối.
 //  13. Gói H: Lộ trình 12 tuần: 186 thẻ chia đúng vào tuần 1–10 (bảng gõ tay), mỗi thẻ đúng một tuần; liên kết trong trang; tình huống 7–12 chỉ dùng cấu trúc đã dạy tới tuần được xếp; chế độ "theo lộ trình" của thẻ từ (bật, đổi tuần, tắt, nhớ sau tải lại, tiến độ ôn không đổi); tệp sao lưu có khóa mới, tệp cũ vẫn nạp được, giá trị lưu hỏng không làm vỡ trang; 390 px và tương phản ba chế độ.
 //  12. Gói G: trang Phân tích câu chạy thật với bộ phân tích đã sửa (4 câu lỗi cũ hiện đúng nhãn, 390 px không tràn, không lỗi console). Độ chính xác do kiem/kiem-phan-tich.mjs đo.
+//  13. Gói I: nạp gộp tiến độ (hàm gộp theo bảng đáp án gõ tay: máy trống, hai bản giống, xung đột thẻ, bài/lộ trình/ô kiểm, ngày kiểm tra, en8020.ltr12, khóa lạ, file hỏng, __proto__) và làm thật bằng trình duyệt (xem trước, Nạp gộp, Hủy, Thay hẳn, vòng xuất–nạp, tệp cũ); báo cáo tuần (số đếm gõ tay, không chép chữ lạ, chép vào clipboard, 390 px, tương phản).
 //   6. Các cụm chữ đã sửa không quay lại ("10–15 từ mới"; "Sau khóa này" không xếp việc đã dạy là việc tiếp theo).
 //
 // Khi cố ý thêm/bớt thẻ, mẫu câu hay câu quiz: sửa BAN_DAU bên dưới (cùng PR) để mốc luôn là số thật.
@@ -853,7 +854,7 @@ try {
     fs.writeFileSync(fileTam, JSON.stringify(cu2));
     await ph.evaluate(() => localStorage.removeItem('en8020.ltr12'));
     await ph.setInputFiles('#bkImport', fileTam);
-    await ph.waitForSelector('#bkMsg button'); await ph.click('#bkMsg button');
+    await ph.waitForSelector('#bkDe'); await ph.click('#bkDe'); // gói I: nút ghi đè nay có id riêng; nút đầu tiên là "Nạp gộp"
     await ph.waitForTimeout(1500);
     await ph.goto(URL_TRANG + '#tu-vung'); await ph.reload(); await ph.waitForSelector('#fc-core-b');
     const hauNap = await ph.evaluate(() => ({ b: localStorage.getItem('en8020.boxes'), l: localStorage.getItem('en8020.ltr12') }));
@@ -903,6 +904,250 @@ try {
     kiem(kq.thua <= 0, 'gói G · 390 px: trang Phân tích câu có kết quả vẫn không tràn ngang', kq.thua + ' px');
     kiem(loiG.length === 0, 'gói G · trang Phân tích câu không lỗi console', loiG.slice(0, 3).join(' || '));
     await cG.close();
+  }
+
+  /* ---------- 13. Gói I: nạp gộp tiến độ và báo cáo tuần ---------- */
+  {
+    const ghiChu = (o) => Object.fromEntries(Object.entries(o).map(([k, v]) => ['en8020.' + k, JSON.stringify(v)]));
+    const gop = (loc, inc) => trang.evaluate(([a, b]) => { const r = window.__GOP.gop(a, b); return r; }, [loc, inc]);
+    const giaiMa = (kq) => Object.fromEntries(Object.entries(kq.ghi || {}).map(([k, v]) => [k.replace('en8020.', ''), JSON.parse(v)]));
+    const bang = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
+    // (a) hàm gộp: bảng đáp án gõ tay. Ngày ôn gần nhất = ngày hẹn − [1,3,7,14,30][hộp−1] (hộp 0: chính ngày hẹn).
+    // máy trống: nhận nguyên file
+    const dayDu = ghiChu({ done: { 'to-be': true }, plan: { w0t0: true }, prac: { s1a: true }, boxes: { want: 3, need: 0 }, due: { want: 110, need: 100 }, ptLast: { level: 'B1', date: '5/11/2026', vocab: 4000 }, ltr12: { on: true, w: 4 }, slow: true });
+    {
+      const r = await gop({}, dayDu), g = giaiMa(r);
+      kiem(r.ok && bang(g.boxes, { want: 3, need: 0 }) && bang(g.due, { want: 110, need: 100 }) && bang(g.done, { 'to-be': true }) && bang(g.plan, { w0t0: true }) && bang(g.prac, { s1a: true }) && g.ptLast?.level === 'B1' && bang(g.ltr12, { on: true, w: 4 }) && g.slow === true && r.bao.the.them === 2 && r.bao.bai === 1,
+        'gói I · nạp gộp vào máy trống: nhận đủ bài, thẻ, ngày hẹn, kết quả kiểm tra, tuần lộ trình, cài đặt', JSON.stringify(r));
+    }
+    // hai bản trùng nhau: không đổi gì
+    {
+      const r = await gop(dayDu, dayDu);
+      kiem(r.ok && Object.keys(r.ghi).length === 0 && r.bao.the.them === 0 && r.bao.the.capNhat === 0 && r.bao.the.giu === 2, 'gói I · nạp gộp hai bản giống nhau: không ghi gì, giữ nguyên 2 thẻ', JSON.stringify(r));
+    }
+    // xung đột thẻ: [tên, máy này {hộp, hẹn}, file {hộp, hẹn}, ai thắng]
+    const XUNG = [
+      ['quên gần đây hơn: máy có hộp 3 hẹn 110 (ôn ngày 103), file hộp 1 hẹn 106 (ôn ngày 105)', [3, 110], [1, 106], 'file'],
+      ['file ôn mới hơn và hộp cao hơn: máy hộp 2 hẹn 100 (ôn 97), file hộp 4 hẹn 130 (ôn 116)', [2, 100], [4, 130], 'file'],
+      ['máy ôn mới hơn: máy hộp 4 hẹn 130 (ôn 116), file hộp 2 hẹn 100 (ôn 97)', [4, 130], [2, 100], 'may'],
+      ['cùng ngày ôn 104, hộp cao hơn thắng: máy hộp 2 hẹn 107, file hộp 3 hẹn 111', [2, 107], [3, 111], 'file'],
+      ['cùng ngày ôn 104, máy hộp cao hơn: máy hộp 3 hẹn 111, file hộp 2 hẹn 107', [3, 111], [2, 107], 'may'],
+      ['hộp 0 cùng ngày ôn 120 với hộp 5 hẹn 150: hộp cao hơn thắng', [0, 120], [5, 150], 'file'],
+    ];
+    for (const [ten, [mb, md], [fb, fd], thang] of XUNG) {
+      const r = await gop(ghiChu({ boxes: { want: mb }, due: { want: md } }), ghiChu({ boxes: { want: fb }, due: { want: fd } }));
+      const g = giaiMa(r);
+      const mong = thang === 'file' ? [fb, fd] : [mb, md];
+      const dung = thang === 'file' ? (r.ok && g.boxes?.want === mong[0] && g.due?.want === mong[1] && r.bao.the.capNhat === 1) : (r.ok && Object.keys(r.ghi).length === 0 && r.bao.the.giu === 1);
+      kiem(dung, 'gói I · xung đột thẻ, ' + ten + ' → thắng: ' + thang, JSON.stringify(r));
+    }
+    {
+      // file không có ngày hẹn (tệp rất cũ) không đè thẻ có ngày hẹn; thẻ chỉ một bên được giữ/thêm; thẻ máy khác không mất
+      const r = await gop(ghiChu({ boxes: { a: 1, chiMay: 2 }, due: { a: 50, chiMay: 60 } }), ghiChu({ boxes: { a: 4, chiFile: 1 } }));
+      const g = giaiMa(r);
+      kiem(r.ok && bang(Object.entries(g.boxes || {}).sort(), [['a', 1], ['chiFile', 1], ['chiMay', 2]]) && g.due?.a === 50 && g.due?.chiMay === 60 && r.bao.the.them === 1 && r.bao.the.giu === 1,
+        'gói I · file thiếu ngày hẹn không đè thẻ có ngày hẹn; thẻ chỉ có ở một bên đều được giữ', JSON.stringify(r));
+    }
+    {
+      // bài, lộ trình, danh sách kiểm: hợp các dấu đã đánh, không bỏ dấu nào của máy này
+      const r = await gop(ghiChu({ done: { a: true, b: false, c: true } }), ghiChu({ done: { a: false, b: true, d: false, e: true } }));
+      const g = giaiMa(r);
+      kiem(r.ok && bang(Object.entries(g.done || {}).sort(), [['a', true], ['b', true], ['c', true], ['d', false], ['e', true]]) && r.bao.bai === 2, 'gói I · bài đã học: hợp dấu của hai máy (a,c ở máy; b,e ở file) và không bỏ dấu nào', JSON.stringify(r));
+    }
+    {
+      // ngày kiểm tra: so theo số, không so chữ ("9/12/2026" mới hơn "10/11/2026")
+      const T = (a, b) => gop(ghiChu({ ptLast: a }), ghiChu({ ptLast: b }));
+      const r1 = await T({ level: 'A2', date: '10/11/2026' }, { level: 'B1', date: '9/12/2026' });
+      const r2 = await T({ level: 'B1', date: '9/12/2026' }, { level: 'A2', date: '10/11/2026' });
+      const r3 = await T({ level: 'A2', date: '5/11/2026' }, { level: 'B1', date: 'hôm qua' });
+      const r4 = await gop({}, ghiChu({ ptLastShort: { level: 'A1', label: 'A1', date: '1/1/2026', ok: 9, n: 15 } }));
+      kiem(giaiMa(r1).ptLast?.level === 'B1' && Object.keys(r2.ghi).length === 0 && Object.keys(r3.ghi).length === 0 && giaiMa(r4).ptLastShort?.ok === 9,
+        'gói I · kết quả kiểm tra: ngày mới hơn thắng (so theo số: 9/12 mới hơn 10/11), ngày hỏng không đè, máy chưa có thì nhận', JSON.stringify([r1, r2, r3, r4]));
+    }
+    {
+      // lộ trình 12 tuần: bật/tắt của máy này, tuần lấy số lớn
+      const T = (a, b) => gop(ghiChu({ ltr12: a }), ghiChu({ ltr12: b }));
+      const r1 = await T({ on: false, w: 2 }, { on: true, w: 5 });
+      const r2 = await T({ on: true, w: 6 }, { on: false, w: 3 });
+      const r3 = await gop({}, ghiChu({ ltr12: { on: true, w: 99 } }));
+      const r4 = await gop(ghiChu({ ltr12: 'rac' }), ghiChu({ ltr12: { on: true, w: 4 } }));
+      kiem(bang(giaiMa(r1).ltr12, { on: false, w: 5 }) && Object.keys(r2.ghi).length === 0 && bang(giaiMa(r3).ltr12, { on: true, w: 1 }) && bang(giaiMa(r4).ltr12, { on: true, w: 4 }),
+        'gói I · en8020.ltr12: giữ bật/tắt của máy này, tuần lấy số lớn hơn (2 và 5 → 5; 6 và 3 → giữ), tuần ngoài 1–12 về 1, giá trị hỏng ở máy thì nhận của file', JSON.stringify([r1, r2, r3, r4]));
+    }
+    {
+      // khóa lạ chỉ nhận khi máy chưa có; cài đặt đọc chậm giữ của máy
+      const r = await gop(ghiChu({ lạ1: { x: 1 }, slow: false }), ghiChu({ lạ1: { x: 2 }, lạ2: [1, 2], slow: true }));
+      const g = giaiMa(r);
+      kiem(r.ok && bang(g['lạ2'], [1, 2]) && !('lạ1' in g) && !('slow' in g), 'gói I · khóa lạ: chỉ nhận khi máy chưa có; cài đặt đọc chậm giữ của máy này', JSON.stringify(r));
+    }
+    {
+      // file hỏng: từ chối cả file, không ghi gì
+      const XAU = [['boxes ngoài 0–5', { boxes: { want: 9 } }], ['boxes không phải số nguyên', { boxes: { want: 1.5 } }], ['done chứa chữ', { done: { a: 'x' } }], ['due là chuỗi', { due: { a: '5' } }], ['plan là mảng', { plan: [true] }]];
+      const loi = [];
+      for (const [ten, o] of XAU) { const r = await gop(ghiChu({ boxes: { a: 1 }, due: { a: 5 } }), ghiChu(o)); if (r.ok || !r.loi) loi.push(ten + ' → ' + JSON.stringify(r)); }
+      const rj = await gop({}, { 'en8020.boxes': '{không phải json' });
+      if (rj.ok) loi.push('JSON hỏng vẫn được nhận');
+      kiem(loi.length === 0, 'gói I · file hỏng (hộp ngoài 0–5, số lẻ, dấu không phải đúng/sai, JSON hỏng): từ chối cả file với lời báo, không ghi gì', loi.join(' ; '));
+    }
+    {
+      // khóa nguy hiểm và không đổi đầu vào
+      const loc = ghiChu({ done: { a: true } }); const locCopy = JSON.stringify(loc);
+      const r = await trang.evaluate(([a, b]) => { const kq = window.__GOP.gop(a, b); return { kq, sau: JSON.stringify(a), proto: ({}).x === undefined && Object.getPrototypeOf({}) === Object.prototype }; }, [loc, { 'en8020.done': '{"__proto__":true,"x":true}', 'en8020.boxes': '{"__proto__":2,"constructor":1}', 'en8020.due': '{"__proto__":100}' }]);
+      kiem(r.kq.ok && r.sau === locCopy && r.proto, 'gói I · khóa "__proto__" trong file không làm hỏng Object.prototype, và hàm gộp không sửa dữ liệu đầu vào', JSON.stringify(r));
+    }
+
+    // (b) làm thật bằng trình duyệt: máy có tiến độ A, file sao lưu của máy B
+    const cI = await trinhDuyet.newContext({ viewport: { width: 390, height: 800 }, colorScheme: 'light', acceptDownloads: true });
+    const pI = await cI.newPage(); const loiI = [], yeuCauMang = [];
+    pI.on('pageerror', e => loiI.push('pageerror: ' + e.message)); pI.on('console', m => { if (m.type() === 'error') loiI.push(m.text()); });
+    pI.on('request', r => { if (!/^(file|data|blob):/.test(r.url()) && !/^https:\/\/fonts\.(googleapis|gstatic)\.com\//.test(r.url())) yeuCauMang.push(r.method() + ' ' + r.url()); else if (r.method() !== 'GET') yeuCauMang.push(r.method() + ' ' + r.url()); });
+    await pI.goto(URL_TRANG + '#lo-trinh'); await pI.waitForSelector('#bkExport');
+    const inf = await pI.evaluate(() => window.__GOP.info());
+    const idBai2 = inf.counted.slice(0, 3);
+    const t0 = inf.today;
+    const kho = {
+      done: { [idBai2[0]]: true }, plan: { w0t0: true }, prac: { s1a: true },
+      boxes: { want: 3, need: 1 }, due: { want: t0 + 7, need: t0 - 5 },
+      ptLast: { level: 'A2', date: '1/11/2026', vocab: 2500 },
+    };
+    const datKho = async (o) => { await pI.evaluate(v => { localStorage.clear(); for (const [k, x] of Object.entries(v)) localStorage.setItem('en8020.' + k, JSON.stringify(x)); }, o); await pI.reload(); await pI.waitForSelector('#bkExport'); };
+    const docKho = () => pI.evaluate(() => Object.fromEntries(Object.keys(localStorage).filter(k => k.startsWith('en8020.')).map(k => [k.slice(7), JSON.parse(localStorage.getItem(k))])));
+    const fileB = path.join(os.tmpdir(), 'gop-b-' + process.pid + '.json');
+    const khoB = {
+      done: { [idBai2[1]]: true, [idBai2[0]]: true }, plan: { w0t0: true, w0t1: true }, prac: { s2a: true },
+      boxes: { want: 1, need: 4, 'child (children)': 2 }, due: { want: t0 + 1, need: t0 + 14, 'child (children)': t0 + 3 },
+      ptLast: { level: 'B1', date: '20/11/2026', vocab: 4100 }, ltr12: { on: true, w: 3 },
+    };
+    // want: máy A hộp 3 hẹn t0+7 (ôn t0), file B hộp 1 hẹn t0+1 (ôn t0): cùng ngày → hộp cao hơn (máy A) thắng. need: A hộp 1 hẹn t0−5 (ôn t0−6), B hộp 4 hẹn t0+14 (ôn t0) → B thắng. child: chỉ B.
+    fs.writeFileSync(fileB, JSON.stringify({ app: 'tieng-anh-8020', version: 1, saved: '2026-11-22T00:00:00.000Z', keys: ghiChu(khoB) }));
+    await datKho(kho);
+    await pI.setInputFiles('#bkImport', fileB);
+    await pI.waitForSelector('#bkGop');
+    const dau = await pI.evaluate(() => [...document.querySelectorAll('#bkMsg button')].map(b => b.id + ':' + b.textContent));
+    const loiNhan = await pI.evaluate(() => document.getElementById('bkMsg').textContent);
+    kiem(bang(dau, ['bkGop:Nạp gộp', 'bkDe:Thay hẳn bằng file này (ghi đè)', 'bkHuy:Hủy']) && /1 thẻ mới/.test(loiNhan) && /1 thẻ ôn gần đây hơn/.test(loiNhan) && /1 bài đã học xong/.test(loiNhan) && /1 việc ở Lộ trình 8 tuần/.test(loiNhan) && /1 ô danh sách kiểm/.test(loiNhan) && /kiểm tra trình độ mới hơn/.test(loiNhan) && /Giữ nguyên 1 thẻ/.test(loiNhan),
+      'gói I · nạp file: xem trước ghi đúng số thay đổi, ba nút theo thứ tự Nạp gộp (mặc định) / Thay hẳn / Hủy', loiNhan + ' | ' + dau.join(','));
+    const truocHuy = await docKho();
+    await pI.click('#bkHuy');
+    kiem(bang(await docKho(), truocHuy) && await pI.evaluate(() => document.getElementById('bkMsg').hidden), 'gói I · bấm Hủy: không ghi gì, hộp thông báo đóng', '');
+    await pI.setInputFiles('#bkImport', fileB); await pI.waitForSelector('#bkGop');
+    await pI.click('#bkGop'); await pI.waitForTimeout(1500);
+    await pI.waitForSelector('#bkExport');
+    const sau = await docKho();
+    const mongKho = { done: { [idBai2[0]]: true, [idBai2[1]]: true }, plan: { w0t0: true, w0t1: true }, prac: { s1a: true, s2a: true }, boxes: { want: 3, need: 4, 'child (children)': 2 }, due: { want: t0 + 7, need: t0 + 14, 'child (children)': t0 + 3 }, ptLast: { level: 'B1', date: '20/11/2026', vocab: 4100 }, ltr12: { on: true, w: 3 } };
+    const ssanh = {}; for (const k of Object.keys(mongKho)) ssanh[k] = bang(JSON.stringify(sau[k]) && sau[k], mongKho[k]) || JSON.stringify(Object.entries(sau[k] || {}).sort()) === JSON.stringify(Object.entries(mongKho[k]).sort());
+    kiem(Object.values(ssanh).every(Boolean), 'gói I · bấm Nạp gộp: máy có hợp tiến độ hai bên (bài, lộ trình, ô kiểm, thẻ thắng thua đúng, kết quả mới hơn, tuần lộ trình) và trang tải lại', JSON.stringify({ ssanh, sau }));
+    // nạp lần hai đúng file đó: không còn gì để gộp
+    await pI.setInputFiles('#bkImport', fileB); await pI.waitForSelector('#bkMsg button');
+    const lan2 = await pI.evaluate(() => ({ t: document.getElementById('bkMsg').textContent, gop: !!document.getElementById('bkGop'), de: !!document.getElementById('bkDe') }));
+    kiem(/nạp gộp sẽ không đổi gì/.test(lan2.t) && !lan2.gop && lan2.de, 'gói I · nạp lại đúng file đó: báo "không đổi gì", không còn nút Nạp gộp', JSON.stringify(lan2));
+    // file hỏng: báo lỗi, không ghi gì, không có nút nạp
+    const fileHong = path.join(os.tmpdir(), 'gop-hong-' + process.pid + '.json');
+    fs.writeFileSync(fileHong, JSON.stringify({ app: 'tieng-anh-8020', version: 1, keys: { 'en8020.boxes': JSON.stringify({ want: 9 }) } }));
+    const truocH = await docKho();
+    await pI.setInputFiles('#bkImport', fileHong); await pI.waitForSelector('#bkMsg:not([hidden])');
+    const loiH2 = await pI.evaluate(() => ({ t: document.getElementById('bkMsg').textContent, nut: document.querySelectorAll('#bkMsg button').length }));
+    kiem(/Không nạp được/.test(loiH2.t) && /boxes/.test(loiH2.t) && loiH2.nut === 0 && bang(await docKho(), truocH), 'gói I · file hỏng: báo lỗi nêu tên mục, không có nút nạp, tiến độ không đổi', JSON.stringify(loiH2));
+    // Thay hẳn: ghi đè từng mục có trong file như cũ
+    await datKho(kho);
+    await pI.setInputFiles('#bkImport', fileB); await pI.waitForSelector('#bkDe'); await pI.click('#bkDe'); await pI.waitForTimeout(1500); await pI.waitForSelector('#bkExport');
+    const de = await docKho();
+    kiem(bang(Object.entries(de.boxes || {}).sort(), Object.entries(khoB.boxes).sort()) && !de.prac?.s1a && de.done?.[idBai2[0]] === true && de.ptLast?.level === 'B1', 'gói I · "Thay hẳn": ghi đè từng mục có trong file (thẻ, ô kiểm của máy này mất), đúng như bản cũ', JSON.stringify(de));
+    // vòng sao lưu: xuất rồi nạp vào máy trống → giống hệt
+    await datKho(mongKho);
+    const [dlI] = await Promise.all([pI.waitForEvent('download'), pI.click('#bkExport')]);
+    const fileXuat = path.join(os.tmpdir(), 'gop-xuat-' + process.pid + '.json'); await dlI.saveAs(fileXuat);
+    await datKho({});
+    await pI.setInputFiles('#bkImport', fileXuat); await pI.waitForSelector('#bkGop'); await pI.click('#bkGop'); await pI.waitForTimeout(1500); await pI.waitForSelector('#bkExport');
+    const vong = await docKho();
+    kiem(bang(Object.keys(vong).sort(), Object.keys(mongKho).sort()) && Object.keys(mongKho).every(k => JSON.stringify(Object.entries(vong[k]).sort?.() ?? vong[k]) === JSON.stringify(Object.entries(mongKho[k]).sort?.() ?? mongKho[k])), 'gói I · xuất file rồi nạp gộp vào máy trống: tiến độ giống hệt', JSON.stringify(vong));
+    // tệp sao lưu cũ (gói H, không ltr12) nạp gộp được và không đụng thẻ khác
+    const fileCu = path.join(os.tmpdir(), 'gop-cu-' + process.pid + '.json');
+    fs.writeFileSync(fileCu, JSON.stringify({ app: 'tieng-anh-8020', version: 1, saved: '2026-11-01T00:00:00.000Z', keys: { 'en8020.boxes': JSON.stringify({ want: 2 }), 'en8020.due': JSON.stringify({ want: 99999 }) } }));
+    await datKho(kho);
+    await pI.setInputFiles('#bkImport', fileCu); await pI.waitForSelector('#bkMsg button');
+    const cuMsg = await pI.evaluate(() => document.getElementById('bkMsg').textContent);
+    kiem(/Giữ nguyên 1 thẻ|1 thẻ ôn gần đây hơn/.test(cuMsg), 'gói I · tệp sao lưu cũ (chỉ có boxes và due) vẫn nạp gộp được', cuMsg);
+    kiem(yeuCauMang.length === 0, 'gói I · nạp gộp, sao lưu, báo cáo không gửi gì ra mạng (chỉ phông chữ có sẵn của trang, không có yêu cầu POST)', yeuCauMang.slice(0, 3).join(' ; '));
+
+    // (c) báo cáo tuần. Số đếm gõ tay: 2 bài, 5 thẻ nền tảng (2 thuộc, 3 đến hạn), 1 thẻ AWL thuộc, 2 việc lộ trình, 3 ô kiểm.
+    const tu = await pI.evaluate(() => window.__BO.vocab.slice(0, 5));
+    const awl0 = inf.awl0;
+    const tong = { awl: inf.awl, field: inf.field, plan: inf.plan };
+    const tongPrac = [...SRC.matchAll(/<input type="checkbox" data-k="/g)].length;
+    const khoBC = {
+      done: { [idBai2[0]]: true, [idBai2[1]]: true, [idBai2[2]]: false },
+      plan: { w0t0: true, w0t1: true, w0t2: false },
+      prac: { s1a: true, s1b: true, s2a: true, s2b: false },
+      boxes: { [tu[0]]: 3, [tu[1]]: 4, [tu[2]]: 1, [tu[3]]: 0, [tu[4]]: 2, ['awl:' + awl0]: 5, 'ma-khong-co-that': 5 },
+      due: { [tu[0]]: t0 + 7, [tu[1]]: t0 - 1, [tu[2]]: t0, [tu[3]]: t0, [tu[4]]: t0 + 3, ['awl:' + awl0]: t0 + 30, 'ma-khong-co-that': t0 - 9 },
+      ptLast: { level: 'B1', date: '20/11/2026', vocab: 4100 },
+      ptLastShort: { level: 'full', label: 'từ A2 trở lên (nên làm bản đầy đủ)', date: '21/11/2026', ok: 13, n: 15 },
+    };
+    await datKho(khoBC);
+    const bcDau = await pI.evaluate(() => ({ an: document.getElementById('bcText').hidden, tat: document.getElementById('bcChep').disabled }));
+    kiem(bcDau.an && bcDau.tat, 'gói I · trước khi bấm "Tạo báo cáo": khối chữ ẩn, nút Sao chép chưa bật', JSON.stringify(bcDau));
+    await pI.click('#bcTao');
+    const bc = await pI.evaluate(() => document.getElementById('bcText').value);
+    const dong = bc.split('\n');
+    const n1 = inf.zone.filter(z => z === 1).length, n2 = inf.zone.filter(z => z === 2).length;
+    const c1 = inf.zone.slice(0, 2).filter(z => z === 1).length;
+    const mong = [
+      /^BÁO CÁO TIẾN ĐỘ TIẾNG ANH · \d{1,2}\/\d{1,2}\/\d{4}$/,
+      `• Bài đã học xong: Khu 1 ${c1}/${n1} · Khu 2 ${2 - c1}/${n2}`,
+      '• Thẻ từ nền tảng: đã thuộc 2/186 · đến hạn ôn hôm nay 3 · chưa gặp 181',
+      `• Thẻ AWL: đã thuộc 1/${tong.awl} · thẻ theo ngành: đã thuộc 0/${tong.field}`,
+      `• Lộ trình 8 tuần: đã đánh dấu 2/${tong.plan} việc`,
+      `• Thực hành tình huống: đã đánh dấu 3/${tongPrac} ô trong danh sách kiểm`,
+      '• Kiểm tra trình độ gần nhất: bản đầy đủ 20/11/2026: B1 (vốn từ ước lượng khoảng 4.100 họ từ) · bản ngắn 21/11/2026: từ A2 trở lên (đúng 13/15 câu)',
+    ];
+    const khop = mong.map((m, i) => (m instanceof RegExp ? m.test(dong[i]) : dong[i] === m));
+    kiem(khop.every(Boolean) && dong.length === 8 && /số đếm/.test(dong[7]), 'gói I · báo cáo tuần: từng dòng khớp số đếm gõ tay (bài, thẻ thuộc/đến hạn/chưa gặp, AWL, lộ trình, ô kiểm, kiểm tra gần nhất)', bc);
+    kiem((await pI.evaluate(() => !document.getElementById('bcText').hidden && !document.getElementById('bcChep').disabled)), 'gói I · sau "Tạo báo cáo": khối chữ hiện, nút Sao chép bật', '');
+    // báo cáo chỉ có số đếm: nhét chữ lạ vào mọi chỗ có thể, chữ đó không được xuất hiện
+    await datKho({ ...khoBC, ptLast: { level: 'BÍ-MẬT-1', date: 'BÍ-MẬT-2', vocab: 'BÍ-MẬT-3' }, ptLastShort: { level: 'BÍ-MẬT-4', label: 'BÍ-MẬT-5', date: '<b>BÍ-MẬT-6</b>', ok: 'BÍ-MẬT-7', n: 15 }, 'tu-go': { cau: 'BÍ-MẬT-8' }, slow: false });
+    await pI.click('#bcTao');
+    const bc2 = await pI.evaluate(() => document.getElementById('bcText').value);
+    kiem(!/BÍ-MẬT|<|>/.test(bc2) && /Kiểm tra trình độ gần nhất: bản đầy đủ \?: \?/.test(bc2), 'gói I · báo cáo không chép chữ lạ từ dữ liệu lưu (mức, ngày, nhãn không hợp lệ ra "?"), chỉ số đếm', bc2);
+    // chưa làm kiểm tra
+    await datKho({});
+    await pI.click('#bcTao');
+    const bc3 = await pI.evaluate(() => document.getElementById('bcText').value);
+    kiem(/Kiểm tra trình độ gần nhất: chưa làm/.test(bc3) && /đã thuộc 0\/186 · đến hạn ôn hôm nay 0 · chưa gặp 186/.test(bc3), 'gói I · học viên mới: báo cáo ghi "chưa làm" và 0 thẻ thuộc / 186 chưa gặp', bc3);
+    // sao chép vào clipboard
+    const cC = await trinhDuyet.newContext({ viewport: { width: 390, height: 800 }, permissions: ['clipboard-read', 'clipboard-write'] });
+    const pC = await cC.newPage();
+    await pC.goto(URL_TRANG + '#lo-trinh'); await pC.waitForSelector('#bcTao');
+    await pC.click('#bcTao'); await pC.click('#bcChep');
+    await pC.waitForFunction(() => /Đã chép|Chưa chép/.test(document.getElementById('toast').textContent), null, { timeout: 4000 }).catch(() => {});
+    const cb = await pC.evaluate(async () => ({ toast: document.getElementById('toast').textContent, text: document.getElementById('bcText').value, clip: await navigator.clipboard.readText().catch(e => 'LỖI ' + e.message) }));
+    kiem(/Đã chép/.test(cb.toast) && cb.clip === cb.text && cb.text.length > 100, 'gói I · nút Sao chép đưa đúng khối báo cáo vào clipboard và báo "Đã chép"', JSON.stringify(cb).slice(0, 300));
+    await cC.close();
+
+    // (d) 390 px không tràn khi hiện báo cáo và thông báo nạp; không lỗi console; tương phản chế độ sáng/tối
+    await datKho(khoBC); await pI.click('#bcTao');
+    await pI.setInputFiles('#bkImport', fileB); await pI.waitForSelector('#bkGop');
+    const tran = await pI.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    kiem(tran <= 1, 'gói I · 390 px: Lộ trình với thông báo nạp gộp và khối báo cáo không tràn ngang', tran + ' px');
+    kiem(loiI.length === 0, 'gói I · nạp gộp, báo cáo, sao chép: không lỗi console', loiI.slice(0, 3).join(' || '));
+    await cI.close();
+    for (const cach of ['sang', 'auto-toi', 'ep-toi']) {
+      const c5 = await trinhDuyet.newContext({ viewport: { width: 1280, height: 900 }, colorScheme: cach === 'auto-toi' ? 'dark' : 'light' });
+      const p5 = await c5.newPage();
+      await p5.goto(URL_TRANG + '#lo-trinh'); await p5.waitForSelector('#bcTao');
+      if (cach === 'ep-toi') await p5.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
+      await p5.click('#bcTao'); await p5.setInputFiles('#bkImport', fileB); await p5.waitForSelector('#bkGop');
+      const tp5 = await p5.evaluate(() => {
+        const toi = s => { const c = s.match(/[\d.]+/g).map(Number); const f = v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }; return .2126 * f(c[0]) + .7152 * f(c[1]) + .0722 * f(c[2]); };
+        const nen = el => { for (let e = el; e; e = e.parentElement) { const b = getComputedStyle(e).backgroundColor; if (b && !/rgba?\(.*,\s*0\)$|transparent/.test(b)) return b; } return 'rgb(0,0,0)'; };
+        const tp = el => { const x = toi(getComputedStyle(el).color), y = toi(nen(el)); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); };
+        return [['khối báo cáo', '#bcText'], ['chữ thông báo nạp', '#bkMsg'], ['nút Nạp gộp', '#bkGop'], ['nút Thay hẳn', '#bkDe'], ['nút Tạo báo cáo', '#bcTao'], ['nút Sao chép', '#bcChep']].map(([ten, s]) => { const el = document.querySelector(s); return { ten, tp: el ? tp(el) : 0 }; });
+      });
+      for (const r of tp5) kiem(r.tp >= NGUONG_TUONG_PHAN, `gói I · ${cach === 'sang' ? 'chế độ sáng' : cach === 'auto-toi' ? 'tối tự động' : 'tối ép data-theme'}: ${r.ten} tương phản ${r.tp.toFixed(2)}:1`, `thấp hơn ${NGUONG_TUONG_PHAN}:1`);
+      await c5.close();
+    }
+    for (const f of [fileB, fileHong, fileXuat, fileCu]) { try { fs.unlinkSync(f); } catch {} }
   }
 } finally {
   await trinhDuyet.close();
