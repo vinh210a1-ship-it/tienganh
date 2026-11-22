@@ -25,3 +25,10 @@ He left the company a year ago. ||| [S He] [V left] [O the company] [A a year ag
 He left a year ago. ||| [S He] [V left] [A a year ago]
 I saw him a week ago. ||| [S I] [V saw] [O him] [A a week ago]
 He found it easy. ||| [S He] [V found] [O it] [C easy]
+# Gói G: các câu lỗi đã biết sau PR #3 (Kiểm định ghi), nay đã sửa
+They appointed her manager. ||| [S They] [V appointed] [O her] [C manager]
+The class voted her the best player. ||| [S The class] [V voted] [O her] [C the best player]
+They crowned her queen. ||| [S They] [V crowned] [O her] [C queen]
+She painted the wall white. ||| [S She] [V painted] [O the wall] [C white]
+He left her sister a note. ||| [S He] [V left] [O her sister] [O a note]
+The teacher, tired and hungry, left the room. ||| [S The teacher] [M tired and hungry] [V left] [O the room]
