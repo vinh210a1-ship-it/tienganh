@@ -114,6 +114,13 @@ td.num{font-variant-numeric:tabular-nums}
 .spk{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;margin-right:6px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--accent);cursor:pointer;vertical-align:-6px;padding:0;flex:none}
 .spk:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
 .spk svg{width:14px;height:14px}
+.rec{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;margin-left:6px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--accent);cursor:pointer;vertical-align:-6px;padding:0;flex:none}
+.rec[hidden]{display:none}
+.rec:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.rec svg{width:14px;height:14px}
+.rec.on{background:var(--bad-soft);color:var(--bad);border-color:var(--bad);animation:ghiNhay 1.2s ease-in-out infinite}
+@keyframes ghiNhay{50%{opacity:.55}}
+@media (prefers-reduced-motion:reduce){.rec.on{animation:none}}
 .phr{list-style:none;padding:0;margin:10px 0;display:flex;flex-direction:column;gap:6px}
 .phr li{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 12px;display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline;max-width:none}
 .phr li .en{font-weight:600}
@@ -1701,6 +1708,8 @@ R&amp;D Department</div>
       <li><b>Đóng vai:</b> che các câu của vai bạn, nhìn câu của người kia, tự nói câu trả lời của mình, rồi đối chiếu.</li>
       <li><b>Đổi thông tin thật:</b> thay tên, món, số, ngày bằng thông tin của bạn rồi ghi âm 30–60 giây bằng điện thoại. Nghe lại, chú ý âm cuối, đuôi -s, -ed ở Bài 1.</li>
     </ol>
+    <p><b>Ghi âm ngay trên trang:</b> cạnh loa của mỗi câu có nút micro. Bấm micro, nói câu đó, bấm nút vuông để dừng, bấm ▶ nghe lại bản của bạn, rồi bấm loa nghe câu mẫu để so âm cuối và nhịp. Mỗi câu ghi tối đa 60 giây. Bản ghi chỉ nằm trong trang này: không lưu, không nằm trong file sao lưu, không gửi đi đâu, và mất khi bạn tải lại trang. Trình duyệt sẽ hỏi quyền dùng micro ở lần ghi đầu tiên.</p>
+    <p id="ghiAmTin" class="note" role="status" aria-live="polite" hidden></p>
   </div>
   <p class="note">Hội thoại mẫu do khóa học này tự soạn để tập nói, không trích từ giáo trình nào, và <b>chưa có người bản xứ hoặc giáo viên tiếng Anh duyệt xem câu đã tự nhiên chưa</b> (sáu tình huống 7–12 mang nhãn <span class="tag hyp">Tự soạn</span>). Giọng đọc là giọng máy của trình duyệt, đủ để bắt chước nhịp câu. Nghe người thật qua <a href="https://youglish.com">YouGlish</a> hoặc <a href="https://www.bbc.co.uk/learningenglish">BBC Learning English</a> bổ sung cho phần này.</p>
 
@@ -4830,6 +4839,145 @@ $("pcFile").addEventListener("change", function(){ readFile(this.files && this.f
 })();
 count();
 window.__PCUI = {render: render, state: st};
+})();
+
+/* ---------- Ghi âm trong trình duyệt để so với câu mẫu (gói K) ---------- */
+/* Mỗi câu ở trang Thực hành (hội thoại và câu then chốt) có nút micro: ghi → nghe lại bản của mình → bấm loa nghe câu mẫu.
+   Bản ghi chỉ nằm trong bộ nhớ của trang này: không lưu (localStorage, tệp sao lưu), không gửi đi đâu; tải lại trang là mất.
+   Micro chỉ được xin khi bấm nút ghi lần đầu, và được trả lại ngay khi dừng. */
+(function(){
+  var host = document.getElementById("thuc-hanh");
+  if(!host) return;
+  var CFG = {toiDa: 60000};
+  var tin = document.getElementById("ghiAmTin");
+  var MIC = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V22h2v-3.1A7 7 0 0 0 19 12h-2z"/></svg>';
+  var STOP = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 6h12v12H6z"/></svg>';
+  var PLAY = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
+  var rec = null;        /* {mr, stream, chunks, row, timer, huy} khi đang ghi */
+  var play = null;       /* {audio, row} khi đang nghe lại */
+  var rows = [];         /* mỗi câu: {el, text, mic, pl, url, size} */
+  function noi(msg, loi){ if(tin){ tin.hidden = false; tin.textContent = msg; tin.className = "note" + (loi ? " warn" : ""); } toast(msg); }
+  function hopHo(){ return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder); }
+  function chonKieu(){
+    var ds = ["audio/webm;codecs=opus","audio/webm","audio/mp4","audio/ogg;codecs=opus"];
+    try{ for(var i=0;i<ds.length;i++) if(MediaRecorder.isTypeSupported(ds[i])) return ds[i]; }catch(e){}
+    return "";
+  }
+  function traMic(stream){ try{ stream.getTracks().forEach(function(t){ t.stop(); }); }catch(e){} }
+  function veNut(r){
+    var ghi = rec && rec.row === r;
+    r.mic.innerHTML = ghi ? STOP : MIC;
+    r.mic.classList.toggle("on", !!ghi);
+    r.mic.setAttribute("aria-label", (ghi ? "Dừng ghi: " : "Ghi âm câu: ") + r.text);
+    r.mic.title = ghi ? "Dừng ghi" : "Ghi âm câu này";
+    r.pl.hidden = !r.url;
+    var dang = !!play && play.row === r;
+    r.pl.innerHTML = dang ? STOP : PLAY;
+    r.pl.setAttribute("aria-label", (dang ? "Dừng nghe: " : "Nghe lại bản ghi của bạn: ") + r.text);
+    r.pl.title = dang ? "Dừng nghe" : "Nghe lại bản ghi của bạn";
+  }
+  function dungNghe(){
+    if(!play) return;
+    var p = play; play = null;
+    try{ p.audio.pause(); }catch(e){}
+    veNut(p.row);
+  }
+  function dungGhi(huy){
+    if(!rec) return;
+    var c = rec; rec.huy = !!huy;
+    clearTimeout(c.timer);
+    try{ if(c.mr.state !== "inactive") c.mr.stop(); else ketThuc(c); }catch(e){ ketThuc(c); }
+  }
+  function ketThuc(c){
+    if(c.xong) return; c.xong = true;
+    traMic(c.stream);
+    if(rec === c) rec = null;
+    var r = c.row;
+    var blob = c.chunks.length ? new Blob(c.chunks, {type: c.mr.mimeType || c.kieu || "audio/webm"}) : null;
+    if(!c.huy){
+      if(blob && blob.size > 0){
+        if(r.url) URL.revokeObjectURL(r.url);
+        r.url = URL.createObjectURL(blob); r.size = blob.size;
+        noi((c.tuDung ? "Đã ghi đủ " + Math.round(CFG.toiDa/1000) + " giây nên tự dừng. " : "Đã ghi xong. ") + "Bấm nút ▶ để nghe lại, rồi bấm loa nghe câu mẫu để so.");
+      } else noi("Không thu được tiếng nào. Hãy kiểm tra micro rồi ghi lại.", true);
+    }
+    veNut(r);
+  }
+  var cho = 0, choSo = 0;  /* đang chờ trình duyệt hỏi quyền micro: chống bấm hai lần và chống ghi tiếp sau khi đã rời bài */
+  function batDau(r){
+    if(cho) return;
+    dungNghe();
+    try{ if(window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){}
+    if(typeof stopAudio === "function") stopAudio();
+    var tk = cho = ++choSo;
+    navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+      if(cho !== tk){ traMic(stream); return; }
+      cho = 0;
+      var kieu = chonKieu(), mr;
+      try{ mr = kieu ? new MediaRecorder(stream, {mimeType: kieu}) : new MediaRecorder(stream); }
+      catch(e){ traMic(stream); noi("Trình duyệt này không ghi được âm thanh ở dạng cần thiết. Hãy thử Chrome, Edge hoặc Safari bản mới.", true); return; }
+      var c = {mr: mr, stream: stream, chunks: [], row: r, kieu: kieu, timer: 0, huy: false, xong: false};
+      mr.ondataavailable = function(ev){ if(ev.data && ev.data.size) c.chunks.push(ev.data); };
+      mr.onstop = function(){ ketThuc(c); };
+      mr.onerror = function(){ c.huy = true; noi("Đang ghi thì có lỗi. Hãy thử lại.", true); dungGhi(true); };
+      rec = c; veNut(r);
+      mr.start();
+      c.timer = setTimeout(function(){ if(rec === c){ c.tuDung = true; dungGhi(); } }, CFG.toiDa);
+      noi("Đang ghi… nói xong thì bấm nút vuông để dừng.");
+    }, function(e){
+      if(cho !== tk) return;
+      cho = 0;
+      var ten = e && e.name;
+      if(ten === "NotAllowedError" || ten === "SecurityError") noi("Trình duyệt đang chặn micro cho trang này. Bấm biểu tượng ổ khóa cạnh địa chỉ trang, cho phép micro rồi thử lại. Không có micro thì vẫn tập nói bình thường, chỉ không nghe lại được bản của mình.", true);
+      else if(ten === "NotFoundError" || ten === "OverconstrainedError") noi("Không tìm thấy micro. Hãy cắm hoặc bật micro rồi thử lại.", true);
+      else if(ten === "NotReadableError" || ten === "AbortError") noi("Micro đang bị ứng dụng khác dùng hoặc không mở được. Đóng ứng dụng đó rồi thử lại.", true);
+      else noi("Không bật được micro. Hãy thử lại hoặc đổi trình duyệt.", true);
+    });
+  }
+  function bamGhi(r){
+    if(!hopHo()){ noi("Trình duyệt này chưa hỗ trợ ghi âm (cần Chrome, Edge hoặc Safari bản mới, và mở trang qua địa chỉ https). Bạn vẫn có thể ghi âm bằng ứng dụng ghi âm của điện thoại.", true); return; }
+    if(rec){ var cung = rec.row === r; dungGhi(); if(cung) return; }
+    batDau(r);
+  }
+  function bamNghe(r){
+    if(!r.url) return;
+    if(play && play.row === r){ dungNghe(); return; }
+    dungNghe();
+    if(rec) dungGhi();
+    try{ if(window.speechSynthesis) window.speechSynthesis.cancel(); }catch(e){}
+    if(typeof stopAudio === "function") stopAudio();
+    var a = new Audio(r.url), p = {audio: a, row: r};
+    play = p;
+    var het = function(){ if(play === p){ play = null; veNut(r); } };
+    a.addEventListener("ended", het); a.addEventListener("error", function(){ het(); noi("Không phát lại được bản ghi này. Hãy ghi lại.", true); });
+    var pr = a.play(); if(pr && pr.catch) pr.catch(function(){ het(); noi("Trình duyệt không cho phát lại. Hãy bấm nút ▶ một lần nữa.", true); });
+    veNut(r);
+  }
+  var cac = host.querySelectorAll(".sit .say");
+  for(var i=0;i<cac.length;i++){
+    (function(el){
+      var text = el.getAttribute("data-say") || el.textContent.trim();
+      var mic = document.createElement("button"); mic.type = "button"; mic.className = "rec";
+      var pl = document.createElement("button"); pl.type = "button"; pl.className = "rec rec-play"; pl.hidden = true;
+      var r = {el: el, text: text, mic: mic, pl: pl, url: null, size: 0};
+      mic.addEventListener("click", function(ev){ ev.stopPropagation(); bamGhi(r); });
+      pl.addEventListener("click", function(ev){ ev.stopPropagation(); bamNghe(r); });
+      el.appendChild(mic); el.appendChild(pl);
+      rows.push(r); veNut(r);
+    })(cac[i]);
+  }
+  /* Bấm loa nghe câu mẫu khi đang ghi thì dừng ghi trước, kẻo giọng mẫu lọt vào bản ghi. */
+  document.addEventListener("click", function(ev){
+    if(!ev.target || !ev.target.closest) return;
+    var l = ev.target.closest(".spk");
+    if(l){ if(rec) dungGhi(); dungNghe(); }
+  }, true);
+  /* Rời trang, đổi bài hay ẩn tab: dừng và trả micro, bỏ bản đang ghi dở. */
+  function roi(){ cho = 0; if(rec) dungGhi(true); dungNghe(); }
+  window.addEventListener("hashchange", roi);
+  window.addEventListener("pagehide", roi);
+  document.addEventListener("visibilitychange", function(){ if(document.hidden) roi(); });
+  window.__GHI = {cfg: CFG, hoTro: hopHo, trangThai: function(){ return {dangGhi: !!rec, dangNghe: !!play, ban: rows.filter(function(r){ return !!r.url; }).length, kichCo: rows.map(function(r){ return r.size; }).filter(Boolean), nut: rows.length}; }};
 })();
 
 /* ---------- Khởi động ---------- */
