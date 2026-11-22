@@ -1,0 +1,32 @@
+# Tập 4: 30 câu viết lời giải trước khi chạy, CHẠY ĐÚNG MỘT LẦN rồi ghi số, không chỉnh code theo tập này (tập chưa từng thấy).
+# Quy ước như gold-heldout.txt.
+My brother plays football every weekend. ||| [S My brother] [V plays] [O football] [A every weekend]
+The children are playing in the garden. ||| [S The children] [V are playing] [A in the garden]
+Can you help me with my homework? ||| [V Can] [S you] [V help] [O me] [A with my homework]
+She doesn't like spicy food. ||| [S She] [V doesn't like] [O spicy food]
+We should finish this report by Friday. ||| [S We] [V should finish] [O this report] [A by Friday]
+The restaurant opens at eight and closes at midnight. ||| [S The restaurant] [V opens] [A at eight] [X and] [V closes] [A at midnight]
+Where did you buy this jacket? ||| [X Where] [V did] [S you] [V buy] [O this jacket]
+I have never seen such a big fish. ||| [S I] [V have never seen] [O such a big fish]
+The new manager was chosen by the board. ||| [S The new manager] [V was chosen] [A by the board]
+He promised to call me tomorrow. ||| [S He] [V promised] <T [T to call] [O me] [A tomorrow]>
+They think that the price is too high. ||| [S They] [V think] <O [X that] [S the price] [V is] [C too high]>
+My sister works as a nurse in a small hospital. ||| [S My sister] [V works] [A as a nurse] [A in a small hospital]
+After dinner, we watched a movie. ||| [A After dinner] [S we] [V watched] [O a movie]
+The teacher gave the students a difficult test. ||| [S The teacher] [V gave] [O the students] [O a difficult test]
+Learning a language takes time. ||| <S [V Learning] [O a language]> [V takes] [O time]
+The woman who lives next door is a doctor. ||| [S The woman] <m [X who] [V lives] [A next door]> [V is] [C a doctor]
+I was tired, so I went to bed early. ||| [S I] [V was] [C tired] [X so] [S I] [V went] [A to bed] [A early]
+The samples were stored at four degrees for two weeks. ||| [S The samples] [V were stored] [A at four degrees] [A for two weeks]
+It is difficult to speak English fluently. ||| [S It] [V is] [C difficult] <T [T to speak] [O English] [A fluently]>
+When I arrived, the meeting had already started. ||| <A [X When] [S I] [V arrived]> [S the meeting] [V had already started]
+This phone is cheaper than that one. ||| [S This phone] [V is] [C cheaper than that one]
+She looks very happy today. ||| [S She] [V looks] [C very happy] [A today]
+Please send me the file before noon. ||| [X Please] [V send] [O me] [O the file] [A before noon]
+The company has grown quickly in the last five years. ||| [S The company] [V has grown] [A quickly] [A in the last five years]
+I don't know where she lives. ||| [S I] [V don't know] <O [X where] [S she] [V lives]>
+Water boils at one hundred degrees Celsius. ||| [S Water] [V boils] [A at one hundred degrees Celsius]
+We are waiting for the bus. ||| [S We] [V are waiting] [A for the bus]
+The students must wear a uniform at school. ||| [S The students] [V must wear] [O a uniform] [A at school]
+Yesterday I met an old friend in the supermarket. ||| [A Yesterday] [S I] [V met] [O an old friend] [A in the supermarket]
+If you heat the oil, it becomes thinner. ||| <A [X If] [S you] [V heat] [O the oil]> [S it] [V becomes] [C thinner]

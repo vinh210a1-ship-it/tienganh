@@ -1,0 +1,46 @@
+# Tập "giữ lại": viết lời giải TRƯỚC khi chạy bộ phân tích lên các câu này, để đo công bằng.
+# Quy ước: [S ..] [V ..] [O ..] [C ..] [A ..] [M ..] là cụm; <T ..> <O ..> <A ..> <S ..> <M ..> là mệnh đề (bên trong có cụm riêng).
+# [X ..] (từ nối) và [m ..] (bổ nghĩa danh từ) có ghi cho đủ nhưng KHÔNG tính điểm.
+She works in a small office. ||| [S She] [V works] [A in a small office]
+My brother likes football. ||| [S My brother] [V likes] [O football]
+They are very happy. ||| [S They] [V are] [C very happy]
+We have a meeting at nine. ||| [S We] [V have] [O a meeting] [A at nine]
+He didn't answer the phone. ||| [S He] [V didn't answer] [O the phone]
+Can you help me? ||| [V Can] [S you] [V help] [O me]
+The students are studying English in the library. ||| [S The students] [V are studying] [O English] [A in the library]
+I want to buy a ticket for tomorrow. ||| [S I] [V want] <T [T to buy] [O a ticket] [A for tomorrow]>
+Please send me the report by Friday. ||| [X Please] [V send] [O me] [O the report] [A by Friday]
+It is important to check the temperature. ||| [S It] [V is] [C important] <T [T to check] [O the temperature]>
+The company has produced more than ten thousand units this year. ||| [S The company] [V has produced] [O more than ten thousand units] [A this year]
+If the sample is too thick, we add some water. ||| <A [X If] [S the sample] [V is] [C too thick]> [S we] [V add] [O some water]
+The results were not significant because the sample was small. ||| [S The results] [V were not] [C significant] <A [X because] [S the sample] [V was] [C small]>
+After the meeting, she sent an email to the supplier. ||| [A After the meeting] [S she] [V sent] [O an email] [A to the supplier]
+There are many people in the room. ||| [S There] [V are] [S many people] [A in the room]
+He said that the machine was broken. ||| [S He] [V said] <O [X that] [S the machine] [V was broken]>
+The manager who called me yesterday works in Hanoi. ||| [S The manager] <m [X who] [V called] [O me] [A yesterday]> [V works] [A in Hanoi]
+Heating the mixture slowly improves the texture. ||| <S [V Heating] [O the mixture] [A slowly]> [V improves] [O the texture]
+She enjoys reading books at night. ||| [S She] [V enjoys] <O [V reading] [O books] [A at night]>
+I don't know what he wants. ||| [S I] [V don't know] <O [X what] [S he] [V wants]>
+Because it was raining, we stayed at home. ||| <A [X Because] [S it] [V was raining]> [S we] [V stayed] [A at home]
+The new method is faster than the old one. ||| [S The new method] [V is] [C faster] [A than the old one]
+Water boils at 100 degrees. ||| [S Water] [V boils] [A at 100 degrees]
+The lab results show that the emulsion is stable. ||| [S The lab results] [V show] <O [X that] [S the emulsion] [V is] [C stable]>
+Many people drink coffee in the morning. ||| [S Many people] [V drink] [O coffee] [A in the morning]
+He is a good teacher and he works hard. ||| [S He] [V is] [C a good teacher] [X and] [S he] [V works] [A hard]
+We need to improve the quality of the product. ||| [S We] [V need] <T [T to improve] [O the quality of the product]>
+The price has increased significantly over the last year. ||| [S The price] [V has increased] [A significantly] [A over the last year]
+Yesterday I went to the market and bought some fruit. ||| [A Yesterday] [S I] [V went] [A to the market] [X and] [V bought] [O some fruit]
+What is the main ingredient in this sauce? ||| [X What] [V is] [S the main ingredient] [m in this sauce]
+Emulsions are thermodynamically unstable systems. ||| [S Emulsions] [V are] [C thermodynamically unstable systems]
+The viscosity of the sample increased when the temperature decreased. ||| [S The viscosity of the sample] [V increased] <A [X when] [S the temperature] [V decreased]>
+Surfactants reduce the interfacial tension between oil and water. ||| [S Surfactants] [V reduce] [O the interfacial tension] [m between oil and water]
+These findings suggest that smaller droplets improve the stability of the emulsion. ||| [S These findings] [V suggest] <O [X that] [S smaller droplets] [V improve] [O the stability of the emulsion]>
+Previous studies have shown that protein can stabilize oil droplets. ||| [S Previous studies] [V have shown] <O [X that] [S protein] [V can stabilize] [O oil droplets]>
+The mixture was heated to eighty degrees and then cooled rapidly. ||| [S The mixture] [V was heated] [A to eighty degrees] [X and] [A then] [V cooled] [A rapidly]
+Although the results were promising, further research is needed. ||| <A [X Although] [S the results] [V were] [C promising]> [S further research] [V is needed]
+The proportion of oil was kept constant throughout the experiment. ||| [S The proportion of oil] [V was kept] [C constant] [A throughout the experiment]
+Researchers measured the particle size using laser diffraction. ||| [S Researchers] [V measured] [O the particle size] <A [V using] [O laser diffraction]>
+Increasing the pH lowers the solubility of the protein. ||| <S [V Increasing] [O the pH]> [V lowers] [O the solubility of the protein]
+The samples that were stored at four degrees remained stable for two weeks. ||| [S The samples] <m [X that] [V were stored] [A at four degrees]> [V remained] [C stable] [A for two weeks]
+Fat contributes to the flavour of the product. ||| [S Fat] [V contributes] [A to the flavour of the product]
+Oil droplets tend to merge when the film between them is thin. ||| [S Oil droplets] [V tend] <T [T to merge] <A [X when] [S the film] [m between them] [V is] [C thin]>>
