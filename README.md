@@ -5,7 +5,7 @@ Web học tiếng Anh bằng tiếng Việt, hai khu: **Học để dùng** (20%
 Trang chính là `index.html`, cộng thêm bộ phân tích câu `phan-tich/phan-tich.js` (một file JavaScript, không cần cài gì). Bấm đúp `index.html` để mở bằng Chrome, Edge hoặc Safari; giữ nguyên thư mục `phan-tich/` bên cạnh nó.
 
 ## Cấu trúc
-- **Khu 1 · Học để dùng:** Bài 0–9, Bài 2B (S + V + O, số ít/số nhiều, to be đầy đủ, bài tập A–H, 5 bài đọc), Bài 3B (đọc giờ, thứ–ngày–tháng–năm, số thứ tự, giá tiền, số điện thoại; hỏi và đáp, 3 hội thoại, bài tập A–E, 12 câu quiz), Bài 5B (so sánh, hiện tại hoàn thành, for/since), 6 tình huống Thực hành, Lộ trình 8 tuần (186 thẻ từ ở Bài 4 cần khoảng 9–12 tuần để học hết; ô "Bộ của buổi dạy" cho ôn riêng từng bộ 20 từ, link dạng `#tu-vung?bo=1`).
+- **Khu 1 · Học để dùng:** Bài 0–9, Bài 2B (S + V + O, số ít/số nhiều, to be đầy đủ, bài tập A–H, 5 bài đọc), Bài 3B (đọc giờ, thứ–ngày–tháng–năm, số thứ tự, giá tiền, số điện thoại; hỏi và đáp, 3 hội thoại, bài tập A–E, 12 câu quiz), Bài 5B (so sánh, hiện tại hoàn thành, for/since), 12 tình huống Thực hành (6 đầu thiên về công việc, 6 sau 7–12 là đời sống: gia đình, hẹn lịch, mua hàng, hiệu thuốc, khách sạn, sân bay; mỗi tình huống mới khai "Học trước" và bị bộ kiểm dò cấu trúc), Lộ trình 8 tuần (186 thẻ từ ở Bài 4 cần khoảng 9–12 tuần để học hết; ô "Bộ của buổi dạy" cho ôn riêng từng bộ 20 từ, link dạng `#tu-vung?bo=1`).
 - **Khu 2 · Nâng cao và IELTS:** Bài 10 (AWL), Bài 11 (chuyên ngành), Bài 12 (IELTS).
 - **Kiểm tra trình độ** dùng chung (A1 → C1 và vốn từ).
 - **Công cụ · Bảng tổng hợp ngữ pháp:** trang tra cứu A1–A2 (link `#bang-ngu-phap`). Bài 2B và bảng này do người soạn tự viết, chưa người bản xứ duyệt, nên mỗi mục mang nhãn "Tự soạn".
