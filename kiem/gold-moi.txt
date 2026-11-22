@@ -1,0 +1,42 @@
+# Tập "mới": 40 câu viết lời giải SAU KHI đã sửa xong theo hai tập kia, và chạy một lần để lấy con số trung thực.
+# (Sau lần chạy đầu, các lỗi tìm ra được sửa tiếp; con số trước và sau khi sửa ghi trong NHAT-KY.md.)
+My name is Linh and I am from Hanoi. ||| [S My name] [V is] [C Linh] [X and] [S I] [V am] [A from Hanoi]
+I usually drink tea in the evening. ||| [S I] [A usually] [V drink] [O tea] [A in the evening]
+Does she work on Saturdays? ||| [V Does] [S she] [V work] [A on Saturdays]
+How do you spell your name? ||| [X How] [V do] [S you] [V spell] [O your name]
+We went to the beach last summer. ||| [S We] [V went] [A to the beach] [A last summer]
+They will visit their grandparents next week. ||| [S They] [V will visit] [O their grandparents] [A next week]
+The train leaves at six. ||| [S The train] [V leaves] [A at six]
+I'm looking for a new apartment. ||| [S I] [V 'm looking] [A for a new apartment]
+She has lived here for ten years. ||| [S She] [V has lived] [A here] [A for ten years]
+You should drink more water. ||| [S You] [V should drink] [O more water]
+There isn't any milk in the fridge. ||| [S There] [V isn't] [S any milk] [A in the fridge]
+My father is a doctor and my mother is a teacher. ||| [S My father] [V is] [C a doctor] [X and] [S my mother] [V is] [C a teacher]
+He wants me to help him. ||| [S He] [V wants] [O me] <T [T to help] [O him]>
+Open the door, please. ||| [V Open] [O the door] [X please]
+The weather was cold, so we stayed inside. ||| [S The weather] [V was] [C cold] [X so] [S we] [V stayed] [A inside]
+I have never seen this movie. ||| [S I] [V have] [A never] [V seen] [O this movie]
+When do you start work? ||| [X When] [V do] [S you] [V start] [O work]
+She is taller than her sister. ||| [S She] [V is] [C taller] [A than her sister]
+We are going to visit Da Nang next month. ||| [S We] [V are going] <T [T to visit] [O Da Nang] [A next month]>
+Which bus goes to the airport? ||| [S Which bus] [V goes] [A to the airport]
+The emulsion was stored at room temperature for three days. ||| [S The emulsion] [V was stored] [A at room temperature] [A for three days]
+Higher temperatures accelerate the oxidation of lipids. ||| [S Higher temperatures] [V accelerate] [O the oxidation of lipids]
+The authors argue that the current standard is not sufficient. ||| [S The authors] [V argue] <O [X that] [S the current standard] [V is not] [C sufficient]>
+Proteins adsorb at the oil-water interface and reduce the surface tension. ||| [S Proteins] [V adsorb] [A at the oil-water interface] [X and] [V reduce] [O the surface tension]
+Because the droplets were small, the emulsion remained stable during storage. ||| <A [X Because] [S the droplets] [V were] [C small]> [S the emulsion] [V remained] [C stable] [A during storage]
+We measured the viscosity at different shear rates. ||| [S We] [V measured] [O the viscosity] [A at different shear rates]
+The data, which were collected over two years, show a clear trend. ||| [S The data] <M [X which] [V were collected] [A over two years]> [V show] [O a clear trend]
+Using a higher concentration of emulsifier reduced the droplet size. ||| <S [V Using] [O a higher concentration of emulsifier]> [V reduced] [O the droplet size]
+The shelf life depends on the storage temperature. ||| [S The shelf life] [V depends] [A on the storage temperature]
+Several factors may explain this difference. ||| [S Several factors] [V may explain] [O this difference]
+A stable emulsion requires a sufficient amount of emulsifier. ||| [S A stable emulsion] [V requires] [O a sufficient amount of emulsifier]
+The results of the first experiment were consistent with the hypothesis. ||| [S The results of the first experiment] [V were] [C consistent] [A with the hypothesis]
+However, the effect disappeared at higher concentrations. ||| [X However] [S the effect] [V disappeared] [A at higher concentrations]
+If the pH is lowered, the protein loses its charge. ||| <A [X If] [S the pH] [V is lowered]> [S the protein] [V loses] [O its charge]
+The supplier delivered the samples late, and the test was delayed. ||| [S The supplier] [V delivered] [O the samples] [A late] [X and] [S the test] [V was delayed]
+Fat crystals form a network that traps the liquid oil. ||| [S Fat crystals] [V form] [O a network] <m [X that] [V traps] [O the liquid oil]>
+This approach has several advantages. ||| [S This approach] [V has] [O several advantages]
+The team decided to postpone the launch until next year. ||| [S The team] [V decided] <T [T to postpone] [O the launch] [A until next year]>
+The product was sold in glass bottles. ||| [S The product] [V was sold] [A in glass bottles]
+Customers prefer products that contain fewer additives. ||| [S Customers] [V prefer] [O products] <m [X that] [V contain] [O fewer additives]>

@@ -239,6 +239,79 @@ nav.toc li.grp{font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transf
   h1{font-size:1.6rem}
 }
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
+
+/* ===== Phân tích câu (phan-tich/phan-tich.js) ===== */
+:root{--pc-S:#1f5bbf;--pc-V:#c4281f;--pc-O:#1a7a40;--pc-C:#6a2fd0;--pc-A:#9a5b00;--pc-M:#0b7373;--pc-X:#5a6578;--pc-T:#b3224a;
+  --pc-N:#1f5bbf;--pc-J:#6a2fd0;--pc-D:#9a5b00;--pc-F:#5a6578}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--pc-S:#7fb0ff;--pc-V:#ff8f85;--pc-O:#5fd08a;--pc-C:#b999ff;--pc-A:#f0b45a;--pc-M:#4fd1d1;--pc-X:#9aa5b8;--pc-T:#ff8fb0;
+    --pc-N:#7fb0ff;--pc-J:#b999ff;--pc-D:#f0b45a;--pc-F:#9aa5b8}
+}
+:root[data-theme="dark"]{--pc-S:#7fb0ff;--pc-V:#ff8f85;--pc-O:#5fd08a;--pc-C:#b999ff;--pc-A:#f0b45a;--pc-M:#4fd1d1;--pc-X:#9aa5b8;--pc-T:#ff8fb0;
+  --pc-N:#7fb0ff;--pc-J:#b999ff;--pc-D:#f0b45a;--pc-F:#9aa5b8}
+.pc-box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:16px 0}
+.pc-box label.pc-lab{display:block;font-weight:600;margin-bottom:6px}
+.pc-ta{width:100%;min-height:150px;resize:vertical;font:inherit;font-size:1rem;line-height:1.6;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.pc-ta:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+.pc-meta{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin-top:8px;font-size:.88rem;color:var(--muted)}
+.pc-bar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.pc-bar .btn{padding:8px 14px}
+.pc-file{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.pc-ta.drag{border-color:var(--accent);background:var(--accent-soft)}
+.pc-modes{position:sticky;top:57px;z-index:4;margin:0 -2px;padding:10px 2px;background:var(--paper);border-bottom:1px solid var(--line)}
+.pc-modes .tabs{margin:0 0 8px}
+.pc-opts{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.9rem;color:var(--muted)}
+.pc-opts label{display:flex;align-items:center;gap:6px;cursor:pointer}
+.pc-opts input{accent-color:var(--accent);width:16px;height:16px}
+.pc-legend{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 0;padding:0;list-style:none}
+.pc-legend button{font:inherit;font-size:.84rem;display:inline-flex;gap:6px;align-items:center;padding:3px 10px 3px 6px;border-radius:99px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
+.pc-legend button[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink) inset}
+.pc-legend b{display:inline-block;min-width:1.5em;text-align:center;border-radius:5px;padding:0 4px;color:var(--c);border:1.5px solid var(--c);font-size:.8rem}
+.pc-res{margin-top:6px}
+.pc-sent{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 16px 12px;margin:12px 0;position:relative}
+.pc-sent .pc-head{display:flex;gap:8px;align-items:center;justify-content:space-between;font-size:.8rem;color:var(--muted);margin-bottom:4px;flex-wrap:wrap}
+.pc-text{font-size:1.12rem;line-height:2.5;max-width:none;margin:0;overflow-wrap:anywhere}
+.pc-skel{display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center;margin-top:6px;padding-top:8px;border-top:1px dashed var(--line);font-size:.88rem}
+.pc-skel .lab{color:var(--muted);margin-right:2px}
+.pc-skel span.i{display:inline-flex;gap:5px;align-items:baseline;border-radius:6px;padding:1px 8px;border:1.5px solid var(--c);color:var(--ink)}
+.pc-skel span.i b{color:var(--c)}
+.pc-conf{display:inline-flex;gap:5px;align-items:center;padding:1px 9px;border-radius:99px;font-weight:600;font-size:.76rem;border:1px solid currentColor}
+.pc-conf.cao{color:var(--ok)}.pc-conf.vua{color:var(--pc-A)}.pc-conf.thap{color:var(--bad)}
+.pc-why{margin-top:8px;font-size:.9rem;background:var(--accent-soft);border-radius:8px;padding:8px 12px;display:none}
+.pc-why.on{display:block}
+.pc-why b.r{color:var(--c);border-bottom:2px solid var(--c)}
+.pc-reasons{margin:6px 0 0;font-size:.84rem;color:var(--muted)}
+.pc-frag{font-size:.84rem;color:var(--muted);margin:2px 0 0}
+/* Gạch chân theo thành phần */
+.pc-ph,.pc-cl{--c:var(--pc-X)}
+[data-r="S"]{--c:var(--pc-S)}[data-r="V"]{--c:var(--pc-V)}[data-r="O"]{--c:var(--pc-O)}[data-r="C"]{--c:var(--pc-C)}
+[data-r="A"]{--c:var(--pc-A)}[data-r="M"]{--c:var(--pc-M)}[data-r="X"]{--c:var(--pc-X)}[data-r="T"]{--c:var(--pc-T)}
+.pc-ph{text-decoration:underline;text-decoration-color:var(--c);text-decoration-thickness:3px;text-underline-offset:5px;text-decoration-skip-ink:none;cursor:pointer;border-radius:3px}
+.pc-ph[data-r="X"]{text-decoration-style:dotted}
+.pc-ph[data-r="T"]{text-decoration-style:dashed}
+.pc-ph:hover,.pc-ph.sel{background:color-mix(in srgb,var(--c) 14%,transparent)}
+.pc-ph:focus-visible,.pc-cl:focus-visible{outline:2px solid var(--c);outline-offset:2px}
+.pc-ph::after{content:"\2060" attr(data-r);display:inline;font-size:.62em;font-weight:700;line-height:1;margin-left:3px;padding:1px 3px;border-radius:4px;color:var(--c);border:1px solid var(--c);vertical-align:.35em;text-decoration:none;white-space:nowrap}
+.pc-cl{display:inline;border:1.5px solid color-mix(in srgb,var(--c) 55%,transparent);border-radius:8px;padding:2px 5px;margin:0 1px;background:color-mix(in srgb,var(--c) 6%,transparent);box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.pc-cl::before{content:attr(data-r) " · " attr(data-c);display:inline-block;font-size:.62em;font-weight:700;line-height:1.3;margin-right:5px;padding:0 5px;border-radius:5px;color:var(--panel);background:var(--c);vertical-align:.3em}
+.pc-nolab .pc-ph::after{display:none}
+.pc-mod{--c:var(--pc-M)}
+.pc-res[data-focus]:not([data-focus=""]) .pc-ph,.pc-res[data-focus]:not([data-focus=""]) .pc-cl{opacity:.32}
+.pc-res[data-focus="S"] [data-r="S"],.pc-res[data-focus="V"] [data-r="V"],.pc-res[data-focus="O"] [data-r="O"],.pc-res[data-focus="C"] [data-r="C"],
+.pc-res[data-focus="A"] [data-r="A"],.pc-res[data-focus="M"] [data-r="M"],.pc-res[data-focus="X"] [data-r="X"],.pc-res[data-focus="T"] [data-r="T"]{opacity:1}
+/* Chế độ loại từ */
+.pc-pos{font-style:normal;border-bottom:3px solid var(--c);padding-bottom:2px}
+.pc-pos.pos-N{--c:var(--pc-N)}.pc-pos.pos-V{--c:var(--pc-V)}.pc-pos.pos-J{--c:var(--pc-J)}.pc-pos.pos-D{--c:var(--pc-D)}.pc-pos.pos-F{--c:var(--pc-F);border-bottom-style:dotted;border-bottom-width:2px}
+.pc-res[data-focus="N"] .pc-pos:not(.pos-N),.pc-res[data-focus="J"] .pc-pos:not(.pos-J),.pc-res[data-focus="D"] .pc-pos:not(.pos-D),.pc-res[data-focus="F"] .pc-pos:not(.pos-F),.pc-res[data-focus="V"] .pc-pos:not(.pos-V){opacity:.3}
+.pc-demo .pc-sent{margin:8px 0}
+.pc-compare{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin:14px 0}
+.pc-compare>div{border:1px solid var(--line);border-radius:10px;padding:10px 14px;background:var(--panel)}
+.pc-compare h3{margin:0 0 4px;font-size:.95rem}
+.pc-compare p{margin:.3rem 0;font-size:.95rem}
+.pc-wrong{color:var(--bad);font-weight:600}.pc-right{color:var(--ok);font-weight:600}
+.pc-busy{opacity:.6}
+@media (max-width:860px){.pc-modes{top:0;position:static}.pc-text{font-size:1.05rem}}
+@media print{.pc-modes,.pc-box,.pager,.pc-why{display:none}}
 </style>
 </head>
 <body>
@@ -323,10 +396,13 @@ nav.toc li.grp{font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transf
   <h2>Các bài của Khu 2: nâng cao và IELTS</h2>
   <p>Phần học thuật ở đây cũng theo 80/20: <span class="tag src">Có nguồn</span>570 họ từ của Academic Word List chiếm khoảng 10% chữ trong văn bản học thuật nhưng chỉ 1,4% trong tiểu thuyết (Coxhead 2000).</p>
   <div class="grid" id="homeCards2"></div>
+  <h2>Công cụ</h2>
+  <div class="grid" id="homeCards3"></div>
 
   <h2>Cách dùng trang này</h2>
   <ul>
     <li><b>Nút loa:</b> đọc câu tiếng Anh bằng giọng đọc có sẵn của trình duyệt. Bật “Đọc chậm” ở góc trên khi mới tập. Chrome, Edge và Safari có giọng tốt nhất.</li>
+    <li><b>Phân tích câu:</b> dán hoặc tải một đoạn tiếng Anh, bật chế độ phân tích để xem từng câu được gạch chân theo thành phần (chủ ngữ, động từ, tân ngữ...). Kết quả chỉ là gợi ý.</li>
     <li><b>Bài tập nhanh</b> ở cuối mỗi bài: chọn đáp án là biết ngay đúng sai kèm giải thích.</li>
     <li><b>Tiến độ</b> (bài đã học, thẻ từ đã thuộc, việc trong tuần) được lưu trên trình duyệt này của bạn, không đồng bộ sang máy khác.</li>
   </ul>
@@ -1431,10 +1507,96 @@ R&amp;D Department</div>
   </ul>
 </section>
 
+<section class="lesson" id="phan-tich" data-title="Phân tích câu">
+  <div class="kicker">Công cụ</div>
+  <h1>Phân tích câu</h1>
+  <p class="lead">Dán hoặc tải một đoạn tiếng Anh lên, bật chế độ phân tích, và trang sẽ gạch chân từng thành phần của câu bằng màu: ai làm (S), làm gì (V), tác động lên cái gì (O), là gì (C), ở đâu và khi nào (A).</p>
+
+  <div class="key">
+    <h3>Đọc trước khi dùng</h3>
+    <ul>
+      <li><b>Đây là gợi ý, không phải đáp án chuẩn.</b> Trang dùng bộ luật tự viết và từ điển nhỏ, chạy ngay trong trình duyệt của bạn. Câu đơn và câu vừa thường đúng; câu rất dài, nhiều dấu phẩy, nhiều từ lạ có thể sai. Mỗi câu có huy hiệu <i>độ tin cậy</i> để bạn biết câu nào nên kiểm lại.</li>
+      <li><b>Tài liệu của bạn không bị gửi đi đâu cả</b> và cũng không được lưu lại: tắt trang là mất.</li>
+      <li><b>Cách học hiệu quả:</b> thử gạch chân trên giấy trước (chế độ Tắt), rồi bật phân tích để đối chiếu. Chỗ khác nhau chính là chỗ đáng suy nghĩ.</li>
+    </ul>
+  </div>
+
+  <div class="pc-box" id="pcIn">
+    <label class="pc-lab" for="pcText">Văn bản tiếng Anh cần phân tích</label>
+    <textarea class="pc-ta" id="pcText" spellcheck="false" placeholder="Dán một đoạn tiếng Anh vào đây, hoặc bấm “Tải tệp”, hoặc chọn một mẫu bên dưới."></textarea>
+    <div class="pc-meta" id="pcMeta"><span id="pcCount">0 ký tự</span><span id="pcFileName"></span></div>
+    <div class="pc-bar" style="margin-top:10px">
+      <button type="button" class="btn" id="pcGo">Phân tích</button>
+      <button type="button" class="btn ghost" id="pcPick">Tải tệp (.txt, .md, .docx)</button>
+      <input class="pc-file" type="file" id="pcFile" accept=".txt,.md,.docx,text/plain" aria-label="Tải tệp văn bản">
+      <button type="button" class="btn ghost" id="pcClear">Xóa</button>
+    </div>
+    <div class="pc-bar" style="margin-top:10px">
+      <span style="font-size:.9rem;color:var(--muted)">Mẫu thử:</span>
+      <button type="button" class="btn ghost" data-sample="basic">Câu cơ bản</button>
+      <button type="button" class="btn ghost" data-sample="ielts">Đoạn đọc kiểu IELTS</button>
+      <button type="button" class="btn ghost" data-sample="food">Đoạn khoa học thực phẩm</button>
+    </div>
+    <p class="pc-meta" style="margin-bottom:0">Tệp PDF chưa đọc được: mở PDF, chọn văn bản, sao chép rồi dán vào ô trên. Tệp .docx đọc được chữ chính, bỏ qua bảng, hình và chú thích.</p>
+  </div>
+
+  <div class="pc-modes" id="pcModes" hidden>
+    <div class="tabs" role="group" aria-label="Chế độ phân tích">
+      <button type="button" data-mode="off" aria-pressed="false">Tắt (tự gạch thử)</button>
+      <button type="button" data-mode="role" aria-pressed="true">Thành phần câu</button>
+      <button type="button" data-mode="pos" aria-pressed="false">Loại từ</button>
+    </div>
+    <div class="pc-opts">
+      <label><input type="checkbox" id="pcLab" checked> Hiện chữ cái cạnh gạch chân (không chỉ dựa vào màu)</label>
+      <label><input type="checkbox" id="pcSkel" checked> Hiện khung câu bên dưới</label>
+    </div>
+    <ul class="pc-legend" id="pcLegend" aria-label="Chú giải màu; bấm để chỉ làm nổi một loại"></ul>
+  </div>
+
+  <div id="pcSummary" class="note" hidden></div>
+  <div class="pc-res" id="pcRes" aria-live="polite"></div>
+
+  <h2>Cách đọc các nhãn</h2>
+  <p><b>Kết luận:</b> mỗi nhãn chỉ gọi tên một loại thành phần, và <b>tân ngữ (O) chỉ là cụm danh từ</b>. Giới từ và động từ thứ hai không bao giờ nằm trong O. Đây là chỗ nhiều tài liệu và nhiều công cụ làm sai, nên trang này tách riêng:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Nhãn</th><th>Là gì</th><th>Không gồm</th><th>Ví dụ</th></tr></thead>
+    <tbody>
+      <tr><td><b style="color:var(--pc-S)">S</b> Chủ ngữ</td><td>Ai/cái gì làm hành động (cụm danh từ, hoặc cả mệnh đề/V-ing/to-V đứng làm chủ ngữ)</td><td>Động từ</td><td><i>Fat crystals</i> form a network.</td></tr>
+      <tr><td><b style="color:var(--pc-V)">V</b> Động từ</td><td>Động từ chính cùng trợ động từ và not. Nếu trạng từ chen giữa thì V bị tách làm hai khúc</td><td>Tân ngữ, giới từ</td><td>She <i>has</i> never <i>been</i> late.</td></tr>
+      <tr><td><b style="color:var(--pc-O)">O</b> Tân ngữ</td><td>Cụm danh từ chịu tác động của động từ, trả lời “cái gì / ai?”</td><td><b>Giới từ, động từ, to-V, cả mệnh đề</b> (mệnh đề được vẽ thành khung riêng)</td><td>We need <i>more data</i>.</td></tr>
+      <tr><td><b style="color:var(--pc-C)">C</b> Bổ ngữ</td><td>Phần nói “chủ ngữ là gì/thế nào” sau <i>be, seem, become, remain, look…</i></td><td>Giới từ chỉ nơi chốn</td><td>The sample is <i>stable</i>.</td></tr>
+      <tr><td><b style="color:var(--pc-A)">A</b> Trạng ngữ</td><td>Nơi chốn, thời gian, cách thức, lý do: thường là cụm giới từ hoặc trạng từ. Bỏ đi câu vẫn đủ</td><td>—</td><td>We met <i>in the lab</i> <i>yesterday</i>.</td></tr>
+      <tr><td><b style="color:var(--pc-T)">T</b> to-V</td><td><i>to</i> + động từ, là một “động từ thứ hai” có tân ngữ riêng; vẽ thành khung</td><td>Không phải O</td><td>We need <i>to improve</i> the texture.</td></tr>
+      <tr><td><b style="color:var(--pc-X)">X</b> Từ nối</td><td>and, but, that, which, however… mở đầu hoặc nối mệnh đề</td><td>—</td><td>…<i>that</i> traps the oil.</td></tr>
+      <tr><td><b style="color:var(--pc-M)">M</b> Bổ sung</td><td>Phần đặt thêm sau dấu phẩy để giải thích (không có cũng đủ nghĩa)</td><td>—</td><td>Ebbinghaus, <i>a German psychologist</i>, …</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Vì sao O không gồm giới từ và động từ?</h3>
+  <p>Đây chính là chỗ nhiều bản gạch chân bị lỗi: gạch cả “at the board” hoặc cả “to improve the texture” vào O. Thử hai câu dưới đây (bấm vào từng khối để xem giải thích):</p>
+  <div class="pc-demo" id="pcDemo"></div>
+  <div class="pc-compare">
+    <div><h3><span class="pc-wrong">Hay gặp ở sách/app khác</span></h3><p>Gộp “O/C” làm một nhãn, và kéo gạch chân O qua cả giới từ (<i>look <u>at the board</u></i>) hoặc cả động từ thứ hai (<i>decide <u>to postpone the launch</u></i>).</p></div>
+    <div><h3><span class="pc-right">Cách dùng ở trang này</span></h3><p>O chỉ là cụm danh từ. <i>at the board</i> là A. <i>to postpone</i> là T, đứng riêng và có O riêng (<i>the launch</i>). Mệnh đề dài được vẽ thành khung có nhãn, bên trong gạch chân từng cụm.</p></div>
+  </div>
+  <p class="note"><span class="tag hyp">Quy ước</span>Ngữ pháp trường học Việt Nam và các giáo trình khác nhau ở vài chỗ (ví dụ gọi <i>to improve</i> là tân ngữ, hay gọi trạng ngữ là “bổ ngữ”). Bộ nhãn này là một quy ước nhất quán, không phải chân lý duy nhất. Khi thấy khác sách của bạn, hãy hiểu theo định nghĩa trong bảng trên.</p>
+
+  <h3>Những chỗ công cụ dễ sai</h3>
+  <ul>
+    <li>Câu rất dài có nhiều mệnh đề lồng nhau, nhiều dấu phẩy, hoặc dấu gạch ngang.</li>
+    <li>Từ chưa có trong từ điển nhỏ (nhất là thuật ngữ chuyên ngành): trang đoán theo đuôi từ, và báo trong phần độ tin cậy.</li>
+    <li>Từ vừa là danh từ vừa là động từ (<i>book, work, form, increase</i>) nếu câu không đủ manh mối.</li>
+    <li>Câu cụt, khẩu ngữ, tiêu đề: trang báo “không phải câu đầy đủ” thay vì cố gạch.</li>
+    <li>Cách chia nhỏ câu theo dấu chấm có thể sai với viết tắt lạ.</li>
+  </ul>
+  <p class="note"><span class="tag hyp">Độ chính xác đo được</span>Khi chạy lần đầu trên 70 câu đời thường và học thuật chưa từng thấy (lời giải viết tay trước khi chạy), khoảng 73% số câu đúng hoàn toàn và khoảng 89–92% các thành phần được gán đúng (F1). Sau khi sửa lỗi tìm ra, điểm trên chính các bộ câu đó cao hơn nhưng đã bị “chỉnh theo đề”, nên đừng xem là độ chính xác thật. Chi tiết và cách chạy lại: thư mục <code>kiem/</code> trong kho mã.</p>
+</section>
+
 </main>
 </div>
 <div class="toast" id="toast" role="status"></div>
 
+<script src="phan-tich/phan-tich.js"></script>
 <script>
 (function(){
 "use strict";
@@ -1458,7 +1620,8 @@ var LESSONS = [
   {id:"lo-trinh", n:"8 tuần", t:"Lộ trình và kiểm tra", d:"Kế hoạch từng tuần, bài kiểm tra cuối khóa, sao lưu tiến độ.", z:1, nocount:true},
   {id:"hoc-thuat", n:"Bài 10", t:"Từ vựng học thuật (AWL)", d:"Sublist 1–3, họ từ, danh từ hóa, hedging, từ nối.", grp:"Khu 2 · Nâng cao và IELTS", z:2},
   {id:"chuyen-nganh", n:"Bài 11", t:"Từ vựng chuyên ngành", d:"Gốc từ khoa học, thuật ngữ 7 ngành, cách tự xây bộ từ.", z:2},
-  {id:"ielts", n:"Bài 12", t:"Chiến lược IELTS", d:"Cấu trúc đề, tiêu chí chấm, TRUE/FALSE/NOT GIVEN, Writing, Speaking.", z:2}
+  {id:"ielts", n:"Bài 12", t:"Chiến lược IELTS", d:"Cấu trúc đề, tiêu chí chấm, TRUE/FALSE/NOT GIVEN, Writing, Speaking.", z:2},
+  {id:"phan-tich", n:"Công cụ", t:"Phân tích câu", d:"Dán hoặc tải tài liệu, bật chế độ phân tích để gạch chân S, V, O, C, A theo màu.", grp:"Công cụ", tool:1}
 ];
 var COUNTED = LESSONS.filter(function(l){return l.z && !l.nocount;}).map(function(l){return l.id;});
 var ZONE = {1:"Khu 1", 2:"Khu 2"};
@@ -2196,7 +2359,7 @@ function wireSay(root){
 
 /* ---------- Mục lục & điều hướng ---------- */
 var toc = document.getElementById("toc");
-var cards1 = document.getElementById("homeCards1"), cards2 = document.getElementById("homeCards2");
+var cards1 = document.getElementById("homeCards1"), cards2 = document.getElementById("homeCards2"), cards3 = document.getElementById("homeCards3");
 LESSONS.forEach(function(l){
   if(l.grp){ var gl = document.createElement("li"); gl.className = "grp"; gl.textContent = l.grp; toc.appendChild(gl); }
   var li = document.createElement("li");
@@ -2206,7 +2369,7 @@ LESSONS.forEach(function(l){
     var a = document.createElement("a");
     a.className = "card"; a.href = "#"+l.id;
     a.innerHTML = '<span class="n">'+l.n+'</span><b>'+l.t+'</b><small>'+l.d+'</small>';
-    (l.z === 2 ? cards2 : cards1).appendChild(a);
+    (l.tool ? cards3 : (l.z === 2 ? cards2 : cards1)).appendChild(a);
   }
 });
 
@@ -2923,6 +3086,208 @@ function ptResult(){
 ptIntro();
 (function(){ var h = document.getElementById("ptLastHome"); if(h) h.innerHTML = ptLastLine(); })();
 window.__PT = {PTB: PTB, build: buildTest, ynScore: ynScore};
+
+/* ---------- Phân tích câu (dùng phan-tich/phan-tich.js) ---------- */
+(function(){
+var PC = window.PhanTich;
+function $(id){ return document.getElementById(id); }
+var ta = $("pcText"), res = $("pcRes"), modesEl = $("pcModes"), sumEl = $("pcSummary"), legEl = $("pcLegend"), demoEl = $("pcDemo");
+if(!ta) return;
+var MAXC = 30000;
+var ROLE_ORDER = ["S","V","O","C","A","T","M","X"];
+var POS_LEG = [["N","Danh từ"],["V","Động từ"],["J","Tính từ"],["D","Trạng từ"],["F","Từ chức năng"]];
+var SAMPLES = {
+  basic: "My name is Linh and I am from Hanoi. I usually drink tea in the evening. We went to the beach last summer. She enjoys reading books at night. The team decided to postpone the launch until next year. If the sample is too thick, we add some water.",
+  ielts: "For more than a century, psychologists have known that memories which are not revisited tend to fade with remarkable speed. In a series of experiments conducted on himself in the 1880s, the German psychologist Hermann Ebbinghaus memorised lists of meaningless syllables and then measured how much he could recall after varying intervals. What he found, now widely known as the ‘forgetting curve’, was that the steepest decline in retention occurs within the first hours after learning, after which the rate of loss gradually levels off.\n\nCrucially, however, Ebbinghaus also observed that each time material was reviewed, it was forgotten more slowly than before. This phenomenon, which later researchers termed the ‘spacing effect’, suggests that distributing study sessions over time is considerably more effective than concentrating them into a single, prolonged session. Although the finding has been replicated in hundreds of studies, it remains surprisingly underused in classrooms, where cramming before examinations is still the norm rather than the exception.",
+  food: "Fat crystals form a network that traps the liquid oil. The viscosity of the sample increased when the temperature decreased. Because the droplets were small, the emulsion remained stable during storage. Using a higher concentration of emulsifier reduced the droplet size. The authors argue that the current standard is not sufficient."
+};
+var st = {mode:"role", focus:"", lab:true, skel:true, r:null, reveal:{}};
+
+if(!PC){
+  res.innerHTML = '<p class="note">Không tải được bộ phân tích (tệp <code>phan-tich/phan-tich.js</code>). Hãy tải lại trang; nếu vẫn lỗi, kiểm tra kết nối mạng.</p>';
+  $("pcGo").disabled = true;
+  return;
+}
+try{ PC.themTuVung(VOCAB); }catch(e){}
+
+function esc2(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function cls(c){ return c === "cao" ? "cao" : (c === "thấp" ? "thap" : "vua"); }
+
+/* ---- chú giải / chế độ ---- */
+function buildLegend(){
+  var h = "", items = [];
+  if(st.mode === "pos"){ items = POS_LEG.map(function(x){ return [x[0], x[1], "var(--pc-"+x[0]+")"]; }); }
+  else { items = ROLE_ORDER.map(function(r){ return [r, PC.ROLES[r].vi, "var(--pc-"+r+")"]; }); }
+  items.forEach(function(it){
+    h += '<li><button type="button" data-focus="'+it[0]+'" aria-pressed="'+(st.focus === it[0])+'" style="--c:'+it[2]+'"><b>'+it[0]+'</b>'+esc2(it[1])+'</button></li>';
+  });
+  legEl.innerHTML = h;
+}
+function setFocus(f){ st.focus = (st.focus === f) ? "" : f; res.setAttribute("data-focus", st.focus); buildLegend(); }
+
+/* ---- thẻ một câu ---- */
+function card(s, text, i, mode, revealed){
+  var plain = esc2(text.slice(s.start, s.end));
+  var shown = mode === "off" && !revealed ? "off" : (mode === "pos" ? "pos" : "role");
+  var body = shown === "off" ? plain : PC.html(s, text, shown);
+  var isFrag = s.reasons.indexOf("không tìm thấy cấu trúc câu đầy đủ") >= 0;
+  var h = '<article class="pc-sent" data-i="'+i+'"><div class="pc-head"><span>Câu '+(i+1)+(s.question ? ' · câu hỏi' : '')+'</span>';
+  h += '<span class="pc-conf '+cls(s.confidence)+'" title="'+esc2(s.reasons.join("; ") || "Không thấy dấu hiệu bất thường")+'">Độ tin cậy: '+s.confidence+'</span></div>';
+  h += '<p class="pc-text">'+body+'</p>';
+  if(shown === "role" && st.skel && s.skeleton && s.skeleton.length){
+    h += '<div class="pc-skel"><span class="lab">Khung câu:</span>';
+    s.skeleton.forEach(function(k){ h += '<span class="i" style="--c:var(--pc-'+k.r+')"><b>'+k.r+'</b>'+esc2(k.txt)+'</span>'; });
+    h += '</div>';
+  }
+  if(isFrag) h += '<p class="pc-frag">Có vẻ đây không phải câu đầy đủ (chưa tìm thấy động từ chia), nên trang không cố gạch. Với câu chào, tiêu đề hay cụm danh từ, điều này là bình thường.</p>';
+  else if(s.reasons.length) h += '<p class="pc-reasons">Cần kiểm lại: '+esc2(s.reasons.join("; "))+'.</p>';
+  if(mode === "off" && !revealed) h += '<div class="pc-bar" style="margin-top:8px"><button type="button" class="btn ghost" data-reveal="'+i+'">Xem phân tích câu này</button></div>';
+  h += '<div class="pc-why" role="status"></div></article>';
+  return h;
+}
+function decorate(root){
+  var els = root.querySelectorAll(".pc-ph,.pc-cl");
+  for(var i = 0; i < els.length; i++){ els[i].setAttribute("tabindex","0"); els[i].setAttribute("role","button"); }
+}
+
+function render(){
+  var txt = ta.value;
+  if(!txt.trim()){ res.innerHTML = ""; modesEl.hidden = true; sumEl.hidden = true; return; }
+  var r;
+  try{ r = PC.analyze(txt, {maxChars: MAXC}); }catch(e){ res.innerHTML = '<p class="note">Bộ phân tích gặp lỗi với văn bản này. Thử chia nhỏ văn bản hoặc bỏ ký tự lạ.</p>'; return; }
+  st.r = r;
+  paint();
+}
+function paint(){
+  var r = st.r; if(!r) return;
+  modesEl.hidden = false;
+  buildLegend();
+  res.setAttribute("data-focus", st.focus);
+  res.classList.toggle("pc-nolab", !st.lab);
+  var h = "", c = {cao:0, "vừa":0, "thấp":0};
+  r.sentences.forEach(function(s, i){ c[s.confidence] = (c[s.confidence] || 0) + 1; });
+  r.sentences.forEach(function(s, i){ h += card(s, r.text, i, st.mode, !!st.reveal[i]); });
+  res.innerHTML = h;
+  decorate(res);
+  var t = "Tìm thấy <b>"+r.sentences.length+" câu</b>. Độ tin cậy: cao "+c.cao+" · vừa "+c["vừa"]+" · thấp "+c["thấp"]+". Bấm vào một đoạn gạch chân để xem giải thích.";
+  if(r.truncated) t += " <b>Chỉ phân tích "+MAXC.toLocaleString("vi-VN")+" ký tự đầu</b>; hãy chia văn bản nhỏ hơn để xem phần còn lại.";
+  sumEl.innerHTML = t; sumEl.hidden = false;
+}
+
+/* ---- giải thích khi bấm ---- */
+function explain(el){
+  var art = el.closest(".pc-sent"); if(!art) return;
+  var box = art.querySelector(".pc-why"); if(!box) return;
+  var prev = document.querySelectorAll(".pc-ph.sel,.pc-cl.sel"); for(var i = 0; i < prev.length; i++) prev[i].classList.remove("sel");
+  el.classList.add("sel");
+  var r = el.getAttribute("data-r"), c = el.getAttribute("data-c") || "", sub = el.getAttribute("data-sub"), note = el.getAttribute("data-note");
+  var info = PC.ROLES[r] || {vi: r, tip: ""};
+  var isCl = el.classList.contains("pc-cl");
+  var h = '<b class="r" style="--c:var(--pc-'+(PC.ROLES[r] ? r : "X")+')">'+esc2(r)+'</b> <b>'+esc2(info.vi)+'</b>';
+  if(isCl) h += ' dạng mệnh đề (' + esc2(c) + ')';
+  else if(sub && PC.SUBVI[sub]) h += ' · ' + esc2(PC.SUBVI[sub]);
+  h += ': “' + esc2(el.textContent.replace(/\s+/g," ").trim()) + '”. ' + esc2(info.tip);
+  if(note) h += ' <i>(' + esc2(note) + ')</i>';
+  box.innerHTML = h; box.classList.add("on");
+}
+function clickEl(e){
+  var rv = e.target.closest && e.target.closest("[data-reveal]");
+  if(rv){ st.reveal[rv.getAttribute("data-reveal")] = true; paint(); return; }
+  var el = e.target.closest && e.target.closest(".pc-ph,.pc-cl");
+  if(el) explain(el);
+}
+res.addEventListener("click", clickEl);
+demoEl.addEventListener("click", clickEl);
+function keyEl(e){ if((e.key === "Enter" || e.key === " ") && e.target.matches && e.target.matches(".pc-ph,.pc-cl")){ e.preventDefault(); explain(e.target); } }
+res.addEventListener("keydown", keyEl);
+demoEl.addEventListener("keydown", keyEl);
+
+/* ---- điều khiển ---- */
+modesEl.addEventListener("click", function(e){
+  var b = e.target.closest("button[data-mode]");
+  if(b){
+    st.mode = b.getAttribute("data-mode"); st.focus = ""; st.reveal = {};
+    var all = modesEl.querySelectorAll("button[data-mode]");
+    for(var i = 0; i < all.length; i++) all[i].setAttribute("aria-pressed", String(all[i] === b));
+    paint(); return;
+  }
+  var f = e.target.closest("button[data-focus]");
+  if(f) setFocus(f.getAttribute("data-focus"));
+});
+$("pcLab").addEventListener("change", function(){ st.lab = this.checked; res.classList.toggle("pc-nolab", !st.lab); });
+$("pcSkel").addEventListener("change", function(){ st.skel = this.checked; paint(); });
+$("pcGo").addEventListener("click", function(){ render(); try{ modesEl.scrollIntoView({block:"start"}); }catch(e){} });
+$("pcClear").addEventListener("click", function(){ ta.value = ""; $("pcFileName").textContent = ""; count(); st.r = null; st.reveal = {}; render(); ta.focus(); });
+ta.addEventListener("keydown", function(e){ if((e.ctrlKey || e.metaKey) && e.key === "Enter"){ e.preventDefault(); render(); } });
+function count(){ var n = ta.value.length; $("pcCount").textContent = n.toLocaleString("vi-VN") + " ký tự" + (n > MAXC ? " (chỉ phân tích " + MAXC.toLocaleString("vi-VN") + " ký tự đầu)" : ""); }
+ta.addEventListener("input", count);
+document.querySelectorAll("[data-sample]").forEach(function(b){
+  b.addEventListener("click", function(){ ta.value = SAMPLES[b.getAttribute("data-sample")]; $("pcFileName").textContent = ""; st.reveal = {}; count(); render(); });
+});
+
+/* ---- tải tệp ---- */
+function setText(t, name){
+  t = String(t).replace(/\r\n?/g, "\n").replace(/\u0000/g, "");
+  ta.value = t; $("pcFileName").textContent = name ? "Tệp: " + name : ""; st.reveal = {}; count(); render();
+  if(t.indexOf("�") >= 0) toast("Tệp có ký tự lạ (có thể không phải UTF-8). Kiểm tra lại văn bản.");
+  else toast("Đã nạp tệp: " + name);
+}
+function u32(dv, o){ return dv.getUint32(o, true); }
+function u16(dv, o){ return dv.getUint16(o, true); }
+function docxText(buf){
+  var dv = new DataView(buf), u8 = new Uint8Array(buf), eocd = -1, i;
+  for(i = u8.length - 22; i >= Math.max(0, u8.length - 65557); i--){ if(u32(dv, i) === 0x06054b50){ eocd = i; break; } }
+  if(eocd < 0) throw new Error("zip");
+  var n = u16(dv, eocd + 10), p = u32(dv, eocd + 16), found = null;
+  for(var k = 0; k < n; k++){
+    if(p + 46 > u8.length || u32(dv, p) !== 0x02014b50) break;
+    var nl = u16(dv, p + 28), xl = u16(dv, p + 30), cl = u16(dv, p + 32);
+    var name = new TextDecoder().decode(u8.subarray(p + 46, p + 46 + nl));
+    if(name === "word/document.xml"){ found = {m: u16(dv, p + 10), cs: u32(dv, p + 20), lh: u32(dv, p + 42)}; break; }
+    p += 46 + nl + xl + cl;
+  }
+  if(!found) throw new Error("nodoc");
+  var start = found.lh + 30 + u16(dv, found.lh + 26) + u16(dv, found.lh + 28);
+  var data = u8.subarray(start, start + found.cs), pr;
+  if(found.m === 0) pr = Promise.resolve(new TextDecoder().decode(data));
+  else if(found.m === 8){
+    if(typeof DecompressionStream === "undefined") throw new Error("nodecomp");
+    pr = new Response(new Blob([data]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).text();
+  } else throw new Error("method");
+  return pr.then(function(x){
+    x = x.replace(/<w:del\b[^>]*>[\s\S]*?<\/w:del>/g, "").replace(/<w:tab\s*\/>/g, " ").replace(/<w:br[^>]*\/>/g, "\n").replace(/<\/w:p>/g, "\n").replace(/<[^>]+>/g, "");
+    x = x.replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&#(\d+);/g, function(_, d){ return String.fromCharCode(+d); }).replace(/&#x([0-9a-f]+);/gi, function(_, d){ return String.fromCharCode(parseInt(d, 16)); }).replace(/&amp;/g,"&");
+    return x.replace(/\n{3,}/g, "\n\n").trim();
+  });
+}
+function readFile(f){
+  if(!f) return;
+  var ext = (f.name.split(".").pop() || "").toLowerCase();
+  if(f.size > 5 * 1024 * 1024){ toast("Tệp lớn hơn 5 MB. Hãy cắt bớt hoặc dán từng phần."); return; }
+  if(ext === "pdf"){ toast("Chưa đọc được PDF. Mở PDF, chọn văn bản, sao chép rồi dán vào ô."); return; }
+  if(ext === "doc"){ toast("Tệp .doc cũ chưa hỗ trợ. Lưu lại thành .docx hoặc .txt rồi tải lên."); return; }
+  if(ext === "docx"){
+    f.arrayBuffer().then(docxText).then(function(t){ if(!t){ toast("Không thấy chữ trong tệp .docx này."); return; } setText(t, f.name); })
+      .catch(function(err){ toast(err && err.message === "nodecomp" ? "Trình duyệt này chưa giải nén được .docx. Hãy dùng Chrome/Edge/Safari mới hoặc dán chữ vào ô." : "Không đọc được tệp .docx. Hãy dán chữ vào ô."); });
+    return;
+  }
+  if(f.text) f.text().then(function(t){ setText(t, f.name); }); else toast("Trình duyệt chưa hỗ trợ đọc tệp.");
+}
+$("pcPick").addEventListener("click", function(){ $("pcFile").click(); });
+$("pcFile").addEventListener("change", function(){ readFile(this.files && this.files[0]); this.value = ""; });
+["dragenter","dragover"].forEach(function(ev){ ta.addEventListener(ev, function(e){ e.preventDefault(); ta.classList.add("drag"); }); });
+["dragleave","drop"].forEach(function(ev){ ta.addEventListener(ev, function(e){ e.preventDefault(); ta.classList.remove("drag"); if(ev === "drop" && e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) readFile(e.dataTransfer.files[0]); }); });
+
+/* ---- ví dụ tĩnh trong phần giải thích nhãn ---- */
+(function(){
+  var ex = ["I looked at the board yesterday.", "The team decided to postpone the launch until next year."];
+  var r, h = "";
+  try{ r = PC.analyze(ex.join("\n\n")); r.sentences.forEach(function(s, i){ h += card(s, r.text, i, "role", true); }); }catch(e){ return; }
+  demoEl.innerHTML = h; decorate(demoEl);
+})();
+count();
+window.__PCUI = {render: render, state: st};
+})();
 
 /* ---------- Khởi động ---------- */
 addPager();
