@@ -15,6 +15,7 @@
 //  13. Gói H: Lộ trình 12 tuần: 186 thẻ chia đúng vào tuần 1–10 (bảng gõ tay), mỗi thẻ đúng một tuần; liên kết trong trang; tình huống 7–12 chỉ dùng cấu trúc đã dạy tới tuần được xếp; chế độ "theo lộ trình" của thẻ từ (bật, đổi tuần, tắt, nhớ sau tải lại, tiến độ ôn không đổi); tệp sao lưu có khóa mới, tệp cũ vẫn nạp được, giá trị lưu hỏng không làm vỡ trang; 390 px và tương phản ba chế độ.
 //  12. Gói G: trang Phân tích câu chạy thật với bộ phân tích đã sửa (4 câu lỗi cũ hiện đúng nhãn, 390 px không tràn, không lỗi console). Độ chính xác do kiem/kiem-phan-tich.mjs đo.
 //  13. Gói I: nạp gộp tiến độ (hàm gộp theo bảng đáp án gõ tay: máy trống, hai bản giống, xung đột thẻ, bài/lộ trình/ô kiểm, ngày kiểm tra, en8020.ltr12, khóa lạ, file hỏng, __proto__) và làm thật bằng trình duyệt (xem trước, Nạp gộp, Hủy, Thay hẳn, vòng xuất–nạp, tệp cũ); báo cáo tuần (số đếm gõ tay, không chép chữ lạ, chép vào clipboard, 390 px, tương phản).
+//  15. Gói K: ghi âm trong trình duyệt ở trang Thực hành: nút micro ở mọi câu; ghi thật bằng micro giả (ghi, dừng, nghe lại bản blob, trả micro, đổi câu, bấm loa, rời bài, tự dừng sau thời gian tối đa); không lưu (localStorage, file sao lưu), không gửi mạng, mất khi tải lại; 7 kịch bản lỗi (chặn quyền, không có micro, micro bận, lỗi lạ, không có mediaDevices, không có MediaRecorder, bản ghi rỗng); 390 px; tương phản sáng/tối.
 //   6. Các cụm chữ đã sửa không quay lại ("10–15 từ mới"; "Sau khóa này" không xếp việc đã dạy là việc tiếp theo).
 //
 // Khi cố ý thêm/bớt thẻ, mẫu câu hay câu quiz: sửa BAN_DAU bên dưới (cùng PR) để mốc luôn là số thật.
@@ -1148,6 +1149,152 @@ try {
       await c5.close();
     }
     for (const f of [fileB, fileHong, fileXuat, fileCu]) { try { fs.unlinkSync(f); } catch {} }
+  }
+
+  /* ---------- 15. Gói K: ghi âm trong trình duyệt ở trang Thực hành ---------- */
+  {
+    const bangK = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+    const URL_K = URL_TRANG + '#thuc-hanh';
+    // (a) giao diện
+    const gd = await trang.evaluate(() => {
+      const cau = [...document.querySelectorAll('#thuc-hanh .sit .say')];
+      const mic = [...document.querySelectorAll('#thuc-hanh .sit .say > button.rec:not(.rec-play)')];
+      const pl = [...document.querySelectorAll('#thuc-hanh .sit .say > button.rec.rec-play')];
+      const ngoai = document.querySelectorAll('#gio-ngay-tien .rec, #home .rec').length;
+      return { cau: cau.length, mic: mic.length, pl: pl.length, plAn: pl.every(b => b.hidden), nhan: mic.every(b => /^Ghi âm câu: .{3,}/.test(b.getAttribute('aria-label'))), ngoai, tin: !!document.getElementById('ghiAmTin'), gioiThieu: document.querySelector('#thuc-hanh .key').textContent, vaiTro: document.getElementById('ghiAmTin').getAttribute('role') };
+    });
+    kiem(gd.cau >= 100 && gd.mic === gd.cau && gd.pl === gd.cau && gd.plAn && gd.nhan && gd.ngoai === 0 && gd.tin && gd.vaiTro === 'status', `gói K · mỗi câu trong 12 tình huống (${gd.cau} câu) có nút micro có nhãn đọc được, nút nghe lại ẩn khi chưa ghi, không có nút ở trang khác, có khung thông báo role=status`, JSON.stringify(gd));
+    kiem(/không lưu/.test(gd.gioiThieu) && /không nằm trong file sao lưu/.test(gd.gioiThieu) && /không gửi đi đâu/.test(gd.gioiThieu) && /tối đa 60 giây/.test(gd.gioiThieu), 'gói K · đầu trang nói rõ: ghi tối đa 60 giây, không lưu, không nằm trong file sao lưu, không gửi đi đâu', gd.gioiThieu.slice(-420));
+
+    // (b) ghi âm thật bằng micro giả của Chromium
+    const trinhDuyetMic = await chromium.launch({ args: ['--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream'] });
+    try {
+      const cM = await trinhDuyetMic.newContext({ viewport: { width: 390, height: 800 }, permissions: ['microphone'] });
+      const loiM = [], mang = [];
+      await cM.addInitScript(() => {
+        window.__k = { streams: [], play: [], tts: 0 };
+        const g = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+        navigator.mediaDevices.getUserMedia = async c => { const st = await g(c); window.__k.streams.push(st); return st; };
+        const p0 = HTMLMediaElement.prototype.play;
+        HTMLMediaElement.prototype.play = function () { window.__k.play.push(this.src.slice(0, 5)); return p0.call(this); };
+      });
+      const pM = await cM.newPage();
+      pM.on('pageerror', e => loiM.push('pageerror: ' + e.message)); pM.on('console', m => { if (m.type() === 'error') loiM.push(m.text()); });
+      pM.on('request', r => { if (!/^(file|data|blob):/.test(r.url()) && !/^https:\/\/fonts\.(googleapis|gstatic)\.com\//.test(r.url())) mang.push(r.method() + ' ' + r.url()); else if (r.method() !== 'GET') mang.push(r.method() + ' ' + r.url()); });
+      await pM.goto(URL_K); await pM.waitForSelector('#thuc-hanh .sit .say > button.rec');
+      await pM.evaluate(() => { const ss = window.speechSynthesis; ss.cancel = () => {}; ss.speak = () => { window.__k.tts++; }; });
+      const luuTruoc = await pM.evaluate(() => JSON.stringify(Object.fromEntries(Object.keys(localStorage).map(k => [k, localStorage.getItem(k)]))));
+      const bam = (i, loai = 'mic') => pM.evaluate(([i, loai]) => document.querySelectorAll('#thuc-hanh .sit .say')[i].querySelector(loai === 'mic' ? 'button.rec:not(.rec-play)' : 'button.rec-play').click(), [i, loai]);
+      const tt = () => pM.evaluate(() => ({ ...window.__GHI.trangThai(), tin: document.getElementById('ghiAmTin').textContent, tinHong: document.getElementById('ghiAmTin').classList.contains('warn') }));
+      const nhan = (i, loai = 'mic') => pM.evaluate(([i, loai]) => { const b = document.querySelectorAll('#thuc-hanh .sit .say')[i].querySelector(loai === 'mic' ? 'button.rec:not(.rec-play)' : 'button.rec-play'); return { nhan: b.getAttribute('aria-label'), bat: b.classList.contains('on'), an: b.hidden }; }, [i, loai]);
+      const micDong = () => pM.evaluate(() => window.__k.streams.map(st => st.getTracks().map(t => t.readyState).join(',')));
+
+      kiem((await pM.evaluate(() => window.__k.streams.length)) === 0, 'gói K · mở trang chưa bấm gì: chưa xin micro (chỉ xin khi bấm nút ghi)', '');
+      kiem(await pM.evaluate(() => window.__GHI.hoTro()), 'gói K · Chromium có getUserMedia và MediaRecorder (phép thử micro giả chạy được)', '');
+      await bam(0);
+      await pM.waitForFunction(() => window.__GHI.trangThai().dangGhi, null, { timeout: 5000 }).catch(() => {});
+      let n = await nhan(0), t = await tt();
+      kiem(t.dangGhi && n.bat && /^Dừng ghi: /.test(n.nhan) && /Đang ghi/.test(t.tin), 'gói K · bấm micro: bắt đầu ghi, nút đổi thành "Dừng ghi" (nhấp nháy), khung thông báo "Đang ghi…"', JSON.stringify({ t, n }));
+      await pM.waitForTimeout(700);
+      await bam(0);
+      await pM.waitForFunction(() => window.__GHI.trangThai().ban === 1, null, { timeout: 5000 }).catch(() => {});
+      t = await tt(); n = await nhan(0); const np = await nhan(0, 'pl');
+      kiem(!t.dangGhi && t.ban === 1 && t.kichCo[0] > 500 && !np.an && /^Nghe lại bản ghi của bạn: /.test(np.nhan) && !n.bat && /Đã ghi xong/.test(t.tin), 'gói K · bấm dừng: có 1 bản ghi (>500 byte), nút nghe lại hiện, nút micro trở lại bình thường', JSON.stringify({ t, n, np }));
+      kiem((await micDong()).every(x => x.split(',').every(v => v === 'ended')), 'gói K · dừng ghi thì trả micro ngay (mọi track ở trạng thái ended)', JSON.stringify(await micDong()));
+      await bam(0, 'pl'); await pM.waitForTimeout(150);
+      const dangNghe = await tt(); const plNhan = await nhan(0, 'pl');
+      kiem(dangNghe.dangNghe && /^Dừng nghe: /.test(plNhan.nhan) && (await pM.evaluate(() => window.__k.play)).includes('blob:'), 'gói K · bấm ▶: phát lại đúng bản ghi (nguồn blob:), nút đổi thành "Dừng nghe"', JSON.stringify({ dangNghe, plNhan }));
+      const heNghe = await pM.waitForFunction(() => !window.__GHI.trangThai().dangNghe, null, { timeout: 6000 }).then(() => true, () => false);
+      kiem(heNghe && /^Nghe lại bản ghi/.test((await nhan(0, 'pl')).nhan), 'gói K · nghe hết thì nút trở lại "Nghe lại"', '');
+      // ghi dòng 2 khi dòng 1 đã có bản; rồi bấm micro dòng 3 khi đang ghi dòng 2: dòng 2 được giữ, dòng 3 bắt đầu
+      await bam(1); await pM.waitForFunction(() => window.__GHI.trangThai().dangGhi).catch(() => {}); await pM.waitForTimeout(500);
+      await bam(2); await pM.waitForTimeout(600);
+      t = await tt();
+      kiem(t.dangGhi && t.ban === 2 && (await nhan(2)).bat && !(await nhan(1)).bat, 'gói K · bấm micro câu khác khi đang ghi: bản câu trước được giữ (2 bản), câu mới bắt đầu ghi', JSON.stringify(t));
+      // bấm loa mẫu khi đang ghi: dừng ghi trước
+      await pM.evaluate(() => document.querySelectorAll('#thuc-hanh .sit .say')[2].querySelector('button.spk').click());
+      await pM.waitForFunction(() => !window.__GHI.trangThai().dangGhi, null, { timeout: 4000 }).catch(() => {});
+      t = await tt();
+      kiem(!t.dangGhi && t.ban === 3 && (await pM.evaluate(() => window.__k.tts)) >= 1, 'gói K · bấm loa câu mẫu khi đang ghi: dừng ghi trước (giữ bản), rồi giọng mẫu đọc', JSON.stringify(t));
+      // rời bài khi đang ghi: bỏ bản dở, trả micro
+      await bam(3); await pM.waitForFunction(() => window.__GHI.trangThai().dangGhi).catch(() => {}); await pM.waitForTimeout(400);
+      await pM.evaluate(() => { location.hash = '#home'; });
+      await pM.waitForFunction(() => !window.__GHI.trangThai().dangGhi, null, { timeout: 4000 }).catch(() => {}); await pM.waitForTimeout(300);
+      t = await tt();
+      kiem(!t.dangGhi && t.ban === 3 && (await micDong()).every(x => x.split(',').every(v => v === 'ended')), 'gói K · đổi sang bài khác khi đang ghi: dừng, bỏ bản ghi dở (vẫn 3 bản), trả micro', JSON.stringify({ t, mic: await micDong() }));
+      // tự dừng khi quá giờ
+      await pM.evaluate(() => { location.hash = '#thuc-hanh'; window.__GHI.cfg.toiDa = 800; });
+      await bam(4); await pM.waitForFunction(() => !window.__GHI.trangThai().dangGhi && window.__GHI.trangThai().ban === 4, null, { timeout: 6000 }).catch(() => {});
+      t = await tt();
+      kiem(!t.dangGhi && t.ban === 4 && /tự dừng/.test(t.tin), 'gói K · quá thời gian tối đa: tự dừng, giữ bản ghi, báo "tự dừng"', JSON.stringify(t));
+      // không lưu, không gửi, không vào sao lưu
+      const luuSau = await pM.evaluate(() => JSON.stringify(Object.fromEntries(Object.keys(localStorage).map(k => [k, localStorage.getItem(k)]))));
+      await pM.evaluate(() => { location.hash = '#lo-trinh'; }); await pM.waitForSelector('#bkExport');
+      const [dl] = await Promise.all([pM.waitForEvent('download'), pM.click('#bkExport')]);
+      const fK = path.join(os.tmpdir(), 'ghi-am-sl-' + process.pid + '.json'); await dl.saveAs(fK);
+      const slK = fs.readFileSync(fK, 'utf8'); fs.unlinkSync(fK);
+      kiem(luuSau === luuTruoc && !/blob:|audio|base64/i.test(slK), 'gói K · ghi 4 bản: localStorage không đổi một byte, file sao lưu không có dữ liệu âm thanh', 'localStorage đổi: ' + (luuSau !== luuTruoc));
+      kiem(mang.length === 0, 'gói K · ghi và nghe lại không gửi gì ra mạng (chỉ phông chữ có sẵn của trang, không POST)', mang.slice(0, 3).join(' ; '));
+      // tải lại trang: mất hết bản ghi
+      await pM.goto(URL_K); await pM.reload(); await pM.waitForSelector('#thuc-hanh .sit .say > button.rec');
+      kiem((await pM.evaluate(() => window.__GHI.trangThai())).ban === 0, 'gói K · tải lại trang: mọi bản ghi mất, nút nghe lại ẩn', '');
+      // 390 px và console
+      await pM.evaluate(() => { location.hash = '#thuc-hanh'; }); await bam(0); await pM.waitForTimeout(400); await bam(0); await pM.waitForFunction(() => window.__GHI.trangThai().ban === 1).catch(() => {});
+      const tran = await pM.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+      kiem(tran <= 1, 'gói K · 390 px: trang Thực hành có nút micro và nút nghe lại vẫn không tràn ngang', tran + ' px');
+      kiem(loiM.length === 0, 'gói K · ghi âm, nghe lại, rời bài, tự dừng: không lỗi JS hay console', loiM.slice(0, 3).join(' || '));
+      await cM.close();
+    } finally { await trinhDuyetMic.close(); }
+
+    // (c) các lỗi: mỗi kịch bản dựng bằng một đoạn mã chạy trước trang
+    const KICH = [
+      ['quyền micro bị chặn (NotAllowedError)', `navigator.mediaDevices.getUserMedia = () => Promise.reject(new DOMException('x', 'NotAllowedError'));`, /chặn micro/],
+      ['không có micro (NotFoundError)', `navigator.mediaDevices.getUserMedia = () => Promise.reject(new DOMException('x', 'NotFoundError'));`, /Không tìm thấy micro/],
+      ['micro bận (NotReadableError)', `navigator.mediaDevices.getUserMedia = () => Promise.reject(new DOMException('x', 'NotReadableError'));`, /ứng dụng khác/],
+      ['lỗi lạ', `navigator.mediaDevices.getUserMedia = () => Promise.reject(new Error('lạ'));`, /Không bật được micro/],
+      ['trình duyệt không có mediaDevices (trang không phải https)', `Object.defineProperty(navigator, 'mediaDevices', { value: undefined, configurable: true });`, /chưa hỗ trợ ghi âm/],
+      ['trình duyệt không có MediaRecorder', `window.MediaRecorder = undefined;`, /chưa hỗ trợ ghi âm/],
+      ['micro không thu được tiếng (bản ghi rỗng)', `navigator.mediaDevices.getUserMedia = () => Promise.resolve({ getTracks: () => [{ stop() { window.__dung = (window.__dung || 0) + 1; } }] });
+        window.MediaRecorder = class { constructor() { this.state = 'inactive'; this.mimeType = 'audio/webm'; } static isTypeSupported() { return true; } start() { this.state = 'recording'; } stop() { this.state = 'inactive'; setTimeout(() => this.onstop && this.onstop(), 5); } };`, /Không thu được tiếng/],
+    ];
+    for (const [ten, ma, mong] of KICH) {
+      const cE = await trinhDuyet.newContext({ viewport: { width: 390, height: 800 } });
+      await cE.addInitScript(ma);
+      const pE = await cE.newPage(); const loiE = [];
+      pE.on('pageerror', e => loiE.push(e.message));
+      await pE.goto(URL_K); await pE.waitForSelector('#thuc-hanh .sit .say > button.rec');
+      await pE.evaluate(() => document.querySelectorAll('#thuc-hanh .sit .say')[0].querySelector('button.rec:not(.rec-play)').click());
+      if (/bản ghi rỗng/.test(ten)) { await pE.waitForTimeout(100); await pE.evaluate(() => document.querySelectorAll('#thuc-hanh .sit .say')[0].querySelector('button.rec:not(.rec-play)').click()); }
+      await pE.waitForTimeout(250);
+      const r = await pE.evaluate(() => { const b = document.querySelectorAll('#thuc-hanh .sit .say')[0]; return { tin: document.getElementById('ghiAmTin').textContent, hong: document.getElementById('ghiAmTin').classList.contains('warn'), hien: !document.getElementById('ghiAmTin').hidden, bat: b.querySelector('button.rec:not(.rec-play)').classList.contains('on'), plAn: b.querySelector('.rec-play').hidden, dung: window.__dung || 0, st: window.__GHI.trangThai() }; });
+      kiem(mong.test(r.tin) && r.hong && r.hien && !r.bat && r.plAn && !r.st.dangGhi && loiE.length === 0 && (!/rỗng/.test(ten) || r.dung === 1), `gói K · ${ten}: báo đúng lời, nút về bình thường, không hiện nút nghe lại, không lỗi JS`, JSON.stringify({ r, loiE }));
+      await cE.close();
+    }
+
+    // (d) tương phản nút micro (sáng, tối tự động, tối ép), cả trạng thái đang ghi
+    for (const cach of ['sang', 'auto-toi', 'ep-toi']) {
+      const c6 = await trinhDuyet.newContext({ viewport: { width: 1280, height: 900 }, colorScheme: cach === 'auto-toi' ? 'dark' : 'light' });
+      const p6 = await c6.newPage();
+      await p6.goto(URL_K); await p6.waitForSelector('#thuc-hanh .sit .say > button.rec');
+      if (cach === 'ep-toi') await p6.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
+      const tp6 = await p6.evaluate(() => {
+        const toi = s => { const c = s.match(/[\d.]+/g).map(Number); const f = v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }; return .2126 * f(c[0]) + .7152 * f(c[1]) + .0722 * f(c[2]); };
+        const nen = el => { for (let e = el; e; e = e.parentElement) { const b = getComputedStyle(e).backgroundColor; if (b && !/rgba?\(.*,\s*0\)$|transparent/.test(b)) return b; } return 'rgb(0,0,0)'; };
+        const tp = el => { const x = toi(getComputedStyle(el).color), y = toi(getComputedStyle(el).backgroundColor); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); };
+        const mic = document.querySelector('#thuc-hanh .sit .say > button.rec:not(.rec-play)');
+        const kq = [{ ten: 'nút micro', tp: tp(mic) }];
+        mic.classList.add('on'); mic.style.animation = 'none';
+        kq.push({ ten: 'nút micro khi đang ghi', tp: tp(mic) });
+        const pl = document.querySelector('#thuc-hanh .sit .say > button.rec-play'); pl.hidden = false;
+        kq.push({ ten: 'nút nghe lại', tp: tp(pl) });
+        const note = document.getElementById('ghiAmTin'); note.hidden = false; note.textContent = 'thử'; note.className = 'note warn';
+        const x = toi(getComputedStyle(note).color), y = toi(nen(note));
+        kq.push({ ten: 'khung thông báo lỗi', tp: (Math.max(x, y) + .05) / (Math.min(x, y) + .05) });
+        return kq;
+      });
+      for (const r of tp6) kiem(r.tp >= NGUONG_TUONG_PHAN, `gói K · ${cach === 'sang' ? 'chế độ sáng' : cach === 'auto-toi' ? 'tối tự động' : 'tối ép data-theme'}: ${r.ten} tương phản ${r.tp.toFixed(2)}:1`, `thấp hơn ${NGUONG_TUONG_PHAN}:1`);
+      await c6.close();
+    }
   }
 } finally {
   await trinhDuyet.close();
