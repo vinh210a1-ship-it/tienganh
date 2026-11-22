@@ -2262,13 +2262,21 @@ R&amp;D Department</div>
   <div class="plan" id="plan"></div>
 
   <h2>Sao lưu tiến độ</h2>
-  <p>Tiến độ (bài đã học, thẻ từ và ngày hẹn ôn, việc trong tuần, danh sách kiểm tình huống, kết quả kiểm tra trình độ gần nhất) chỉ nằm trong trình duyệt này. Muốn chuyển sang máy khác, hoặc phòng khi xóa dữ liệu trình duyệt, tải file sao lưu rồi nạp lại ở nơi cần.</p>
+  <p>Tiến độ (bài đã học, thẻ từ và ngày hẹn ôn, việc trong tuần, danh sách kiểm tình huống, kết quả kiểm tra trình độ gần nhất, tuần của Lộ trình 12 tuần) chỉ nằm trong trình duyệt này. Muốn chuyển sang máy khác, hoặc phòng khi xóa dữ liệu trình duyệt, tải file sao lưu rồi nạp lại ở nơi cần. Khi nạp, trang cho xem trước và mặc định <b>gộp</b> với tiến độ đang có trên máy (không ghi đè): dấu “đã học” của cả hai máy được giữ, mỗi thẻ lấy bản ôn gần đây hơn.</p>
   <div class="backup">
     <button class="btn" type="button" id="bkExport">Tải file sao lưu</button>
     <button class="btn ghost" type="button" id="bkPick">Nạp file sao lưu</button>
     <input type="file" id="bkImport" accept="application/json,.json" hidden>
   </div>
   <div id="bkMsg" class="note" hidden></div>
+
+  <h2>Báo cáo tuần cho thầy</h2>
+  <p>Bấm “Tạo báo cáo”, chép khối chữ rồi dán vào Zalo gửi thầy. Báo cáo chỉ có số đếm (bài đã học, thẻ đã thuộc, thẻ đến hạn, việc đã đánh dấu, kết quả kiểm tra gần nhất), không có chữ bạn đã gõ, và không gửi đi đâu: bạn tự dán và gửi.</p>
+  <div class="backup">
+    <button class="btn" type="button" id="bcTao">Tạo báo cáo</button>
+    <button class="btn ghost" type="button" id="bcChep" disabled>Sao chép</button>
+  </div>
+  <textarea id="bcText" class="pc-ta" readonly hidden aria-label="Báo cáo tiến độ để chép gửi thầy"></textarea>
 
   <h2>Cách kiểm chứng tiến bộ</h2>
   <ul>
@@ -3914,6 +3922,149 @@ var prac = load("prac", {});
   }
 })();
 
+/* ---------- Gộp tiến độ và báo cáo tuần (gói I) ---------- */
+/* gopTienDo: hàm thuần, không đụng localStorage. local và incoming là {"en8020.xxx": "<chuỗi JSON>"}.
+   Trả {ok:true, ghi:{khóa: chuỗi JSON mới, chỉ khóa có đổi}, bao:{...số đếm}} hoặc {ok:false, loi:"..."}.
+   Luật (không có đồng hồ ôn thẻ, nên suy ngày ôn gần nhất từ ngày hẹn: hộp b>=1 thì ngày ôn = hẹn − DAYS[b−1]; hộp 0 thì ngày ôn = hẹn):
+   - Bài đã học, việc lộ trình, ô danh sách kiểm: ĐÃ ĐÁNH DẤU ở máy nào cũng giữ (hợp). Nạp gộp không xóa dấu nào.
+   - Thẻ: bản có ngày ôn gần nhất mới hơn thắng (kể cả khi quên: về hộp 0); cùng ngày thì hộp cao hơn; thẻ chỉ có ở một bên thì lấy.
+   - Kiểm tra trình độ gần nhất (bản đầy đủ, bản ngắn): bản có ngày làm mới hơn thắng.
+   - Chế độ theo lộ trình: giữ bật/tắt của máy này, tuần lấy số lớn hơn. Cài đặt đọc chậm: giữ của máy này.
+   - Khóa lạ (trang bản sau thêm): chỉ nhận khi máy này chưa có. */
+function gopTienDo(local, incoming){
+  var PRE = "en8020.", DAYS_ = [1,3,7,14,30];
+  function ndict(){ return Object.create(null); }
+  function isObj(v){ return !!v && typeof v === "object" && !Array.isArray(v); }
+  function allOf(v, f){ return Object.keys(v).every(function(k){ return f(v[k]); }); }
+  var CHECK = {
+    done:function(v){ return isObj(v) && allOf(v, function(x){ return typeof x === "boolean"; }); },
+    plan:function(v){ return isObj(v) && allOf(v, function(x){ return typeof x === "boolean"; }); },
+    prac:function(v){ return isObj(v) && allOf(v, function(x){ return typeof x === "boolean"; }); },
+    boxes:function(v){ return isObj(v) && allOf(v, function(x){ return typeof x === "number" && x >= 0 && x <= 5 && Math.floor(x) === x; }); },
+    due:function(v){ return isObj(v) && allOf(v, function(x){ return typeof x === "number" && isFinite(x); }); },
+    slow:function(v){ return typeof v === "boolean"; },
+    ptLast:function(v){ return isObj(v); },
+    ptLastShort:function(v){ return isObj(v); },
+    ltr12:function(v){ return isObj(v); }
+  };
+  var inc = ndict(), loc = ndict(), k, name;
+  for(k in incoming){
+    if(k.indexOf(PRE) !== 0 || typeof incoming[k] !== "string") continue;
+    name = k.slice(PRE.length); if(!name) continue;
+    var v;
+    try{ v = JSON.parse(incoming[k]); }catch(e){ return {ok:false, loi:"Mục «" + name + "» trong file không phải JSON hợp lệ."}; }
+    if(CHECK[name] && !CHECK[name](v)) return {ok:false, loi:"Mục «" + name + "» trong file có dạng lạ (file hỏng hoặc do bản trang khác tạo)."};
+    inc[name] = v;
+  }
+  for(k in local){
+    if(k.indexOf(PRE) !== 0 || typeof local[k] !== "string") continue;
+    name = k.slice(PRE.length); if(!name) continue;
+    try{ var lv = JSON.parse(local[k]); if(!CHECK[name] || CHECK[name](lv)) loc[name] = lv; }catch(e){}
+  }
+  var ghi = {}, bao = {the:{them:0, capNhat:0, giu:0}, bai:0, plan:0, prac:0, pt:0, ltr:false, khac:0};
+  function put(n, val){ ghi[PRE + n] = JSON.stringify(val); }
+  function copy(o){ var r = ndict(); if(o) Object.keys(o).forEach(function(x){ r[x] = o[x]; }); return r; }
+  // bài, lộ trình, danh sách kiểm: hợp các dấu đã đánh
+  [["done","bai"],["plan","plan"],["prac","prac"]].forEach(function(p){
+    if(!inc[p[0]]) return;
+    var out = copy(loc[p[0]]), changed = false;
+    Object.keys(inc[p[0]]).forEach(function(x){
+      if(!(x in out)){ out[x] = inc[p[0]][x]; changed = true; if(out[x]) bao[p[1]]++; }
+      else if(inc[p[0]][x] && !out[x]){ out[x] = true; changed = true; bao[p[1]]++; }
+    });
+    if(changed) put(p[0], out);
+  });
+  // thẻ
+  if(inc.boxes){
+    var lb = copy(loc.boxes), ld = copy(loc.due), ib = inc.boxes, id = inc.due || {}, chBox = false;
+    var lastRev = function(b, d){ return typeof d === "number" ? (b >= 1 ? d - DAYS_[b-1] : d) : null; };
+    Object.keys(ib).forEach(function(x){
+      if(!(x in lb)){ lb[x] = ib[x]; if(typeof id[x] === "number") ld[x] = id[x]; chBox = true; bao.the.them++; return; }
+      var a = lastRev(ib[x], id[x]), c = lastRev(lb[x], ld[x]), win;
+      if(a === null && c === null) win = ib[x] > lb[x];
+      else if(a === null) win = false;
+      else if(c === null) win = true;
+      else if(a !== c) win = a > c;
+      else win = ib[x] > lb[x];
+      if(win){
+        lb[x] = ib[x]; if(typeof id[x] === "number") ld[x] = id[x]; chBox = true; bao.the.capNhat++;
+      } else bao.the.giu++;
+    });
+    if(chBox){ put("boxes", lb); put("due", ld); }
+  }
+  // kiểm tra trình độ: ngày làm mới hơn thắng
+  function dayNum(s){ var m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(String((s && s.date) || "")); return m ? (+m[3])*10000 + (+m[2])*100 + (+m[1]) : -1; }
+  ["ptLast","ptLastShort"].forEach(function(n){
+    if(!inc[n]) return;
+    if(!loc[n] || dayNum(inc[n]) > dayNum(loc[n])){ put(n, inc[n]); bao.pt++; }
+  });
+  // chế độ theo lộ trình: bật/tắt của máy này, tuần lớn hơn
+  if(inc.ltr12){
+    var okW = function(o){ return o && typeof o.w === "number" && o.w >= 1 && o.w <= 12 && Math.floor(o.w) === o.w ? o.w : 1; };
+    if(!loc.ltr12){ put("ltr12", {on:inc.ltr12.on === true, w:okW(inc.ltr12)}); bao.ltr = true; }
+    else {
+      var nw = Math.max(okW(loc.ltr12), okW(inc.ltr12));
+      if(nw !== okW(loc.ltr12)){ put("ltr12", {on:loc.ltr12.on === true, w:nw}); bao.ltr = true; }
+    }
+  }
+  // đọc chậm: giữ của máy này; khóa lạ: chỉ nhận khi chưa có
+  Object.keys(inc).forEach(function(n){
+    if(CHECK[n] && n !== "slow") return;
+    if(!(n in loc)){ put(n, inc[n]); if(n !== "slow") bao.khac++; }
+  });
+  return {ok:true, ghi:ghi, bao:bao};
+}
+
+/* baoCaoTuan: một khối chữ cho học viên dán vào Zalo. Chỉ số đếm; không đưa chữ nào học viên đã gõ. */
+function baoCaoTuan(){
+  var d = new Date(), ngay = d.getDate() + "/" + (d.getMonth()+1) + "/" + d.getFullYear(), t0 = today();
+  function deck(data, pre){
+    var thuoc = 0, hen = 0, moi = 0;
+    data.forEach(function(v){
+      var k = pre + v[0], seen = Object.prototype.hasOwnProperty.call(boxes, k);
+      if(!seen){ moi++; return; }
+      if((boxes[k] || 0) >= 3) thuoc++;
+      var dd = due[k]; if((typeof dd === "number" ? dd : t0) <= t0) hen++;
+    });
+    return {n:data.length, thuoc:thuoc, hen:hen, moi:moi};
+  }
+  var c = deck(VOCAB, ""), a = deck(AWL, "awl:"), f = deck(FIELD, "field:");
+  var c1 = 0, n1 = 0, c2 = 0, n2 = 0;
+  LESSONS.forEach(function(l){ if(COUNTED.indexOf(l.id) < 0) return; var ok = done[l.id] === true; if(l.z === 1){ n1++; if(ok) c1++; } else { n2++; if(ok) c2++; } });
+  var nPlan = 0, tPlan = 0;
+  WEEKS.forEach(function(w, wi){ w.k.forEach(function(x, ti){ tPlan++; if(plan["w"+wi+"t"+ti] === true) nPlan++; }); });
+  var chk = document.querySelectorAll(".chk-row input[data-k]"), nPrac = 0;
+  for(var i=0;i<chk.length;i++) if(prac[chk[i].getAttribute("data-k")] === true) nPrac++;
+  function ngayOk(s){ return /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(String(s)) ? String(s) : "?"; }
+  function so(x){ return (typeof x === "number" && isFinite(x)) ? Math.max(0, Math.round(x)) : null; }
+  var kt = [], L = load("ptLast", null), S = load("ptLastShort", null);
+  if(L && typeof L === "object"){
+    var lvOk = ["Dưới A1","A1","A2","B1","B2","C1"].indexOf(L.level) >= 0 ? L.level : "?";
+    var vv = so(L.vocab);
+    kt.push("bản đầy đủ " + ngayOk(L.date) + ": " + lvOk + (vv ? " (vốn từ ước lượng khoảng " + vv.toLocaleString("vi-VN") + " họ từ)" : ""));
+  }
+  if(S && typeof S === "object"){
+    var sl = {"Dưới A1":"Dưới A1","A1":"A1","A2":"A2","full":"từ A2 trở lên"}[S.level] || "?";
+    var ok2 = so(S.ok), n2s = so(S.n);
+    kt.push("bản ngắn " + ngayOk(S.date) + ": " + sl + (ok2 !== null && n2s ? " (đúng " + ok2 + "/" + n2s + " câu)" : ""));
+  }
+  var L2 = [
+    "BÁO CÁO TIẾN ĐỘ TIẾNG ANH · " + ngay,
+    "• Bài đã học xong: Khu 1 " + c1 + "/" + n1 + " · Khu 2 " + c2 + "/" + n2,
+    "• Thẻ từ nền tảng: đã thuộc " + c.thuoc + "/" + c.n + " · đến hạn ôn hôm nay " + c.hen + " · chưa gặp " + c.moi,
+    "• Thẻ AWL: đã thuộc " + a.thuoc + "/" + a.n + " · thẻ theo ngành: đã thuộc " + f.thuoc + "/" + f.n,
+    "• Lộ trình 8 tuần: đã đánh dấu " + nPlan + "/" + tPlan + " việc",
+    "• Thực hành tình huống: đã đánh dấu " + nPrac + "/" + chk.length + " ô trong danh sách kiểm",
+    "• Kiểm tra trình độ gần nhất: " + (kt.length ? kt.join(" · ") : "chưa làm"),
+    "(Chỉ là số đếm lấy từ trình duyệt của học viên, không có chữ học viên đã gõ. “Đã thuộc” = thẻ ở hộp 3 trở lên.)"
+  ];
+  return L2.join("\n");
+}
+window.__GOP = {gop: gopTienDo, baoCao: baoCaoTuan, info: function(){
+  return {counted: COUNTED.slice(), zone: COUNTED.map(function(id){ return LESSONS.filter(function(l){ return l.id === id; })[0].z; }), awl0: AWL[0][0], awl: AWL.length, field: FIELD.length,
+    plan: WEEKS.reduce(function(s, w){ return s + w.k.length; }, 0), today: today()};
+}};
+
 /* ---------- Sao lưu tiến độ ---------- */
 (function(){
   var ex = document.getElementById("bkExport"), pick = document.getElementById("bkPick"), fi = document.getElementById("bkImport"), msg = document.getElementById("bkMsg");
@@ -3925,10 +4076,27 @@ var prac = load("prac", {});
     Object.keys(mem).forEach(function(k){ out[PRE+k] = JSON.stringify(mem[k]); });
     return out;
   }
-  function show(html, btnLabel, fn){
+  function show(html, nuts){
     msg.hidden = false; msg.innerHTML = html;
-    if(btnLabel){ var b = document.createElement("button"); b.type = "button"; b.className = "btn"; b.style.marginLeft = "8px"; b.textContent = btnLabel; b.addEventListener("click", fn); msg.appendChild(b); }
+    if(nuts && nuts.length){
+      var row = document.createElement("div"); row.className = "backup"; msg.appendChild(row);
+      nuts.forEach(function(n){
+        var b = document.createElement("button"); b.type = "button"; b.id = n.id; b.className = "btn" + (n.ghost ? " ghost" : ""); b.textContent = n.label; b.addEventListener("click", n.fn); row.appendChild(b);
+      });
+    }
   }
+  function ghiVao(map){
+    var cu = {}, k;
+    try{
+      Object.keys(map).forEach(function(x){ cu[x] = localStorage.getItem(x); });
+      Object.keys(map).forEach(function(x){ localStorage.setItem(x, map[x]); });
+    }catch(e){
+      try{ Object.keys(cu).forEach(function(x){ if(cu[x] === null) localStorage.removeItem(x); else localStorage.setItem(x, cu[x]); }); }catch(e2){}
+      return false;
+    }
+    return true;
+  }
+  function xong(){ show("Đã nạp xong. Trang sẽ tải lại để thấy tiến độ mới."); setTimeout(function(){ location.reload(); }, 900); }
   ex.addEventListener("click", function(){
     var data = {app:"tieng-anh-8020", version:1, saved:new Date().toISOString(), keys:collect()};
     var blob = new Blob([JSON.stringify(data, null, 1)], {type:"application/json"});
@@ -3948,17 +4116,52 @@ var prac = load("prac", {});
       try{ data = JSON.parse(String(r.result)); }catch(e){ show("File không đọc được: không phải JSON hợp lệ."); return; }
       if(!data || data.app !== "tieng-anh-8020" || !data.keys || typeof data.keys !== "object"){ show("File này không phải file sao lưu của trang này."); return; }
       var keys = Object.keys(data.keys).filter(function(k){ return k.indexOf(PRE) === 0 && typeof data.keys[k] === "string"; });
-      show("File sao lưu ngày " + esc(String(data.saved || "?").slice(0,10)) + " có " + keys.length + " mục. Nạp vào sẽ <b>ghi đè</b> tiến độ hiện có trên trình duyệt này.", "Nạp và ghi đè", function(){
+      var head = "File sao lưu ngày " + esc(String(data.saved || "?").slice(0,10)) + " có " + keys.length + " mục. ";
+      var g = gopTienDo(collect(), data.keys);
+      if(!g.ok){ show(head + "<b>Không nạp được:</b> " + esc(g.loi) + " Tiến độ hiện tại không bị đổi."); return; }
+      var b = g.bao, dong = [];
+      if(b.the.them) dong.push(b.the.them + " thẻ mới có trong file");
+      if(b.the.capNhat) dong.push(b.the.capNhat + " thẻ ôn gần đây hơn trong file nên được cập nhật");
+      if(b.bai) dong.push(b.bai + " bài đã học xong");
+      if(b.plan) dong.push(b.plan + " việc ở Lộ trình 8 tuần");
+      if(b.prac) dong.push(b.prac + " ô danh sách kiểm Thực hành");
+      if(b.pt) dong.push("kết quả kiểm tra trình độ mới hơn");
+      if(b.ltr) dong.push("tuần của Lộ trình 12 tuần");
+      if(b.khac) dong.push(b.khac + " mục khác");
+      var giu = b.the.giu ? " Giữ nguyên " + b.the.giu + " thẻ mà máy này đã có bản mới hơn hoặc bằng." : "";
+      var nutDe = {id:"bkDe", ghost:true, label:"Thay hẳn bằng file này (ghi đè)", fn:function(){
         try{
           keys.forEach(function(k){ JSON.parse(data.keys[k]); });
-          keys.forEach(function(k){ localStorage.setItem(k, data.keys[k]); });
-        }catch(e){ show("Không nạp được (trình duyệt chặn lưu hoặc dữ liệu hỏng). Tiến độ hiện tại không bị đổi."); return; }
-        show("Đã nạp xong. Tải lại trang để thấy tiến độ mới."); setTimeout(function(){ location.reload(); }, 900);
-      });
+        }catch(e){ show("Không nạp được (dữ liệu hỏng). Tiến độ hiện tại không bị đổi."); return; }
+        var map = {}; keys.forEach(function(k){ map[k] = data.keys[k]; });
+        if(!ghiVao(map)){ show("Không nạp được (trình duyệt chặn lưu). Tiến độ hiện tại không bị đổi."); return; }
+        xong();
+      }};
+      var nutHuy = {id:"bkHuy", ghost:true, label:"Hủy", fn:function(){ msg.hidden = true; msg.innerHTML = ""; }};
+      var ghiChu = " <small>Nạp gộp chỉ thêm, không xóa gì: bài hay thẻ bạn đã xóa dấu trên máy này sẽ quay lại nếu file còn dấu đó. “Thay hẳn” ghi đè từng mục có trong file và không gộp.</small>";
+      if(!dong.length){ show(head + "Máy này đã có đủ mọi thứ trong file: nạp gộp sẽ không đổi gì." + giu + ghiChu, [nutDe, nutHuy]); return; }
+      show(head + "<b>Nạp gộp</b> sẽ thêm hoặc cập nhật: " + dong.join("; ") + "." + giu + ghiChu, [
+        {id:"bkGop", label:"Nạp gộp", fn:function(){
+          if(!ghiVao(g.ghi)){ show("Không nạp được (trình duyệt chặn lưu). Tiến độ hiện tại không bị đổi."); return; }
+          xong();
+        }}, nutDe, nutHuy]);
     };
     r.readAsText(f);
     fi.value = "";
   });
+  /* Báo cáo tuần */
+  var bcTao = document.getElementById("bcTao"), bcChep = document.getElementById("bcChep"), bcText = document.getElementById("bcText");
+  if(bcTao){
+    bcTao.addEventListener("click", function(){
+      bcText.value = baoCaoTuan(); bcText.hidden = false; bcChep.disabled = false;
+      bcText.setAttribute("rows", String(bcText.value.split("\n").length + 1));
+    });
+    bcChep.addEventListener("click", function(){
+      function du(){ try{ bcText.hidden = false; bcText.focus(); bcText.select(); var ok = document.execCommand("copy"); toast(ok ? "Đã chép. Dán vào Zalo gửi thầy." : "Chưa chép được: hãy bôi đen khối chữ rồi chép tay."); }catch(e){ toast("Chưa chép được: hãy bôi đen khối chữ rồi chép tay."); } }
+      if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(bcText.value).then(function(){ toast("Đã chép. Dán vào Zalo gửi thầy."); }, du); }
+      else du();
+    });
+  }
 })();
 
 /* ---------- Kiểm tra trình độ (bản 2: chống đoán, A1 → C1) ---------- */
