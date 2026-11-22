@@ -1,5 +1,11 @@
 # Nhật ký web Tiếng Anh 80/20 (mục mới nhất ở trên)
 
+## 2026-11-22 tối · sửa PR #6 theo Kiểm định (cùng nhánh claude/goi-c-ngu-phap)
+- Mục 9 bảng so sánh: thêm hàng "2 âm tiết tận cùng -y" (easier, happier, the easiest, the happiest) và đổi hàng dài thành "trừ tận cùng -y", khớp Bài 5B.
+- Mục 6 số nhiều: bỏ "-o" khỏi quy tắc -es chung, thêm "một số từ tận cùng -o → -es (tomatoes, potatoes; nhưng photos, pianos)".
+- Nit: Bài 2B "Với danh từ, tiếng Anh không có dấu hiệu nào khác..." (đại từ thì có: he / him); mục 11 đổi "công thức vạn năng" thành "công thức thường dùng" và thêm hai ngoại lệ (to be: Where is the bank?; từ hỏi là chủ ngữ: Who called you?).
+- Vì bộ kiểm buộc khớp file gốc: sửa cả `kiem/nguon-ngu-phap/*.md` và hai file gốc ở /mnt/project-files/tieng-anh/ (BANG-TONG-HOP-NGU-PHAP, BAI-3-CAU-CO-BAN-TO-BE). `kiem-web.mjs` xanh.
+
 ## 2026-11-22 tối · gói C: bảng tổng hợp ngữ pháp + Bài 2B + sửa nút ghost chế độ tối (nhánh claude/goi-c-ngu-phap)
 - Đối chiếu trước khi thêm: Bài 2 đã có bảng đại từ, am/is/are, khẳng định/phủ định/hỏi, khung tự giới thiệu; Bài 7 đã có a/an/the, đếm được, in/on/at, there is/are, từ nối; Bài 3, 5, 5B, 6 đã có hiện tại đơn, quá khứ/tương lai, so sánh, modal. Vì vậy: không chép lại phần đó, chỉ thêm phần chưa có và trỏ liên kết sang bài đã có.
 - **Trang tra cứu "Bảng tổng hợp ngữ pháp"** (`#bang-ngu-phap`, nhóm Công cụ): từ BANG-TONG-HOP-NGU-PHAP (mục 0–11 và mục "chưa có"); bỏ mục 12 vì là gợi ý dạy 60 phút cho thầy. Mỗi mục có liên kết "học kỹ" sang bài. Bảng nằm trong khung cuộn ngang nên không làm tràn trang ở 390 px.

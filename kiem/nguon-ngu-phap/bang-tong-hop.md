@@ -96,7 +96,7 @@ Bẫy: **don't have to** = không cần (được phép không làm); **mustn't*
 
 | Chủ đề | Quy tắc | Ví dụ |
 |---|---|---|
-| Số nhiều | thêm -s; -s/-sh/-ch/-x/-o → -es; phụ âm + y → -ies | cats, boxes, babies |
+| Số nhiều | thêm -s; -s/-sh/-ch/-x → -es; phụ âm + y → -ies; một số từ tận cùng -o → -es (tomatoes, potatoes; nhưng photos, pianos) | cats, boxes, babies |
 | Bất quy tắc | man–men, woman–women, child–children, person–people | |
 | Đếm được / không đếm được | đếm được có a/an, số nhiều; không đếm được không có a/an, không -s | a book, two books / water, rice, information, advice |
 | Lượng từ | đếm được: many, a few; không đếm được: much, a little; cả hai: some, any, a lot of | some water, many people |
@@ -147,7 +147,8 @@ Học giới từ **theo cụm**, không theo nghĩa từng chữ: depend **on**
 | Loại từ | So sánh hơn | So sánh nhất |
 |---|---|---|
 | Ngắn (1 âm tiết) | tính từ + -er (cheaper) than | the + -est (the cheapest) |
-| Dài (2 âm tiết trở lên) | more + tính từ (more expensive) than | the most + tính từ (the most expensive) |
+| 2 âm tiết tận cùng -y | đổi y → i rồi thêm -er (easier, happier) than | the + -iest (the easiest, the happiest) |
+| Dài (2 âm tiết trở lên, trừ tận cùng -y) | more + tính từ (more expensive) than | the most + tính từ (the most expensive) |
 | Bất quy tắc | good → better | the best (bad → worse → the worst) |
 
 ## 10. Liên từ và câu ghép
@@ -175,7 +176,7 @@ Có thể dạy sớm: **if** dùng hiện tại đơn cho cả hai vế khi nó
 | Mệnh lệnh / lời nhờ | V nguyên mẫu (+ please) | Close the door, please. |
 
 **Từ hỏi:** what (cái gì), where (ở đâu), when (khi nào), who (ai), why (tại sao), how (thế nào), how much / how many (bao nhiêu), which (cái nào).
-Công thức vạn năng: **từ hỏi → trợ động từ (do/does/did/will/can) → chủ ngữ → động từ nguyên mẫu**. Bỏ từ hỏi là thành câu Yes/No.
+Công thức thường dùng: **từ hỏi → trợ động từ (do/does/did/will/can) → chủ ngữ → động từ nguyên mẫu**. Bỏ từ hỏi là thành câu Yes/No. Hai ngoại lệ hay gặp: với to be thì đưa be lên trước chủ ngữ (Where is the bank?), và khi từ hỏi chính là chủ ngữ thì không cần trợ động từ (Who called you?).
 
 ## 12. Gợi ý dùng bảng này trong buổi dạy đầu
 

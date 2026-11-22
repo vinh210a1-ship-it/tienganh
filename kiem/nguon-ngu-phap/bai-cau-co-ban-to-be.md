@@ -30,7 +30,7 @@ Ví dụ: **My sister** (S) **drinks** (V) **tea** (O) every morning.
 | The dog bites the man. | Con chó cắn người. |
 | The man bites the dog. | Người cắn chó. |
 
-Đổi chỗ S và O là đổi nghĩa. Tiếng Anh không có dấu hiệu nào khác để báo ai làm gì.
+Đổi chỗ S và O là đổi nghĩa. Với danh từ, tiếng Anh không có dấu hiệu nào khác để báo ai làm gì (đại từ thì có: he / him).
 
 ### 1.3. Bốn kiểu câu cơ bản
 
